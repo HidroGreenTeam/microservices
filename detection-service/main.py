@@ -6,18 +6,41 @@ import numpy as np
 from PIL import Image
 import io
 import os
+from py_eureka_client import eureka_client
+import asyncio
+from contextlib import asynccontextmanager
 
 app = FastAPI(
     title="Plant Disease Detection API",
     description="An API for detecting plant diseases using a pre-trained model.",
-    version="1.0.0",
-    prefix="/api/v1",
+    version="1.0.0"
 )
 
 MODEL_PATH = os.path.join("model", "model-8678.keras")
 model = load_model(MODEL_PATH)
 
 class_names = ['miner', 'nodisease', 'phoma', 'redspider', 'rust']
+
+EUREKA_SERVER = "http://localhost:8761/eureka/"
+SERVICE_PORT = 8000  # Cambia si usas otro puerto
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await eureka_client.init_async(
+        eureka_server=EUREKA_SERVER,
+        app_name="detection-service",
+        instance_port=SERVICE_PORT,
+        instance_host="localhost",
+    )
+    yield
+
+app = FastAPI(
+    title="Plant Disease Detection API",
+    description="An API for detecting plant diseases using a pre-trained model.",
+    version="1.0.0",
+    prefix="/api/v1",
+    lifespan=lifespan,
+)
 
 @app.get("/")
 async def read_root():
