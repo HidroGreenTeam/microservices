@@ -26,6 +26,10 @@ spring:
               uri: lb://report-service
               predicates:
                 - Path=/api/v1/reports/**
+            - id: detection-service
+              uri: lb://detection-service
+              predicates:
+                - Path=/api/v1/detections/**
 
 server:
   port: 8080

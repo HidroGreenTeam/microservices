@@ -9,6 +9,7 @@ import os
 from py_eureka_client import eureka_client
 import asyncio
 from contextlib import asynccontextmanager
+from fastapi import APIRouter
 
 app = FastAPI(
     title="Plant Disease Detection API",
@@ -42,11 +43,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-@app.get("/")
-async def read_root():
-    return {"Hello": "World"}
+router = APIRouter(prefix="/api/v1/detections")
 
-@app.post("/predict")
+@router.post("/predict")
 async def predict(file: UploadFile = File(...)):
     try:
         contents = await file.read()
@@ -66,3 +65,9 @@ async def predict(file: UploadFile = File(...)):
         }
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+
+@router.get("/")
+async def read_root():
+    return {"Hello": "World"}
+
+app.include_router(router)
