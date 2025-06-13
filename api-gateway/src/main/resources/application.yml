@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: auth-user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/v1/auth/**
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/v1/users/**
+            - id: farmers-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/v1/farmers/**
+            - id: roles-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/v1/roles/**
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+        defaultZone: http://localhost:8761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
