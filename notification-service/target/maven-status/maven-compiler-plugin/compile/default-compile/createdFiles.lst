@@ -1,0 +1,6 @@
+com\ayni\notification_service\notifications\domain\services\NotificationCommandService.class
+com\ayni\notification_service\infrastructure\config\RabbitMQConfig.class
+com\ayni\notification_service\notifications\application\internal\eventhandlers\ActivityReminderEventHandler.class
+com\ayni\notification_service\notifications\domain\services\NotificationCommandService$1.class
+com\ayni\notification_service\notifications\domain\model\NotificationType.class
+com\ayni\notification_service\NotificationServiceApplication.class

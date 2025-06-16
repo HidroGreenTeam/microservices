@@ -1,0 +1,17 @@
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\infrastructure\messaging\ActivityReminderEvent.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\application\schedulers\NotificationScheduler.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\domain\model\valueobjects\ActivityStatus.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\infrastructure\messaging\NotificationPublisher.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\domain\model\aggregates\Treatment.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\infrastructure\persistence\jpa\repositories\TreatmentRepository.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\interfaces\rest\controllers\TreatmentController.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\domain\model\valueobjects\TreatmentStatus.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\infrastructure\persistence\jpa\repositories\ActivityRepository.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\TreatmentActivityServiceApplication.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\interfaces\rest\dto\CreateTreatmentRequest.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\domain\model\entities\Activity.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\application\services\ActivityService.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\application\services\TreatmentService.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\infrastructure\config\RabbitMQConfig.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\interfaces\rest\controllers\ActivityController.java
+C:\Users\Windows 11\microservices\treatment-activity-service\src\main\java\com\hidrogreen\treatment_activity_service\interfaces\rest\dto\CreateActivityRequest.java
