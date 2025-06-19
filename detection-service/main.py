@@ -10,6 +10,9 @@ from py_eureka_client import eureka_client
 import asyncio
 from contextlib import asynccontextmanager
 from fastapi import APIRouter
+from dotenv import load_dotenv
+
+load_dotenv()  # Carga las variables de entorno desde el archivo .env
 
 app = FastAPI(
     title="Plant Disease Detection API",
@@ -22,7 +25,7 @@ model = load_model(MODEL_PATH)
 
 class_names = ['miner', 'nodisease', 'phoma', 'redspider', 'rust']
 
-EUREKA_SERVER = "http://localhost:8761/eureka/"
+EUREKA_SERVER = os.getenv("EUREKA_SEEUREKA_CLIENT_SERVICE_URL_DEFAULTZONERVER", "http://localhost:8761/eureka")  # URL del servidor Eureka
 SERVICE_PORT = 8000  # Cambia si usas otro puerto
 
 @asynccontextmanager
