@@ -22,6 +22,26 @@ spring:
               uri: lb://user-service
               predicates:
                 - Path=/api/v1/roles/**
+            - id: crop-service
+              uri: lb://crop-service
+              predicates:
+                - Path=/api/v1/crops/**
+            - id: diagnosis-service
+              uri: lb://crop-service
+              predicates:
+                - Path=/api/v1/diagnosis/**
+            - id: activity-service
+              uri: lb://treatment-service
+              predicates:
+                - Path=/api/v1/activities/**
+            - id: notification-service
+              uri: lb://notification-service
+              predicates:
+                - Path=/api/v1/notifications/**
+            - id: reminders-service
+              uri: lb://notification-service
+              predicates:
+                - Path=/api/v1/reminders/**
             - id: report-service
               uri: lb://report-service
               predicates:

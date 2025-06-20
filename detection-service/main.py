@@ -25,7 +25,7 @@ model = load_model(MODEL_PATH)
 
 class_names = ['miner', 'nodisease', 'phoma', 'redspider', 'rust']
 
-EUREKA_SERVER = os.getenv("EUREKA_SEEUREKA_CLIENT_SERVICE_URL_DEFAULTZONERVER", "http://localhost:8761/eureka")  # URL del servidor Eureka
+EUREKA_SERVER = os.getenv("EUREKA_CLIENT_SERVICE_URL_DEFAULTZONERVER", "http://localhost:8761/eureka")  # URL del servidor Eureka
 SERVICE_PORT = 8000  # Cambia si usas otro puerto
 
 @asynccontextmanager

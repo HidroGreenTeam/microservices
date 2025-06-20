@@ -74,9 +74,9 @@ services:
       - hidrogreen-network
     restart: unless-stopped
 
-  treatment-activity-service:
+  treatment-service:
     build:
-      context: ./treatment-activity-service
+      context: ./treatment-service
       dockerfile: Dockerfile
     container_name: hidrogreen-treatment-service
     ports:
@@ -94,6 +94,47 @@ services:
     depends_on:
       - mysql
       - rabbitmq
+      - discovery-service
+    networks:
+      - hidrogreen-network
+    restart: unless-stopped
+
+  crop-service:
+    build:
+      context: ./crop-service
+      dockerfile: Dockerfile
+    container_name: hidrogreen-crop-service
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - mysql
+      - rabbitmq
+      - discovery-service
+    networks:
+      - hidrogreen-network
+    restart: unless-stopped
+
+  detection-service:
+    build:
+      context: ./detection-service
+      dockerfile: Dockerfile
+    container_name: hidrogreen-detection-service
+    ports:
+      - "8000:8000"
+    environment:
+      - EUREKA_SERVER=http://discovery-service:8761/eureka/
+      - SERVICE_HOST=detection-service
+    depends_on:
       - discovery-service
     networks:
       - hidrogreen-network
@@ -123,7 +164,6 @@ services:
     networks:
       - hidrogreen-network
     restart: unless-stopped
-
   notification-service:
     build:
       context: ./notification-service
@@ -141,6 +181,14 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_RABBITMQ_HOST=rabbitmq
+      # Variables de entorno para servicios externos
+      - EMAIL_USERNAME=${EMAIL_USERNAME:-contact.pocketpartners@gmail.com}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-dummy_password}
+      - EMAIL_FROM_ADDRESS=${EMAIL_FROM_ADDRESS:-contact.pocketpartners@gmail.com}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-ACdummy_account_sid_for_development}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-dummy_auth_token_for_development}
+      - TWILIO_WHATSAPP_FROM=${TWILIO_WHATSAPP_FROM:-whatsapp:+14155238886}
+      - FIREBASE_SERVER_KEY=${FIREBASE_SERVER_KEY:-dummy_firebase_server_key}
     depends_on:
       - mysql
       - rabbitmq
@@ -161,10 +209,6 @@ services:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
     depends_on:
       - discovery-service
-      - user-service
-      - treatment-activity-service
-      - report-service
-      - notification-service
     networks:
       - hidrogreen-network
     restart: unless-stopped

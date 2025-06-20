@@ -168,4 +168,61 @@ public class FarmerController {
 
         return ResponseEntity.ok(FarmerResourceFromEntityAssembler.toResourceFromEntity(updatedFarmer));
     }
+
+    // ============================================
+    // ENDPOINTS FOR MICROSERVICE COMMUNICATION
+    // ============================================
+
+    @Operation(
+            summary = "Get farmer email by id",
+            description = "Get farmer email by id for inter-service communication"
+    )
+    @GetMapping("/{farmerId}/email")
+    public ResponseEntity<String> getFarmerEmail(@PathVariable Long farmerId) {
+        var getFarmerByIdQuery = new GetFarmerByIdQuery(farmerId);
+        var farmer = farmerQueryService.getFarmerById(getFarmerByIdQuery);
+        if (farmer.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(farmer.get().getEmail());
+    }
+
+    @Operation(
+            summary = "Get farmer phone by id",
+            description = "Get farmer phone number by id for inter-service communication"
+    )
+    @GetMapping("/{farmerId}/phone")
+    public ResponseEntity<String> getFarmerPhone(@PathVariable Long farmerId) {
+        var getFarmerByIdQuery = new GetFarmerByIdQuery(farmerId);
+        var farmer = farmerQueryService.getFarmerById(getFarmerByIdQuery);
+        if (farmer.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(farmer.get().getPhoneNumber());
+    }
+
+    @Operation(
+            summary = "Get farmer name by id",
+            description = "Get farmer name by id for inter-service communication"
+    )
+    @GetMapping("/{farmerId}/name")
+    public ResponseEntity<String> getFarmerName(@PathVariable Long farmerId) {
+        var getFarmerByIdQuery = new GetFarmerByIdQuery(farmerId);
+        var farmer = farmerQueryService.getFarmerById(getFarmerByIdQuery);
+        if (farmer.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(farmer.get().getUsername());
+    }
+
+    @Operation(
+            summary = "Check if farmer exists by id",
+            description = "Check if farmer exists by id for inter-service communication"
+    )
+    @GetMapping("/{farmerId}/exists")
+    public ResponseEntity<Boolean> farmerExists(@PathVariable Long farmerId) {
+        var getFarmerByIdQuery = new GetFarmerByIdQuery(farmerId);
+        var farmer = farmerQueryService.getFarmerById(getFarmerByIdQuery);
+        return ResponseEntity.ok(farmer.isPresent());
+    }
 }
