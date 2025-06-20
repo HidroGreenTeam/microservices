@@ -1,7 +1,4 @@
-# HidroGreen Microservices - Docker Compose Complete
-
 services:
-  # Servicios de Infraestructura
   mysql:
     image: mysql:8.0
     container_name: hidrogreen-mysql
@@ -91,10 +88,12 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_RABBITMQ_HOST=rabbitmq
+      - USER_SERVICE_URL=http://user-service:8081
     depends_on:
       - mysql
       - rabbitmq
       - discovery-service
+      - user-service
     networks:
       - hidrogreen-network
     restart: unless-stopped
@@ -134,8 +133,15 @@ services:
     environment:
       - EUREKA_SERVER=http://discovery-service:8761/eureka/
       - SERVICE_HOST=detection-service
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASSWORD=guest
+      - USER_SERVICE_URL=http://user-service:8081
     depends_on:
       - discovery-service
+      - rabbitmq
+      - user-service
     networks:
       - hidrogreen-network
     restart: unless-stopped
@@ -164,6 +170,7 @@ services:
     networks:
       - hidrogreen-network
     restart: unless-stopped
+
   notification-service:
     build:
       context: ./notification-service
@@ -218,4 +225,4 @@ volumes:
 
 networks:
   hidrogreen-network:
-    driver: bridge
+    driver: bridge 
