@@ -15,9 +15,10 @@ RUN pip install poetry
 RUN poetry config virtualenvs.create false
 
 # Copy dependency files first (for better caching)
-COPY pyproject.toml poetry.lock* ./
+COPY pyproject.toml ./
 
-# Install dependencies (this layer will be cached unless dependencies change)
+# Generate lock file and install dependencies
+RUN poetry lock
 RUN poetry install --no-interaction --no-ansi --no-root --only=main
 
 # Final stage
