@@ -1,0 +1,453 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8" />-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0" />-->
+<!--    <title>Subscription Plans</title>-->
+<!--    &lt;!&ndash; Google Font &ndash;&gt;-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />-->
+<!--    <style>-->
+<!--        :root {-->
+<!--            &#45;&#45;bg-color: #f5f7fa;-->
+<!--            &#45;&#45;card-bg: #ffffff;-->
+<!--            &#45;&#45;primary: #0070ba;-->
+<!--            &#45;&#45;primary-hover: #005c99;-->
+<!--            &#45;&#45;text-dark: #1f2833;-->
+<!--            &#45;&#45;text-light: #4a5568;-->
+<!--            &#45;&#45;accent: #ff9900;-->
+<!--            &#45;&#45;radius: 8px;-->
+<!--            &#45;&#45;transition: 0.3s ease;-->
+<!--        }-->
+<!--        * {-->
+<!--            box-sizing: border-box;-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--        }-->
+<!--        body {-->
+<!--            font-family: 'Inter', sans-serif;-->
+<!--            background-color: var(&#45;&#45;bg-color);-->
+<!--            color: var(&#45;&#45;text-dark);-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            height: 100vh;-->
+<!--            padding: 20px;-->
+<!--        }-->
+<!--        .container {-->
+<!--            text-align: center;-->
+<!--            max-width: 800px;-->
+<!--            width: 100%;-->
+<!--        }-->
+<!--        h2 {-->
+<!--            font-size: 2rem;-->
+<!--            margin-bottom: 16px;-->
+<!--            font-weight: 600;-->
+<!--        }-->
+<!--        .plans {-->
+<!--            display: grid;-->
+<!--            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));-->
+<!--            gap: 20px;-->
+<!--            margin-bottom: 30px;-->
+<!--        }-->
+<!--        .plan-card {-->
+<!--            background: var(&#45;&#45;card-bg);-->
+<!--            border: 2px solid transparent;-->
+<!--            border-radius: var(&#45;&#45;radius);-->
+<!--            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);-->
+<!--            padding: 20px;-->
+<!--            cursor: pointer;-->
+<!--            transition: border-color var(&#45;&#45;transition), transform var(&#45;&#45;transition);-->
+<!--            position: relative;-->
+<!--        }-->
+<!--        .plan-card input {-->
+<!--            position: absolute;-->
+<!--            opacity: 0;-->
+<!--            cursor: pointer;-->
+<!--            height: 0;-->
+<!--            width: 0;-->
+<!--        }-->
+<!--        .plan-card:hover {-->
+<!--            transform: translateY(-4px);-->
+<!--        }-->
+<!--        .plan-card input:checked ~ .card-content {-->
+<!--            border-color: var(&#45;&#45;accent);-->
+<!--        }-->
+<!--        .card-content {-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            align-items: center;-->
+<!--            border: 2px solid transparent;-->
+<!--            border-radius: var(&#45;&#45;radius);-->
+<!--            padding: 10px;-->
+<!--            transition: border-color var(&#45;&#45;transition);-->
+<!--            width: 100%;-->
+<!--            height: 100%;-->
+<!--        }-->
+<!--        .plan-title {-->
+<!--            font-size: 1.25rem;-->
+<!--            font-weight: 600;-->
+<!--            margin-bottom: 8px;-->
+<!--        }-->
+<!--        .plan-price {-->
+<!--            font-size: 1.5rem;-->
+<!--            margin-bottom: 8px;-->
+<!--            color: var(&#45;&#45;primary);-->
+<!--        }-->
+<!--        .plan-features {-->
+<!--            font-size: 0.9rem;-->
+<!--            color: var(&#45;&#45;text-light);-->
+<!--            list-style: none;-->
+<!--            margin-bottom: 12px;-->
+<!--            padding: 0;-->
+<!--        }-->
+<!--        .plan-features li {-->
+<!--            margin: 4px 0;-->
+<!--        }-->
+<!--        button {-->
+<!--            padding: 14px 28px;-->
+<!--            font-size: 1rem;-->
+<!--            font-weight: 600;-->
+<!--            color: #fff;-->
+<!--            background-color: var(&#45;&#45;primary);-->
+<!--            border: none;-->
+<!--            border-radius: var(&#45;&#45;radius);-->
+<!--            cursor: pointer;-->
+<!--            transition: background-color var(&#45;&#45;transition), transform var(&#45;&#45;transition);-->
+<!--            min-width: 200px;-->
+<!--        }-->
+<!--        button:disabled {-->
+<!--            background-color: #ccd0d5;-->
+<!--            cursor: not-allowed;-->
+<!--        }-->
+<!--        button:hover:not(:disabled) {-->
+<!--            background-color: var(&#45;&#45;primary-hover);-->
+<!--            transform: translateY(-2px);-->
+<!--        }-->
+<!--        #status {-->
+<!--            margin-top: 20px;-->
+<!--            font-size: 0.95rem;-->
+<!--            color: var(&#45;&#45;text-light);-->
+<!--            min-height: 1.2em;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--    <h2>Choose Your Subscription Plan</h2>-->
+<!--    <div class="plans">-->
+<!--        <label class="plan-card">-->
+<!--            <input type="radio" name="plan" value="10.00" />-->
+<!--            <div class="card-content">-->
+<!--                <div class="plan-title">Basic</div>-->
+<!--                <div class="plan-price">$10 / mo</div>-->
+<!--                <ul class="plan-features">-->
+<!--                    <li>Feature A</li>-->
+<!--                    <li>Feature B</li>-->
+<!--                    <li>Feature C</li>-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--        </label>-->
+<!--        <label class="plan-card">-->
+<!--            <input type="radio" name="plan" value="20.00" />-->
+<!--            <div class="card-content">-->
+<!--                <div class="plan-title">Standard</div>-->
+<!--                <div class="plan-price">$20 / mo</div>-->
+<!--                <ul class="plan-features">-->
+<!--                    <li>Feature A+</li>-->
+<!--                    <li>Feature B+</li>-->
+<!--                    <li>Feature C+</li>-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--        </label>-->
+<!--        <label class="plan-card">-->
+<!--            <input type="radio" name="plan" value="30.00" />-->
+<!--            <div class="card-content">-->
+<!--                <div class="plan-title">Premium</div>-->
+<!--                <div class="plan-price">$30 / mo</div>-->
+<!--                <ul class="plan-features">-->
+<!--                    <li>All Features</li>-->
+<!--                    <li>Priority Support</li>-->
+<!--                    <li>Unlimited Access</li>-->
+<!--                </ul>-->
+<!--            </div>-->
+<!--        </label>-->
+<!--    </div>-->
+<!--    <button id="payBtn" onclick="makePayment()" disabled>Pay</button>-->
+<!--    <p id="status"></p>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    const plans = document.getElementsByName('plan');-->
+<!--    const payBtn = document.getElementById('payBtn');-->
+<!--    plans.forEach(radio => {-->
+<!--        radio.addEventListener('change', () => {-->
+<!--            payBtn.disabled = false;-->
+<!--            payBtn.innerText = `Pay $${radio.value}`;-->
+<!--        });-->
+<!--    });-->
+
+<!--    async function makePayment() {-->
+<!--        const selected = document.querySelector('input[name="plan"]:checked');-->
+<!--        const amount = selected ? selected.value : null;-->
+<!--        if (!amount) {-->
+<!--            alert("Please select a plan!");-->
+<!--            return;-->
+<!--        }-->
+<!--        document.getElementById("status").innerText = "Processing payment...";-->
+<!--        try {-->
+<!--            const response = await fetch("http://localhost:8081/paypal/pay?amount=" + amount, { method: "POST" });-->
+<!--            const result = await response.text();-->
+<!--            if (result.includes("Redirect to:")) {-->
+<!--                const url = result.replace("Redirect to: ", "").trim();-->
+<!--                window.location.href = url;-->
+<!--            } else {-->
+<!--                document.getElementById("status").innerText = "Payment initiation failed.";-->
+<!--            }-->
+<!--        } catch (error) {-->
+<!--            console.error("Error:", error);-->
+<!--            document.getElementById("status").innerText = "Payment request failed.";-->
+<!--        }-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subscription Plans</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        /* ... (Tu CSS existente - sin cambios) ... */
+        :root {
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --primary: #0070ba;
+            --primary-hover: #005c99;
+            --text-dark: #1f2833;
+            --text-light: #4a5568;
+            --accent: #ff9900;
+            --radius: 8px;
+            --transition: 0.3s ease;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { text-align: center; max-width: 800px; width: 100%; }
+        h2 { font-size: 2rem; margin-bottom: 16px; font-weight: 600; }
+        .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .plan-card {
+            background: var(--card-bg);
+            border: 2px solid #e2e8f0; /* Default border */
+            border-radius: var(--radius);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 0; /* Padding is now in .card-content-wrapper */
+            cursor: pointer;
+            transition: border-color var(--transition), transform var(--transition);
+            position: relative;
+            display: flex; /* Ensure input and content align */
+        }
+        .plan-card input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* Above content for click capture */
+        }
+        .plan-card:hover { transform: translateY(-4px); }
+        .plan-card input:checked + .card-content-wrapper .card-content {
+            border-color: var(--accent); /* Apply border to inner content on check */
+        }
+        .card-content-wrapper { /* New wrapper for consistent padding and border behavior */
+            width: 100%;
+            height: 100%;
+            padding: 20px; /* Original padding of plan-card */
+            pointer-events: none; /* Allow clicks to pass to the input */
+        }
+        .card-content { /* Inner content area */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            border: 2px solid transparent; /* This border will change on check */
+            border-radius: calc(var(--radius) - 2px); /* Adjust for wrapper padding */
+            width: 100%;
+            height: 100%;
+            transition: border-color var(--transition);
+        }
+        .plan-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 8px; }
+        .plan-price { font-size: 1.5rem; margin-bottom: 8px; color: var(--primary); }
+        .plan-features { font-size: 0.9rem; color: var(--text-light); list-style: none; margin-bottom: 12px; padding: 0; text-align: center; }
+        .plan-features li { margin: 4px 0; }
+        button {
+            padding: 14px 28px; font-size: 1rem; font-weight: 600; color: #fff;
+            background-color: var(--primary); border: none; border-radius: var(--radius);
+            cursor: pointer; transition: background-color var(--transition), transform var(--transition);
+            min-width: 200px;
+        }
+        button:disabled { background-color: #ccd0d5; cursor: not-allowed; }
+        button:hover:not(:disabled) { background-color: var(--primary-hover); transform: translateY(-2px); }
+        #status { margin-top: 20px; font-size: 0.95rem; color: var(--text-light); min-height: 1.2em; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Choose Your Subscription Plan</h2>
+    <div class="plans">
+        <label class="plan-card">
+            <input type="radio" name="plan" value="10.00" data-description="Basic Plan Subscription" />
+            <div class="card-content-wrapper">
+                <div class="card-content">
+                    <div class="plan-title">Basic</div>
+                    <div class="plan-price">$10 / mo</div>
+                    <ul class="plan-features">
+                        <li>Feature A</li>
+                        <li>Feature B</li>
+                        <li>Feature C</li>
+                    </ul>
+                </div>
+            </div>
+        </label>
+        <label class="plan-card">
+            <input type="radio" name="plan" value="20.00" data-description="Standard Plan Subscription" />
+            <div class="card-content-wrapper">
+                <div class="card-content">
+                    <div class="plan-title">Standard</div>
+                    <div class="plan-price">$20 / mo</div>
+                    <ul class="plan-features">
+                        <li>Feature A+</li>
+                        <li>Feature B+</li>
+                        <li>Feature C+</li>
+                    </ul>
+                </div>
+            </div>
+        </label>
+        <label class="plan-card">
+            <input type="radio" name="plan" value="30.00" data-description="Premium Plan Subscription" />
+            <div class="card-content-wrapper">
+                <div class="card-content">
+                    <div class="plan-title">Premium</div>
+                    <div class="plan-price">$30 / mo</div>
+                    <ul class="plan-features">
+                        <li>All Features</li>
+                        <li>Priority Support</li>
+                        <li>Unlimited Access</li>
+                    </ul>
+                </div>
+            </div>
+        </label>
+    </div>
+    <button id="payBtn" onclick="initiatePaymentApiCall()" disabled>Select a Plan</button> <!-- Cambiado el nombre de la función -->
+    <p id="status"></p>
+</div>
+
+<script>
+    const plansRadios = document.querySelectorAll('input[name="plan"]');
+    const payBtn = document.getElementById('payBtn');
+    const statusElement = document.getElementById("status"); // Definir una vez
+
+    plansRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (radio.checked) {
+                payBtn.disabled = false;
+                payBtn.innerText = `Pay $${radio.value}`;
+            }
+        });
+    });
+
+    async function initiatePaymentApiCall() { // Nombre de función cambiado para claridad
+        const selectedRadio = document.querySelector('input[name="plan"]:checked');
+
+        if (!selectedRadio) {
+            alert("Please select a plan!");
+            return;
+        }
+
+        const amount = selectedRadio.value;
+        const description = selectedRadio.dataset.description || `Payment for plan ${amount}`;
+
+        statusElement.innerText = "Processing payment...";
+        payBtn.disabled = true;
+
+        try {
+            // LLAMADA A LA NUEVA API
+            const response = await fetch("http://localhost:8081/api/v1/payments/initiate", { // URL actualizada
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ // Cuerpo JSON
+                    amount: parseFloat(amount),
+                    currency: "USD", // Puedes hacerlo dinámico si es necesario
+                    orderDescription: description
+                })
+            });
+
+            const data = await response.json(); // Esperar respuesta JSON
+
+            if (!response.ok) {
+                // Si la API devuelve un error (ej. 500), data puede tener el mensaje de error
+                throw new Error(data.status || `HTTP error ${response.status}`);
+            }
+
+            if (data.approvalUrl) {
+                statusElement.innerText = "Redirecting to PayPal...";
+                window.location.href = data.approvalUrl; // Usar approvalUrl del JSON
+            } else {
+                statusElement.innerText = "Payment initiation failed: No approval URL received. " + (data.status || '');
+                payBtn.disabled = false;
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            statusElement.innerText = "Error: " + error.message;
+            payBtn.disabled = false;
+        }
+    }
+
+    // Manejo de parámetros de URL en las páginas de resultado
+    // Este script debe estar presente en payment.html, payment-success.html,
+    // payment-cancel.html, y payment-error.html (o en un archivo JS común importado).
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const localStatusElement = document.getElementById('status'); // Usar el elemento de la página actual
+
+        const internalPaymentId = urlParams.get('internalPaymentId');
+        const errorMessage = urlParams.get('error');
+        const currentPath = window.location.pathname; // ej: "/payment.html" o "/payment-success.html"
+
+        if (localStatusElement) { // Solo actuar si el elemento #status existe en la página
+            if (currentPath.endsWith('/payment-success.html') && internalPaymentId) {
+                localStatusElement.innerHTML = `Payment successful! <br>Our Payment ID: ${internalPaymentId}`;
+                // Opcional: limpiar el botón de pago si existe en esta página
+                const localPayBtn = document.getElementById('payBtn');
+                if (localPayBtn) localPayBtn.style.display = 'none';
+
+            } else if (currentPath.endsWith('/payment-error.html') && errorMessage) {
+                localStatusElement.textContent = `Payment Error: ${decodeURIComponent(errorMessage)}`;
+                const localPayBtn = document.getElementById('payBtn');
+                if (localPayBtn) localPayBtn.disabled = false; // Permitir reintentar si es apropiado
+
+            } else if (currentPath.endsWith('/payment-cancel.html')) {
+                localStatusElement.textContent = 'Payment was cancelled.';
+                const localPayBtn = document.getElementById('payBtn');
+                if (localPayBtn) localPayBtn.disabled = false; // Permitir reintentar si es apropiado
+            }
+            // No hacer nada especial en payment.html al cargar, a menos que quieras limpiar el estado
+        }
+    };
+</script>
+</body>
+</html>
