@@ -30,6 +30,10 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.routing.key.treatment}")
     private String treatmentRoutingKey;
     
+    // Subscription-related configuration
+    public static final String SUBSCRIPTION_NOTIFICATION_QUEUE = "subscription.notification.queue";
+    public static final String SUBSCRIPTION_EXCHANGE = "subscription.exchange";
+    
     @PostConstruct
     public void init() {
         logger.info("RabbitMQ Configuration loaded in Notification Service:");
@@ -38,6 +42,8 @@ public class RabbitMQConfig {
         logger.info("Treatment Queue: {}", treatmentRemindersQueue);
         logger.info("Activity Routing Key: {}", activityRoutingKey);
         logger.info("Treatment Routing Key: {}", treatmentRoutingKey);
+        logger.info("Subscription Queue: {}", SUBSCRIPTION_NOTIFICATION_QUEUE);
+        logger.info("Subscription Exchange: {}", SUBSCRIPTION_EXCHANGE);
     }
     
     @Bean
@@ -84,5 +90,28 @@ public class RabbitMQConfig {
                 .bind(treatmentRemindersQueue())
                 .to(notificationsExchange())
                 .with(treatmentRoutingKey);
+    }
+    
+    // Subscription-related beans
+    @Bean
+    public TopicExchange subscriptionExchange() {
+        logger.info("Creating Subscription TopicExchange: {}", SUBSCRIPTION_EXCHANGE);
+        return new TopicExchange(SUBSCRIPTION_EXCHANGE);
+    }
+    
+    @Bean
+    public Queue subscriptionNotificationQueue() {
+        logger.info("Creating Subscription Queue: {}", SUBSCRIPTION_NOTIFICATION_QUEUE);
+        return QueueBuilder.durable(SUBSCRIPTION_NOTIFICATION_QUEUE).build();
+    }
+    
+    @Bean
+    public Binding subscriptionNotificationBinding() {
+        logger.info("Creating Binding for subscription notifications: queue={}, exchange={}", 
+                   SUBSCRIPTION_NOTIFICATION_QUEUE, SUBSCRIPTION_EXCHANGE);
+        return BindingBuilder
+                .bind(subscriptionNotificationQueue())
+                .to(subscriptionExchange())
+                .with("subscription.*");
     }
 }
