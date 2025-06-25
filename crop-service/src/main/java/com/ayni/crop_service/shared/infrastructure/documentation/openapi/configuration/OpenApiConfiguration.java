@@ -9,25 +9,28 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Configuration
+@EnableJpaAuditing
 public class OpenApiConfiguration {
+
     @Bean
-    public OpenAPI learningPlatformOpenApi() {
-        // General Configuration
+    public OpenAPI AinyOpenApi() {
+
         var openApi = new OpenAPI();
+
         openApi
                 .info(new Info()
-                        .title("HidroBots Crop API")
-                        .description("HidroBots Crop Service REST API documentation.")
+                        .title("Ainy API")
+                        .description("Ainy REST API documentation")
                         .version("v1.0.0")
-                        .license(new License().name("HIGN 2.0")
-                                .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
-                .externalDocs(new ExternalDocumentation()
-                        .description("HidroBots Documentation")
-                        .url("https://github.com/IoT-Solutions-SW71-Grupo-4/HidroBots-Report"));
+                        .license(new License().name("Apache 2.0")
+                                .url("http://springdoc.org")))
+                .externalDocs(new ExternalDocumentation().
+                        description("Ainy wiki Documentation")
+                        .url("https://Ainy.wiki.github.io/docs"));
 
-        // Add security scheme
         final String securitySchemeName = "bearerAuth";
 
         openApi.addSecurityItem(new SecurityRequirement()

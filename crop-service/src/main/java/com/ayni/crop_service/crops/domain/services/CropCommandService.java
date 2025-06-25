@@ -2,35 +2,22 @@ package com.ayni.crop_service.crops.domain.services;
 
 import com.ayni.crop_service.crops.domain.model.aggregates.Crop;
 import com.ayni.crop_service.crops.domain.model.commands.CreateCropCommand;
-import com.ayni.crop_service.crops.domain.model.commands.UpdateCropStatusCommand;
+import com.ayni.crop_service.crops.domain.model.commands.DeleteCropCommand;
+import com.ayni.crop_service.crops.domain.model.commands.UpdateCropCommand;
+import com.ayni.crop_service.crops.domain.model.commands.UpdateIrrigationTypeCommand;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
-/**
- * Crop command service interface
- */
-public interface CropCommandService {    /**
-     * Create a new crop
-     *
-     * @param command the create crop command
-     * @return the created crop ID
-     */
-    Long handle(CreateCropCommand command);
+public interface CropCommandService {
+    Long handle(CreateCropCommand command, MultipartFile file) throws IOException; // Long -> retorna el id creado
+    Optional<Crop> handle(UpdateCropCommand command); // Optional -> almacena datos y comprueba que no sea "null"
+    Optional<Crop> handle(UpdateIrrigationTypeCommand command); // Optional -> almacena datos y comprueba que no sea "null"
+    void handle(DeleteCropCommand command); // void -> no retorna nada
 
-    /**
-     * Update crop status
-     *
-     * @param command the update crop status command
-     * @return the updated crop
-     */
-    Optional<Crop> handle(UpdateCropStatusCommand command);
+    Optional<Crop> UpdateCropImage(MultipartFile file, Crop crop) throws IOException;
+    Optional<Crop> deleteCropImage(Long cropId) throws IOException;
 
-    /**
-     * Update crop notes
-     *
-     * @param cropId the crop ID
-     * @param notes the new notes
-     * @return the updated crop
-     */
-    Optional<Crop> updateCropNotes(Long cropId, String notes);
+
 }
