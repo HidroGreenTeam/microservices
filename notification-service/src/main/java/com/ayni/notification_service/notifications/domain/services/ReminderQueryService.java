@@ -10,6 +10,6 @@ import java.util.List;
  */
 public interface ReminderQueryService {
     List<Reminder> handle(GetPendingRemindersQuery query);
-    List<Reminder> getRemindersByProfileId(Long profileId);
+    List<Reminder> getRemindersByfarmerId(Long farmerId);
     List<Reminder> getRecurringReminders();
 }

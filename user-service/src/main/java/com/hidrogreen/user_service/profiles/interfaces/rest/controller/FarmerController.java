@@ -8,12 +8,12 @@ import com.hidrogreen.user_service.profiles.domain.model.queries.GetAllFarmersQu
 import com.hidrogreen.user_service.profiles.domain.model.queries.GetFarmerByIdQuery;
 import com.hidrogreen.user_service.profiles.domain.services.FarmerCommandService;
 import com.hidrogreen.user_service.profiles.domain.services.FarmerQueryService;
-import com.hidrogreen.user_service.profiles.interfaces.rest.resources.CreateFarmerResource;
 import com.hidrogreen.user_service.profiles.interfaces.rest.resources.FarmerResource;
 import com.hidrogreen.user_service.profiles.interfaces.rest.resources.UpdateFarmerResource;
-import com.hidrogreen.user_service.profiles.interfaces.rest.transform.CreateFarmerResourceCommandFromResourceAssembler;
 import com.hidrogreen.user_service.profiles.interfaces.rest.transform.FarmerResourceFromEntityAssembler;
 import com.hidrogreen.user_service.profiles.interfaces.rest.transform.UpdateFarmerResourceCommandFromResourceAssembler;
+import com.hidrogreen.user_service.shared.interfaces.rest.response.ApiResponse;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,52 +27,33 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "api/v1/farmers", produces = "application/json")
-@Tag(name = "Farmers", description = "Farmers API")
+@Tag(name = "Farmers", description = "Farmers API - Read Only Operations")
 @CrossOrigin(origins = "*")
 public class FarmerController {
 
     private final FarmerCommandService farmerCommandService;
     private final FarmerQueryService farmerQueryService;
 
-
     public FarmerController(FarmerCommandService farmerCommandService, FarmerQueryService farmerQueryService) {
         this.farmerCommandService = farmerCommandService;
         this.farmerQueryService = farmerQueryService;
     }
 
-    @Operation(
-            summary = "Create farmer",
-            description = "Create a new farmer"
-    )
-    @PostMapping
-    public ResponseEntity<FarmerResource> createFarmer(@Valid @RequestBody CreateFarmerResource createFarmerResource) {
-
-        var createFarmerCommand = CreateFarmerResourceCommandFromResourceAssembler.toCommandFromResource(createFarmerResource);
-        var farmerId = farmerCommandService.createFarmer(createFarmerCommand);
-        if (farmerId == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        var getFarmerByIdQuery = new GetFarmerByIdQuery(farmerId);
-        var farmer = farmerQueryService.getFarmerById(getFarmerByIdQuery);
-        if (farmer.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-        var farmerResource = FarmerResourceFromEntityAssembler.toResourceFromEntity(farmer.get());
-        return new ResponseEntity<>(farmerResource, HttpStatus.CREATED);
-
-    }
+    // ============================================
+    // READ OPERATIONS
+    // ============================================
 
     @Operation(
             summary = "Get farmer by id",
             description = "Get a farmer by its id"
     )
     @GetMapping("/{farmerId}")
-    public ResponseEntity<FarmerResource> getFarmerById(@PathVariable Long farmerId) {
+    public ResponseEntity<?> getFarmerById(@PathVariable Long farmerId) {
         var getFarmerByIdQuery = new GetFarmerByIdQuery(farmerId);
         var farmer = farmerQueryService.getFarmerById(getFarmerByIdQuery);
         if (farmer.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Resource not found", "Farmer with id " + farmerId + " not found"));
         }
         var farmerResource = FarmerResourceFromEntityAssembler.toResourceFromEntity(farmer.get());
         return ResponseEntity.ok(farmerResource);
@@ -86,23 +67,35 @@ public class FarmerController {
     public ResponseEntity<List<FarmerResource>> getAllFarmers() {
         var getAllFarmerQuery = new GetAllFarmersQuery();
         var farmers = farmerQueryService.getAllFarmers(getAllFarmerQuery);
-        return ResponseEntity.ok(farmers.stream().map(FarmerResourceFromEntityAssembler::toResourceFromEntity).collect(Collectors.toList()));
+        var farmerResources = farmers.stream()
+                .map(FarmerResourceFromEntityAssembler::toResourceFromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(farmerResources);
     }
 
+    // ============================================
+    // UPDATE OPERATIONS
+    // ============================================
 
     @Operation(
             summary = "Update farmer (only the farmer data) | NO IMAGE UPDATE",
             description = "Update a farmer by its id"
     )
     @PutMapping("/{farmerId}")
-    public ResponseEntity<FarmerResource> updateFarmer(@Valid @PathVariable Long farmerId, @RequestBody UpdateFarmerResource updateFarmerResource) {
-        var updateFarmerCommand = UpdateFarmerResourceCommandFromResourceAssembler.toCommandFromResource(updateFarmerResource, farmerId);
-        var updatedFarmer = farmerCommandService.updateFarmer(updateFarmerCommand);
-        if (updatedFarmer.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<?> updateFarmer(@Valid @PathVariable Long farmerId, @RequestBody UpdateFarmerResource updateFarmerResource) {
+        try {
+            var updateFarmerCommand = UpdateFarmerResourceCommandFromResourceAssembler.toCommandFromResource(updateFarmerResource, farmerId);
+            var updatedFarmer = farmerCommandService.updateFarmer(updateFarmerCommand);
+            if (updatedFarmer.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("Resource not found", "Farmer with id " + farmerId + " not found"));
+            }
+            var farmerResource = FarmerResourceFromEntityAssembler.toResourceFromEntity(updatedFarmer.get());
+            return ResponseEntity.ok(farmerResource);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Bad request", "Failed to update farmer: " + e.getMessage()));
         }
-        var farmerResource = FarmerResourceFromEntityAssembler.toResourceFromEntity(updatedFarmer.get());
-        return ResponseEntity.ok(farmerResource);
     }
 
     @Operation(
@@ -110,42 +103,31 @@ public class FarmerController {
             description = "Update the image of a farmer by its id"
     )
     @PutMapping(value = "/{farmerId}/farmerImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<FarmerResource> updateFarmerImage(
+    public ResponseEntity<?> updateFarmerImage(
             @PathVariable Long farmerId,
-            @RequestPart("file")MultipartFile file) throws IOException {
+            @RequestPart("file") MultipartFile file) {
+        try {
+            Optional<Farmer> farmerOptional = farmerQueryService.getFarmerById(new GetFarmerByIdQuery(farmerId));
 
-        // buscamos el id
-        Optional<Farmer> farmerOptional = farmerQueryService.getFarmerById(new GetFarmerByIdQuery(farmerId));
+            if (farmerOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("Resource not found", "Farmer with id " + farmerId + " not found"));
+            }
 
+            Farmer farmer = farmerOptional.get();
+            Optional<Farmer> updatedFarmerOptional = farmerCommandService.UpdateFarmerImage(file, farmer);
 
-        // si no existe el farmer
-        if (farmerOptional.isEmpty()) {
-            return ResponseEntity.notFound().header("message", "Farmer with id " + farmerId + " not found").build();
+            if (updatedFarmerOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(ApiResponse.error("Internal server error", "Error while updating farmer image"));
+            }
+
+            var farmerResource = FarmerResourceFromEntityAssembler.toResourceFromEntity(updatedFarmerOptional.get());
+            return ResponseEntity.ok(farmerResource);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Internal server error", "Error processing image: " + e.getMessage()));
         }
-
-        Farmer farmer = farmerOptional.get();
-
-        // actualizamos la imagen
-        Optional<Farmer> updatedFarmerOptional = farmerCommandService.UpdateFarmerImage(file, farmer);
-
-        // si no se pudo actualizar la imagen
-        if (updatedFarmerOptional.isEmpty()) {
-            return ResponseEntity.badRequest().header("message", "Error while updating farmer image").build();
-        }
-
-        // retornamos el farmer actualizado
-        return ResponseEntity.ok(FarmerResourceFromEntityAssembler.toResourceFromEntity(updatedFarmerOptional.get()));
-
-    }
-
-    @Operation(
-            summary = "Delete farmer",
-            description = "Delete a farmer by its id"
-    )
-    @DeleteMapping("/{farmerId}")
-    public ResponseEntity<?> deleteFarmer(@PathVariable Long farmerId) {
-        farmerCommandService.deleteFarmer(farmerId);
-        return ResponseEntity.ok("Farmer with given id successfully deleted");
     }
 
     @Operation(
@@ -153,20 +135,20 @@ public class FarmerController {
             description = "Delete the image of a farmer by its id"
     )
     @DeleteMapping("/{farmerId}/farmerImage")
-    public ResponseEntity<FarmerResource> deleteFarmerImage(@PathVariable Long farmerId) throws IOException {
+    public ResponseEntity<?> deleteFarmerImage(@PathVariable Long farmerId) {
+        try {
+            Optional<Farmer> updatedFarmerOptional = farmerCommandService.deleteFarmerImage(farmerId);
 
-        // delegar la eliminación de la imagen al servicio
-        Optional<Farmer> updatedFarmerOptional = farmerCommandService.deleteFarmerImage(farmerId);
+            if (updatedFarmerOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("Resource not found", "Farmer with id " + farmerId + " doesn't have an image"));
+            }
 
-        // si no se pudo eliminar la imagen
-        if (updatedFarmerOptional.isEmpty()) {
-            return ResponseEntity.badRequest().header("message", "Error while deleting farmer image").build();
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Internal server error", "Error while deleting farmer image: " + e.getMessage()));
         }
-
-        // retornamos el farmer actualizado
-        Farmer updatedFarmer = updatedFarmerOptional.get();
-
-        return ResponseEntity.ok(FarmerResourceFromEntityAssembler.toResourceFromEntity(updatedFarmer));
     }
 
     // ============================================
@@ -174,55 +156,73 @@ public class FarmerController {
     // ============================================
 
     @Operation(
-            summary = "Get farmer email by id",
-            description = "Get farmer email by id for inter-service communication"
-    )
-    @GetMapping("/{farmerId}/email")
-    public ResponseEntity<String> getFarmerEmail(@PathVariable Long farmerId) {
-        var getFarmerByIdQuery = new GetFarmerByIdQuery(farmerId);
-        var farmer = farmerQueryService.getFarmerById(getFarmerByIdQuery);
-        if (farmer.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(farmer.get().getEmail());
-    }
-
-    @Operation(
-            summary = "Get farmer phone by id",
-            description = "Get farmer phone number by id for inter-service communication"
+            summary = "Get farmer phone by farmer id",
+            description = "Get farmer phone number by farmer id for inter-service communication"
     )
     @GetMapping("/{farmerId}/phone")
-    public ResponseEntity<String> getFarmerPhone(@PathVariable Long farmerId) {
+    public ResponseEntity<?> getFarmerPhone(@PathVariable Long farmerId) {
         var getFarmerByIdQuery = new GetFarmerByIdQuery(farmerId);
         var farmer = farmerQueryService.getFarmerById(getFarmerByIdQuery);
         if (farmer.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Resource not found", "Farmer with id " + farmerId + " not found"));
         }
-        return ResponseEntity.ok(farmer.get().getPhoneNumber());
+        String phoneNumber = farmer.get().getPhoneNumber();
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 No Content when phone is not defined
+        }
+        return ResponseEntity.ok(phoneNumber);
     }
 
     @Operation(
-            summary = "Get farmer name by id",
-            description = "Get farmer name by id for inter-service communication"
+            summary = "Get farmer name by farmer id",
+            description = "Get farmer full name by farmer id for inter-service communication"
     )
     @GetMapping("/{farmerId}/name")
-    public ResponseEntity<String> getFarmerName(@PathVariable Long farmerId) {
+    public ResponseEntity<?> getFarmerName(@PathVariable Long farmerId) {
         var getFarmerByIdQuery = new GetFarmerByIdQuery(farmerId);
         var farmer = farmerQueryService.getFarmerById(getFarmerByIdQuery);
         if (farmer.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Resource not found", "Farmer with id " + farmerId + " not found"));
         }
-        return ResponseEntity.ok(farmer.get().getUsername());
+        String fullName = farmer.get().getFullName();
+        if (fullName == null || fullName.trim().isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 No Content when name is not defined
+        }
+        return ResponseEntity.ok(fullName);
     }
 
     @Operation(
-            summary = "Check if farmer exists by id",
-            description = "Check if farmer exists by id for inter-service communication"
+            summary = "Get farmer by user id",
+            description = "Get farmer profile by user id for inter-service communication"
     )
-    @GetMapping("/{farmerId}/exists")
-    public ResponseEntity<Boolean> farmerExists(@PathVariable Long farmerId) {
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getFarmerByUserId(@PathVariable Long userId) {
+        var getFarmerByUserIdQuery = new com.hidrogreen.user_service.profiles.domain.model.queries.GetFarmerByUserIdQuery(userId);
+        var farmer = farmerQueryService.getFarmerByUserId(getFarmerByUserIdQuery);
+        if (farmer.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Resource not found", "Farmer with user id " + userId + " not found"));
+        }
+        var farmerResource = FarmerResourceFromEntityAssembler.toResourceFromEntity(farmer.get());
+        return ResponseEntity.ok(farmerResource);
+    }
+
+    @Operation(
+            summary = "Get farmer user id by farmer id",
+            description = "Get the user id associated with a farmer for inter-service communication"
+    )
+    @GetMapping("/{farmerId}/user-id")
+    public ResponseEntity<?> getFarmerUserId(@PathVariable Long farmerId) {
         var getFarmerByIdQuery = new GetFarmerByIdQuery(farmerId);
         var farmer = farmerQueryService.getFarmerById(getFarmerByIdQuery);
-        return ResponseEntity.ok(farmer.isPresent());
+        if (farmer.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Resource not found", "Farmer with id " + farmerId + " not found"));
+        }
+        return ResponseEntity.ok(farmer.get().getUserId());
     }
+
+   
 }

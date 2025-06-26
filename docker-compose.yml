@@ -12,7 +12,7 @@ services:
       - mysql_data:/var/lib/mysql
     command: --bind-address=0.0.0.0
     networks:
-      - hidrogreen-network
+      - ayni-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
@@ -28,7 +28,7 @@ services:
       - "5672:5672"
       - "15672:15672"
     networks:
-      - hidrogreen-network
+      - ayni-network
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       timeout: 30s
@@ -43,7 +43,7 @@ services:
     ports:
       - "8761:8761"
     networks:
-      - hidrogreen-network
+      - ayni-network
     restart: unless-stopped
 
   user-service:
@@ -63,19 +63,21 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_RABBITMQ_HOST=rabbitmq
+      - SERVICE_AUTH_SECRET=ServiceSecretForInternalCommunication123
+      - SERVICE_AUTH_EXPIRATION_HOURS=24
     depends_on:
       - mysql
       - rabbitmq
       - discovery-service
     networks:
-      - hidrogreen-network
+      - ayni-network
     restart: unless-stopped
 
-  treatment-service:
+  crop-service:
     build:
-      context: ./treatment-service
+      context: ./crop-service
       dockerfile: Dockerfile
-    container_name: hidrogreen-treatment-service
+    container_name: hidrogreen-crop-service
     ports:
       - "8082:8082"
     environment:
@@ -89,140 +91,47 @@ services:
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_RABBITMQ_HOST=rabbitmq
       - USER_SERVICE_URL=http://user-service:8081
+      - SERVICE_AUTH_SECRET=ServiceSecretForInternalCommunication123
+      - SERVICE_AUTH_EXPIRATION_HOURS=24
     depends_on:
       - mysql
       - rabbitmq
       - discovery-service
       - user-service
     networks:
-      - hidrogreen-network
+      - ayni-network
     restart: unless-stopped
 
-  crop-service:
-    build:
-      context: ./crop-service
-      dockerfile: Dockerfile
-    container_name: hidrogreen-crop-service
-    ports:
-      - "8085:8085"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_SHOW_SQL=true
-      - SPRING_RABBITMQ_HOST=rabbitmq
-    depends_on:
-      - mysql
-      - rabbitmq
-      - discovery-service
-    networks:
-      - hidrogreen-network
-    restart: unless-stopped
-
-  detection-service:
-    build:
-      context: ./detection-service
-      dockerfile: Dockerfile
-    container_name: hidrogreen-detection-service
-    ports:
-      - "8000:8000"
-    environment:
-      - EUREKA_SERVER=http://discovery-service:8761/eureka/
-      - SERVICE_HOST=detection-service
-      - RABBITMQ_HOST=rabbitmq
-      - RABBITMQ_PORT=5672
-      - RABBITMQ_USER=guest
-      - RABBITMQ_PASSWORD=guest
-      - USER_SERVICE_URL=http://user-service:8081
-    depends_on:
-      - discovery-service
-      - rabbitmq
-      - user-service
-    networks:
-      - hidrogreen-network
-    restart: unless-stopped
-
-  report-service:
-    build:
-      context: ./report-service
-      dockerfile: Dockerfile
-    container_name: hidrogreen-report-service
-    ports:
-      - "8083:8083"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_SHOW_SQL=true
-      - SPRING_RABBITMQ_HOST=rabbitmq
-    depends_on:
-      - mysql
-      - rabbitmq
-      - discovery-service
-    networks:
-      - hidrogreen-network
-    restart: unless-stopped
-
-  notification-service:
-    build:
-      context: ./notification-service
-      dockerfile: Dockerfile
-    container_name: hidrogreen-notification-service
-    ports:
-      - "8084:8084"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_SHOW_SQL=true
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      # Variables de entorno para servicios externos
-      - EMAIL_USERNAME=${EMAIL_USERNAME:-contact.pocketpartners@gmail.com}
-      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-dummy_password}
-      - EMAIL_FROM_ADDRESS=${EMAIL_FROM_ADDRESS:-contact.pocketpartners@gmail.com}
-      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-ACdummy_account_sid_for_development}
-      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-dummy_auth_token_for_development}
-      - TWILIO_WHATSAPP_FROM=${TWILIO_WHATSAPP_FROM:-whatsapp:+14155238886}
-      - FIREBASE_SERVER_KEY=${FIREBASE_SERVER_KEY:-dummy_firebase_server_key}
-    depends_on:
-      - mysql
-      - rabbitmq
-      - discovery-service
-    networks:
-      - hidrogreen-network
-    restart: unless-stopped
-
-  api-gateway:
-    build:
-      context: ./api-gateway
-      dockerfile: Dockerfile
-    container_name: hidrogreen-api-gateway
-    ports:
-      - "8080:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-    depends_on:
-      - discovery-service
-    networks:
-      - hidrogreen-network
-    restart: unless-stopped
+#   treatment-service:
+#     build:
+#       context: ./treatment-service
+#       dockerfile: Dockerfile
+#     container_name: hidrogreen-treatment-service
+#     ports:
+#       - "8082:8082"
+#     environment:
+#       - SPRING_PROFILES_ACTIVE=docker
+#       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+#       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+#       - SPRING_DATASOURCE_USERNAME=root
+#       - SPRING_DATASOURCE_PASSWORD=root
+#       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+#       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+#       - SPRING_JPA_SHOW_SQL=true
+#       - SPRING_RABBITMQ_HOST=rabbitmq
+#       - USER_SERVICE_URL=http://user-service:8081
+#     depends_on:
+#       - mysql
+#       - rabbitmq
+#       - discovery-service
+#       - user-service
+#     networks:
+#       - ayni-network
+#     restart: unless-stopped
 
 volumes:
   mysql_data:
 
 networks:
-  hidrogreen-network:
+  ayni-network:
     driver: bridge 

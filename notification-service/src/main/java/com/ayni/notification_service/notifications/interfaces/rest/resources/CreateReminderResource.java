@@ -4,7 +4,7 @@ package com.ayni.notification_service.notifications.interfaces.rest.resources;
  * CreateReminderResource
  */
 public record CreateReminderResource(
-    Long profileId,
+    Long farmerId,
     String title,
     String message,
     String notificationChannel,

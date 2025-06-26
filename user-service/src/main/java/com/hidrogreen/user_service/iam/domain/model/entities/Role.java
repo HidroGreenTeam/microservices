@@ -22,7 +22,7 @@ public class Role {
 
     @Getter
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
     private Roles name;
 
 

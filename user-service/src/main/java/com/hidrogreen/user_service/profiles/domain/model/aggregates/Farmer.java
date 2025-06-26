@@ -1,9 +1,6 @@
 package com.hidrogreen.user_service.profiles.domain.model.aggregates;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,15 +9,6 @@ import com.hidrogreen.user_service.profiles.domain.model.commands.CreateFarmerCo
 import com.hidrogreen.user_service.profiles.domain.model.entities.FarmerImage;
 import com.hidrogreen.user_service.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 
-/**
- * Farmer
- *
- * <p>
- *     This class represents a Farmer.
- * </p>
- *
- */
-
 @Entity
 @Getter
 @Setter
@@ -28,23 +16,23 @@ import com.hidrogreen.user_service.shared.domain.model.aggregates.AuditableAbstr
 @AllArgsConstructor
 public class Farmer extends AuditableAbstractAggregateRoot<Farmer> {
 
-    private String username;
+    @Column(unique = true, nullable = false)
+    private Long userId;
 
-    private String email;
+    private String fullName;
 
     private String phoneNumber;
 
-    private String password;
+    private String address;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "farmer_image_id", referencedColumnName = "id")
     private FarmerImage farmerImage;
 
     public Farmer(CreateFarmerCommand command) {
-        this.username = command.username();
-        this.email = command.email();
+        this.userId = command.userId();
+        this.fullName = command.fullName();
         this.phoneNumber = command.phoneNumber();
-        this.password = command.password();
+        this.address = command.address();
     }
-
 }

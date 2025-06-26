@@ -7,28 +7,34 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.hidrogreen.user_service.iam.infrastructure.authorization.sfs.model.UsernamePasswordAuthenticationTokenBuilder;
 import com.hidrogreen.user_service.iam.infrastructure.tokens.jwt.BearerTokenService;
+import com.hidrogreen.user_service.iam.infrastructure.tokens.jwt.services.TokenServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 public class BearerAuthorizationRequestFilter extends OncePerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BearerAuthorizationRequestFilter.class);
     private final BearerTokenService tokenService;
+    private final TokenServiceImpl tokenServiceImpl;
 
     @Qualifier("defaultUserDetailsService")
     private final UserDetailsService userDetailsService;
 
-    public BearerAuthorizationRequestFilter(BearerTokenService tokenService, UserDetailsService userDetailsService) {
+    public BearerAuthorizationRequestFilter(BearerTokenService tokenService, UserDetailsService userDetailsService, TokenServiceImpl tokenServiceImpl) {
         this.tokenService = tokenService;
         this.userDetailsService = userDetailsService;
+        this.tokenServiceImpl = tokenServiceImpl;
     }
 
     @Override
@@ -41,10 +47,22 @@ public class BearerAuthorizationRequestFilter extends OncePerRequestFilter {
             LOGGER.info("Token: {}", token);
             if (token != null && tokenService.validateToken(token)) {
                 String username = tokenService.getUsernameFromToken(token);
-                var userDetails = userDetailsService.loadUserByUsername(username);
-                SecurityContextHolder.getContext()
-                        .setAuthentication(UsernamePasswordAuthenticationTokenBuilder
-                                .build(userDetails, request));
+                
+                if (tokenServiceImpl.isServiceToken(token)) {
+                    // Service token - create service authentication
+                    var serviceAuth = new UsernamePasswordAuthenticationToken(
+                            username,
+                            null,
+                            List.of(new SimpleGrantedAuthority("ROLE_SERVICE"))
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(serviceAuth);
+                } else {
+                    // User token - create user authentication
+                    var userDetails = userDetailsService.loadUserByUsername(username);
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(UsernamePasswordAuthenticationTokenBuilder
+                                    .build(userDetails, request));
+                }
             } else {
                 LOGGER.info("Token is not valid");
             }

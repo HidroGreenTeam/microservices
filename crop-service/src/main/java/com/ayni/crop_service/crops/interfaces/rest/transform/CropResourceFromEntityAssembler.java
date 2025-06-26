@@ -8,11 +8,10 @@ public class CropResourceFromEntityAssembler {
         return new CropResource(
                 crop.getId(),
                 crop.getCropName(),
-                crop.getIrrigationType().name(),
                 crop.getArea(),
                 crop.getPlantingDate().toString(),
                 crop.getFarmerId(),
-                crop.getCropImage() != null ? crop.getCropImage().getImageUrl() : null // Aquí evitamos el NullPointerException
+                crop.getCropImage() != null ? crop.getCropImage().getImageUrl() : null
         );
     }
 

@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @Getter
 public final class ReminderCreatedEvent extends ApplicationEvent {
     private final Long reminderId;
-    private final Long profileId;
+    private final Long farmerId;
     private final LocalDateTime remindAt;
 
-    public ReminderCreatedEvent(Object source, Long reminderId, Long profileId, LocalDateTime remindAt) {
+    public ReminderCreatedEvent(Object source, Long reminderId, Long farmerId, LocalDateTime remindAt) {
         super(source);
         this.reminderId = reminderId;
-        this.profileId = profileId;
+        this.farmerId = farmerId;
         this.remindAt = remindAt;
     }
 }

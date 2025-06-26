@@ -2,10 +2,10 @@ package com.hidrogreen.user_service.profiles.interfaces.rest.resources;
 
 public record FarmerResource(
         Long id,
-        String username,
-        String email,
+        Long userId,
+        String fullName,
         String phoneNumber,
-        String password,
+        String address,
         String imageUrl
 ) {
 }

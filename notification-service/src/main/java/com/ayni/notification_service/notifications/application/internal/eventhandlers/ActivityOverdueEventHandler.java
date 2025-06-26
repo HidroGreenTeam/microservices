@@ -32,11 +32,11 @@ public class ActivityOverdueEventHandler {
         try {
             // Get activity information including owner profile ID
             var activityInfo = externalActivityService.getActivityInfo(event.getActivityId());
-            Long profileId = activityInfo.profileId();
+            Long farmerId = activityInfo.farmerId();
             
             // Send urgent overdue alert via WhatsApp
             SendNotificationCommand whatsAppCommand = new SendNotificationCommand(
-                profileId,
+                farmerId,
                 NotificationType.ALERT,
                 NotificationChannel.WHATSAPP,
                 "⚠️ ACTIVIDAD VENCIDA - URGENTE",
@@ -53,7 +53,7 @@ public class ActivityOverdueEventHandler {
             
             // Send urgent email alert as backup
             SendNotificationCommand emailCommand = new SendNotificationCommand(
-                profileId,
+                farmerId,
                 NotificationType.ALERT,
                 NotificationChannel.EMAIL,
                 "⚠️ ALERTA: Actividad Agrícola Vencida - Acción Requerida",

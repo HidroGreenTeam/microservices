@@ -13,7 +13,7 @@ public class ExternalActivityService {
         String activityName,
         String description,
         Long cropId,
-        Long profileId,
+        Long farmerId,
         String status
     ) {}
     
@@ -30,7 +30,7 @@ public class ExternalActivityService {
                 "Mock Activity",
                 "Temporary mock activity description",
                 1L,
-                1L, // profileId
+                1L, // farmerId
                 "PENDING"
             );
             
@@ -44,10 +44,10 @@ public class ExternalActivityService {
      * @param activityId The activity ID
      * @return The profile ID of the activity owner
      */
-    public Long getActivityOwnerProfileId(Long activityId) {
+    public Long getActivityOwnerfarmerId(Long activityId) {
         try {
             ActivityInfo activityInfo = getActivityInfo(activityId);
-            return activityInfo.profileId();
+            return activityInfo.farmerId();
             
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve activity owner profile ID", e);

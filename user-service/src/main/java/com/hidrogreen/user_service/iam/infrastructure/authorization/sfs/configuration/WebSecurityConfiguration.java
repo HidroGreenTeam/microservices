@@ -3,6 +3,7 @@ package com.hidrogreen.user_service.iam.infrastructure.authorization.sfs.configu
 import com.hidrogreen.user_service.iam.infrastructure.authorization.sfs.pipeline.BearerAuthorizationRequestFilter;
 import com.hidrogreen.user_service.iam.infrastructure.hashing.bcrypt.BCryptHashingService;
 import com.hidrogreen.user_service.iam.infrastructure.tokens.jwt.BearerTokenService;
+import com.hidrogreen.user_service.iam.infrastructure.tokens.jwt.services.TokenServiceImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,20 +27,22 @@ import java.util.List;
 public class WebSecurityConfiguration {
     private final UserDetailsService userDetailsService;
     private final BearerTokenService tokenService;
+    private final TokenServiceImpl tokenServiceImpl;
     private final BCryptHashingService hashingService;
     private final AuthenticationEntryPoint unauthorizedRequestHandler;
 
 
-    public WebSecurityConfiguration(@Qualifier("defaultUserDetailsService") UserDetailsService userDetailsService, BearerTokenService tokenService, BCryptHashingService hashingService, AuthenticationEntryPoint authenticationEntryPoint) {
+    public WebSecurityConfiguration(@Qualifier("defaultUserDetailsService") UserDetailsService userDetailsService, BearerTokenService tokenService, TokenServiceImpl tokenServiceImpl, BCryptHashingService hashingService, AuthenticationEntryPoint authenticationEntryPoint) {
         this.userDetailsService = userDetailsService;
         this.tokenService = tokenService;
+        this.tokenServiceImpl = tokenServiceImpl;
         this.hashingService = hashingService;
         this.unauthorizedRequestHandler = authenticationEntryPoint;
     }
 
     @Bean
     public BearerAuthorizationRequestFilter authorizationRequestFilter() {
-        return new BearerAuthorizationRequestFilter(tokenService, userDetailsService);
+        return new BearerAuthorizationRequestFilter(tokenService, userDetailsService, tokenServiceImpl);
     }
 
     @Bean
@@ -84,7 +87,10 @@ public class WebSecurityConfiguration {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
-                                "/webjars/**").permitAll()
+                                "/webjars/**",
+                                "/actuator/health").permitAll()
+                        // Internal endpoints for service-to-service communication
+                        .requestMatchers("/internal/**").hasRole("SERVICE")
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authorizationRequestFilter(), UsernamePasswordAuthenticationFilter.class);

@@ -7,12 +7,11 @@ public class FarmerResourceFromEntityAssembler {
     public static FarmerResource toResourceFromEntity(Farmer farmer) {
         return new FarmerResource(
                 farmer.getId(),
-                farmer.getUsername(),
-                farmer.getEmail(),
+                farmer.getUserId(),
+                farmer.getFullName(),
                 farmer.getPhoneNumber(),
-                farmer.getPassword(),
-                farmer.getFarmerImage() != null ? farmer.getFarmerImage().getImageUrl() : null // Aquí evitamos el NullPointerException
-
+                farmer.getAddress(),
+                farmer.getFarmerImage() != null ? farmer.getFarmerImage().getImageUrl() : null
         );
     }
 }

@@ -18,14 +18,14 @@ public class OpenApiConfiguration {
         var openApi = new OpenAPI();
         openApi
                 .info(new Info()
-                        .title("HidroBots Treatment API")
-                        .description("HidroBots Treatment Service REST API documentation.")
+                        .title("Ayni Treatment Service API")
+                        .description("Ayni Treatment Service REST API documentation.")
                         .version("v1.0.0")
-                        .license(new License().name("HIGN 2.0")
+                        .license(new License().name("AYNI 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
                 .externalDocs(new ExternalDocumentation()
-                        .description("HidroBots Documentation")
-                        .url("https://github.com/IoT-Solutions-SW71-Grupo-4/HidroBots-Report"));
+                        .description("Ayni Documentation")
+                        .url("https://github.com/Ayni-Team/Ayni-Documentation"));
 
         // Add security scheme
         final String securitySchemeName = "bearerAuth";

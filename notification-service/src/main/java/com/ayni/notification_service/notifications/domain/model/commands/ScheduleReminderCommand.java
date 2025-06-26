@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
  * ScheduleReminderCommand
  */
 public record ScheduleReminderCommand(
-    Long profileId,
+    Long farmerId,
     NotificationChannel notificationChannel,
     String title,
     String message,
@@ -18,8 +18,8 @@ public record ScheduleReminderCommand(
     boolean isRecurring,
     String recurrencePattern
 ) {
-    public ScheduleReminderCommand(Long profileId, NotificationChannel notificationChannel, 
+    public ScheduleReminderCommand(Long farmerId, NotificationChannel notificationChannel, 
                                  String title, String message, LocalDateTime remindAt) {
-        this(profileId, notificationChannel, title, message, remindAt, null, null, false, null);
+        this(farmerId, notificationChannel, title, message, remindAt, null, null, false, null);
     }
 }

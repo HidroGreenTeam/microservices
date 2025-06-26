@@ -6,6 +6,7 @@ import com.ayni.notification_service.notifications.domain.services.NotificationC
 import com.ayni.notification_service.notifications.domain.services.NotificationQueryService;
 import com.ayni.notification_service.notifications.interfaces.rest.resources.NotificationResource;
 import com.ayni.notification_service.notifications.interfaces.rest.resources.SendNotificationResource;
+import com.ayni.notification_service.shared.interfaces.rest.response.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -48,7 +49,7 @@ public class NotificationsController {
      */
     @PostMapping("/email")
     @Operation(summary = "Send email notification", description = "Send an email notification to a user")
-    public ResponseEntity<String> sendEmail(@RequestBody SendNotificationResource resource) {
+    public ResponseEntity<?> sendEmail(@RequestBody SendNotificationResource resource) {
         try {
             logger.info("Sending email notification to: {}", resource.recipient());
             emailNotificationService.sendEmail(
@@ -60,7 +61,7 @@ public class NotificationsController {
         } catch (Exception e) {
             logger.error("Failed to send email: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send email: " + e.getMessage());
+                    .body(ApiResponse.error("Email sending failed", e.getMessage()));
         }
     }
 
@@ -69,7 +70,7 @@ public class NotificationsController {
      */
     @PostMapping("/whatsapp")
     @Operation(summary = "Send WhatsApp notification", description = "Send a WhatsApp message to a user")
-    public ResponseEntity<String> sendWhatsApp(@RequestBody SendNotificationResource resource) {
+    public ResponseEntity<?> sendWhatsApp(@RequestBody SendNotificationResource resource) {
         try {
             logger.info("Sending WhatsApp notification to: {}", resource.recipient());
             whatsAppNotificationService.sendWhatsApp(
@@ -80,7 +81,7 @@ public class NotificationsController {
         } catch (Exception e) {
             logger.error("Failed to send WhatsApp message: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send WhatsApp message: " + e.getMessage());
+                    .body(ApiResponse.error("WhatsApp sending failed", e.getMessage()));
         }
     }
 
@@ -89,7 +90,7 @@ public class NotificationsController {
      */
     @PostMapping("/test/email")
     @Operation(summary = "Test email configuration", description = "Send a test email to verify configuration")
-    public ResponseEntity<String> testEmail(@RequestParam String recipient) {
+    public ResponseEntity<?> testEmail(@RequestParam String recipient) {
         try {
             logger.info("Testing email configuration with recipient: {}", recipient);
             emailNotificationService.sendEmail(
@@ -102,7 +103,7 @@ public class NotificationsController {
         } catch (Exception e) {
             logger.error("Failed to send test email: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send test email: " + e.getMessage());
+                    .body(ApiResponse.error("Test email failed", e.getMessage()));
         }
     }
 
@@ -111,7 +112,7 @@ public class NotificationsController {
      */
     @PostMapping("/test/whatsapp")
     @Operation(summary = "Test WhatsApp configuration", description = "Send a test WhatsApp message to verify configuration")
-    public ResponseEntity<String> testWhatsApp(@RequestParam String recipient) {
+    public ResponseEntity<?> testWhatsApp(@RequestParam String recipient) {
         try {
             logger.info("Testing WhatsApp configuration with recipient: {}", recipient);
             whatsAppNotificationService.sendWhatsApp(
@@ -122,23 +123,24 @@ public class NotificationsController {
         } catch (Exception e) {
             logger.error("Failed to send test WhatsApp message: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send test WhatsApp message: " + e.getMessage());
+                    .body(ApiResponse.error("Test WhatsApp failed", e.getMessage()));
         }
     }
 
     /**
      * Get notification history for a user
      */
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{farmerId}")
     @Operation(summary = "Get user notifications", description = "Get notification history for a specific user")
-    public ResponseEntity<List<NotificationResource>> getUserNotifications(@PathVariable Long userId) {
+    public ResponseEntity<?> getUserNotifications(@PathVariable Long farmerId) {
         try {
             // This would be implemented based on your notification query service
-            logger.info("Getting notifications for user: {}", userId);
+            logger.info("Getting notifications for user: {}", farmerId);
             return ResponseEntity.ok().build(); // Placeholder
         } catch (Exception e) {
             logger.error("Failed to get user notifications: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Failed to retrieve notifications", e.getMessage()));
         }
     }
 

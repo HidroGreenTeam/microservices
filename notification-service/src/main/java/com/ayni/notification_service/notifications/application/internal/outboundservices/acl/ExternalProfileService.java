@@ -22,77 +22,77 @@ public class ExternalProfileService {
     }
 
     /**
-     * Get profile email by ProfileId
+     * Get profile email by farmerId
      *
-     * @param profileId the profile ID
+     * @param farmerId the profile ID
      * @return the profile email address
      */
-    public String getProfileEmail(Long profileId) {
-        log.debug("Retrieving email for profileId: {}", profileId);
+    public String getProfileEmail(Long farmerId) {
+        log.debug("Retrieving email for farmerId: {}", farmerId);
         
         try {
-            String email = userServiceClient.getFarmerEmail(profileId);
-            log.debug("Retrieved email: {} for profileId: {}", email, profileId);
+            String email = userServiceClient.getFarmerEmail(farmerId);
+            log.debug("Retrieved email: {} for farmerId: {}", email, farmerId);
             return email;
         } catch (Exception e) {
-            log.warn("Failed to retrieve email for profileId: {}, using fallback: {}", profileId, e.getMessage());
+            log.warn("Failed to retrieve email for farmerId: {}, using fallback: {}", farmerId, e.getMessage());
             return "user@example.com"; // Fallback email
         }
     }
 
     /**
-     * Get profile phone number by ProfileId
+     * Get profile phone number by farmerId
      *
-     * @param profileId the profile ID
+     * @param farmerId the profile ID
      * @return the profile phone number
      */
-    public String getProfilePhoneNumber(Long profileId) {
-        log.debug("Retrieving phone for profileId: {}", profileId);
+    public String getProfilePhoneNumber(Long farmerId) {
+        log.debug("Retrieving phone for farmerId: {}", farmerId);
         
         try {
-            String phone = userServiceClient.getFarmerPhone(profileId);
-            log.debug("Retrieved phone: {} for profileId: {}", phone, profileId);
+            String phone = userServiceClient.getFarmerPhone(farmerId);
+            log.debug("Retrieved phone: {} for farmerId: {}", phone, farmerId);
             return phone;
         } catch (Exception e) {
-            log.warn("Failed to retrieve phone for profileId: {}, using fallback: {}", profileId, e.getMessage());
+            log.warn("Failed to retrieve phone for farmerId: {}, using fallback: {}", farmerId, e.getMessage());
             return "+1234567890"; // Fallback phone number
         }
     }
 
     /**
-     * Get profile name by ProfileId
+     * Get profile name by farmerId
      *
-     * @param profileId the profile ID
+     * @param farmerId the profile ID
      * @return the profile full name
      */
-    public String getProfileName(Long profileId) {
-        log.debug("Retrieving name for profileId: {}", profileId);
+    public String getProfileName(Long farmerId) {
+        log.debug("Retrieving name for farmerId: {}", farmerId);
         
         try {
-            String name = userServiceClient.getFarmerName(profileId);
-            log.debug("Retrieved name: {} for profileId: {}", name, profileId);
+            String name = userServiceClient.getFarmerName(farmerId);
+            log.debug("Retrieved name: {} for farmerId: {}", name, farmerId);
             return name;
         } catch (Exception e) {
-            log.warn("Failed to retrieve name for profileId: {}, using fallback: {}", profileId, e.getMessage());
+            log.warn("Failed to retrieve name for farmerId: {}, using fallback: {}", farmerId, e.getMessage());
             return "Unknown User"; // Fallback name
         }
     }
 
     /**
-     * Check if profile exists by ProfileId
+     * Check if profile exists by farmerId
      *
-     * @param profileId the profile ID
+     * @param farmerId the profile ID
      * @return true if profile exists
      */
-    public boolean existsProfile(Long profileId) {
-        log.debug("Checking if profileId exists: {}", profileId);
+    public boolean existsProfile(Long farmerId) {
+        log.debug("Checking if farmerId exists: {}", farmerId);
         
         try {
-            Boolean exists = userServiceClient.farmerExists(profileId);
-            log.debug("ProfileId {} exists: {}", profileId, exists);
+            Boolean exists = userServiceClient.farmerExists(farmerId);
+            log.debug("farmerId {} exists: {}", farmerId, exists);
             return exists;
         } catch (Exception e) {
-            log.warn("Failed to check if profileId exists: {}, assuming false: {}", profileId, e.getMessage());
+            log.warn("Failed to check if farmerId exists: {}, assuming false: {}", farmerId, e.getMessage());
             return false; // Assume profile doesn't exist on error
         }
     }
@@ -100,7 +100,7 @@ public class ExternalProfileService {
     /**
      * Feign Client for User Service communication
      */
-    @FeignClient(name = "user-service")
+    @FeignClient(name = "user-service", configuration = com.ayni.notification_service.shared.infrastructure.security.feign.FeignConfiguration.class)
     public interface UserServiceClient {
         
         @GetMapping("/api/v1/farmers/{farmerId}/email")
@@ -112,7 +112,7 @@ public class ExternalProfileService {
         @GetMapping("/api/v1/farmers/{farmerId}/name")
         String getFarmerName(@PathVariable("farmerId") Long farmerId);
         
-        @GetMapping("/api/v1/farmers/{farmerId}/exists")
+        @GetMapping("/api/v1/user-profiles/internal/farmers/{farmerId}/exists")
         Boolean farmerExists(@PathVariable("farmerId") Long farmerId);
     }
 }

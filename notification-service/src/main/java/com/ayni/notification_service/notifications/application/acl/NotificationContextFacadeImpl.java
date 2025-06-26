@@ -27,10 +27,10 @@ public class NotificationContextFacadeImpl implements NotificationContextFacade 
     }
     
     @Override
-    public Long sendNotification(Long profileId, String title, String message, String channel) {
+    public Long sendNotification(Long farmerId, String title, String message, String channel) {
         NotificationChannel notificationChannel = NotificationChannel.valueOf(channel.toUpperCase());
         SendNotificationCommand command = new SendNotificationCommand(
-            profileId,
+            farmerId,
             NotificationType.INFO,
             notificationChannel,
             title,
@@ -40,11 +40,11 @@ public class NotificationContextFacadeImpl implements NotificationContextFacade 
     }
     
     @Override
-    public Long scheduleReminder(Long profileId, String title, String message, 
+    public Long scheduleReminder(Long farmerId, String title, String message, 
                                LocalDateTime remindAt, String channel) {
         NotificationChannel notificationChannel = NotificationChannel.valueOf(channel.toUpperCase());
         ScheduleReminderCommand command = new ScheduleReminderCommand(
-            profileId,
+            farmerId,
             notificationChannel,
             title,
             message,
@@ -54,9 +54,9 @@ public class NotificationContextFacadeImpl implements NotificationContextFacade 
     }
     
     @Override
-    public void sendActivityReminder(Long profileId, Long activityId, String activityTitle) {
+    public void sendActivityReminder(Long farmerId, Long activityId, String activityTitle) {
         SendNotificationCommand command = new SendNotificationCommand(
-            profileId,
+            farmerId,
             NotificationType.REMINDER,
             NotificationChannel.WHATSAPP,
             "Recordatorio: " + activityTitle,

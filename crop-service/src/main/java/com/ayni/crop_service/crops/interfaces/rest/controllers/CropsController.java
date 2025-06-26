@@ -1,11 +1,7 @@
 package com.ayni.crop_service.crops.interfaces.rest.controllers;
 
-
-import com.ayni.crop_service.crops.application.internal.commandServiceImpl.CropCommandServiceImpl;
-import com.ayni.crop_service.crops.application.internal.commandServiceImpl.CropImageServiceImpl;
 import com.ayni.crop_service.crops.domain.model.aggregates.Crop;
 import com.ayni.crop_service.crops.domain.model.commands.DeleteCropCommand;
-import com.ayni.crop_service.crops.domain.model.commands.UpdateIrrigationTypeCommand;
 import com.ayni.crop_service.crops.domain.model.queries.GetAllCropsQuery;
 import com.ayni.crop_service.crops.domain.model.queries.GetCropByIdQuery;
 import com.ayni.crop_service.crops.domain.model.queries.GetCropsFromAFarmerQuery;
@@ -14,44 +10,44 @@ import com.ayni.crop_service.crops.domain.services.CropQueryService;
 import com.ayni.crop_service.crops.interfaces.rest.resources.CreateCropResource;
 import com.ayni.crop_service.crops.interfaces.rest.resources.CropResource;
 import com.ayni.crop_service.crops.interfaces.rest.resources.UpdateCropResource;
-import com.ayni.crop_service.crops.interfaces.rest.resources.UpdateIrrigationTypeResource;
 import com.ayni.crop_service.crops.interfaces.rest.transform.CreateCropResourceCommandFromResourceAssembler;
 import com.ayni.crop_service.crops.interfaces.rest.transform.CropResourceFromEntityAssembler;
 import com.ayni.crop_service.crops.interfaces.rest.transform.UpdateCropResourceCommandFromResourceAssembler;
+
+import com.ayni.crop_service.shared.interfaces.rest.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@Tag(name = "Crops", description = "Crops management")
+@Tag(name = "Crops", description = "Crop Management API - CRUD operations for crop cultivation")
 @RequestMapping(value = "api/v1/crops", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CropsController {
 
     private final CropCommandService cropCommandService;
     private final CropQueryService cropQueryService;
 
-    @Autowired
-    public CropsController(CropCommandService cropCommandService, CropQueryService cropQueryService, CropCommandServiceImpl cropCommandServiceImpl, CropImageServiceImpl cropImageServiceImpl) {
+    public CropsController(CropCommandService cropCommandService, CropQueryService cropQueryService) {
         this.cropCommandService = cropCommandService;
         this.cropQueryService = cropQueryService;
     }
 
+    // ============================================
+    // QUERY OPERATIONS - WITHOUT PAGINATION
+    // ============================================
+
     @Operation(
             summary = "Get all crops",
-            description = "Returns a list of all crops"
+            description = "Returns all crops in the system"
     )
     @GetMapping
     public ResponseEntity<List<CropResource>> getAllCrops() {
@@ -66,190 +62,276 @@ public class CropsController {
     }
 
     @Operation(
-            summary = "Create a crop with an image",
-            description = "Creates a new crop using the data provided in the request body and the image provided in the request form-data"
-    )
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CropResource> createCrop(
-            @RequestPart("file") MultipartFile file,
-            @RequestPart("crop") @Valid CreateCropResource createCropResource) throws IOException {
-
-        // Crear el comando de cultivo
-        var createCropCommand = CreateCropResourceCommandFromResourceAssembler.toCommandFromResource(createCropResource);
-
-        // Llamar al servicio que maneja tanto la creación del cultivo como la subida de la imagen
-        Long cropId = cropCommandService.handle(createCropCommand, file);
-
-        // Devolver el recurso del cultivo creado
-        return cropQueryService.handle(new GetCropByIdQuery(cropId))
-                .map(cropEntity -> new ResponseEntity<>(
-                        CropResourceFromEntityAssembler.toResourceFromEntity(cropEntity), HttpStatus.CREATED))
-                .orElse(ResponseEntity.badRequest().build());
-    }
-
-
-    @Operation(
-            summary = "Get a crop by cropId",
-            description = "Returns the crop with the given cropId"
+            summary = "Get crop by ID", 
+            description = "Returns detailed information of a specific crop"
     )
     @GetMapping("/{cropId}")
-    public ResponseEntity<CropResource> getCropById(@PathVariable Long cropId) {
-        return cropQueryService.handle(new GetCropByIdQuery(cropId))
-                .map(cropEntity -> new ResponseEntity<>(
-                        CropResourceFromEntityAssembler.toResourceFromEntity(cropEntity), HttpStatus.OK))
-                .orElse(ResponseEntity.notFound().header(
-                        "message", "Crop with id " + cropId + " not found"
-                ).build());
+    public ResponseEntity<?> getCropById(@PathVariable Long cropId) {
+        var cropOpt = cropQueryService.handle(new GetCropByIdQuery(cropId));
+        if (cropOpt.isPresent()) {
+            var cropResource = CropResourceFromEntityAssembler.toResourceFromEntity(cropOpt.get());
+            return ResponseEntity.ok(cropResource);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Resource not found", "Crop not found with id: " + cropId));
+        }
     }
 
-
-
-
-
     @Operation(
-            summary = "Get all crops for a specific farmer",
-            description = "Returns a list of all crops associated with the given farmerId"
+            summary = "Get crops from specific farmer",
+            description = "Returns all crops associated with a farmer ID"
     )
-    @GetMapping("/farmer/{farmerId}/crops")
-    public ResponseEntity<List<CropResource>> getCropsFromFarmer(@PathVariable Long farmerId) {
-        // Crear la consulta usando el farmerId
-        GetCropsFromAFarmerQuery query = new GetCropsFromAFarmerQuery(farmerId);
+    @GetMapping("/farmers/{farmerId}/crops")
+    public ResponseEntity<?> getCropsFromFarmer(@PathVariable Long farmerId) {
+        try {
+            GetCropsFromAFarmerQuery query = new GetCropsFromAFarmerQuery(farmerId);
+            List<Crop> crops = cropQueryService.handle(query);
 
-        // Llamar al servicio que maneja la lógica de consulta
-        List<Crop> crops = cropQueryService.handle(query);
+            List<CropResource> cropResources = crops.stream()
+                    .map(CropResourceFromEntityAssembler::toResourceFromEntity)
+                    .toList();
 
-        // Convertir los cultivos obtenidos a recursos para enviarlos como respuesta
-        List<CropResource> cropResources = crops.stream()
-                .map(CropResourceFromEntityAssembler::toResourceFromEntity)
-                .toList();
-
-        // Devolver los cultivos como una respuesta HTTP
-        return ResponseEntity.ok(cropResources);
+            return ResponseEntity.ok(cropResources);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Resource not found", e.getMessage()));
+        }
     }
 
+    @Operation(
+            summary = "Get farmer crop metrics",
+            description = "Returns statistics and metrics for a farmer's crops"
+    )
+    @GetMapping("/farmers/{farmerId}/metrics")
+    public ResponseEntity<?> getFarmerCropMetrics(@PathVariable Long farmerId) {
+        try {
+            GetCropsFromAFarmerQuery query = new GetCropsFromAFarmerQuery(farmerId);
+            List<Crop> crops = cropQueryService.handle(query);
 
+            long totalArea = crops.stream().mapToLong(Crop::getArea).sum();
+            long averageArea = crops.isEmpty() ? 0 : totalArea / crops.size();
+            
+            var metrics = new FarmerCropMetrics(
+                    farmerId,
+                    crops.size(),
+                    totalArea,
+                    averageArea,
+                    crops.stream().anyMatch(c -> c.getCropImage() != null)
+            );
 
+            return ResponseEntity.ok(metrics);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Resource not found", e.getMessage()));
+        }
+    }
+
+    // ============================================
+    // COMMAND OPERATIONS
+    // ============================================
 
     @Operation(
-            summary = "Update a crop by cropId (only the crop data) | NO IMAGE UPDATE",
-            description = "Updates the crop with the given cropId using the data provided in the request body"
+            summary = "Create new crop with image for specific farmer",
+            description = "Creates a new crop with validation and optional image upload for a specific farmer"
+    )
+    @PostMapping(value = "/farmers/{farmerId}/crops", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createCrop(
+            @PathVariable Long farmerId,
+            @RequestPart("file") MultipartFile file,
+            @RequestPart(value = "crop", name = "crop") @Valid CreateCropResource createCropResource) throws IOException {
+
+        var createCropCommand = CreateCropResourceCommandFromResourceAssembler.toCommandFromResource(createCropResource, farmerId);
+
+        try {
+            Long cropId = cropCommandService.handle(createCropCommand, file);
+
+            var cropOpt = cropQueryService.handle(new GetCropByIdQuery(cropId));
+            if (cropOpt.isPresent()) {
+                var cropResource = CropResourceFromEntityAssembler.toResourceFromEntity(cropOpt.get());
+                return ResponseEntity.status(HttpStatus.CREATED).body(cropResource);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(ApiResponse.error("Internal server error", "Failed to retrieve created crop"));
+            }
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Bad request", "Failed to create crop: " + e.getMessage()));
+        }
+    }
+
+    @Operation(
+            summary = "Update crop data",
+            description = "Updates crop information (excluding image)"
     )
     @PutMapping("/{cropId}")
-    public ResponseEntity<CropResource> updateCrop(@PathVariable Long cropId, @RequestBody UpdateCropResource updateCropResource) {
+    public ResponseEntity<?> updateCrop(
+            @PathVariable Long cropId, 
+            @RequestBody @Valid UpdateCropResource updateCropResource) {
+        
         var updateCropCommand = UpdateCropResourceCommandFromResourceAssembler.toCommandFromResource(cropId, updateCropResource);
 
-        var updatedCrop = cropCommandService.handle(updateCropCommand); // actualizamos sin la imagen
+        try {
+            var updatedCrop = cropCommandService.handle(updateCropCommand);
 
-        if (updatedCrop.isEmpty()) {
-            return ResponseEntity.notFound().header(
-                    "message", "Crop with id " + cropId + " not found"
-            ).build();
+            if (updatedCrop.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("Resource not found", "Crop not found with id: " + cropId));
+            }
+
+            var cropResource = CropResourceFromEntityAssembler.toResourceFromEntity(updatedCrop.get());
+            return ResponseEntity.ok(cropResource);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Bad request", "Failed to update crop: " + e.getMessage()));
         }
-
-        var cropResource = CropResourceFromEntityAssembler.toResourceFromEntity(updatedCrop.get());
-        return ResponseEntity.ok(cropResource);
     }
 
-
+    // ============================================
+    // IMAGE OPERATIONS
+    // ============================================
 
     @Operation(
-            summary = "Update a crop image by cropId",
-            description = "Updates the crop image with the given cropId using the image provided in the request body"
+            summary = "Update crop image",
+            description = "Updates or adds an image to an existing crop"
     )
     @PutMapping(value = "/{cropId}/cropImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CropResource> updateCropImage(
+    public ResponseEntity<?> updateCropImage(
             @PathVariable Long cropId,
             @RequestPart("file") MultipartFile file) throws IOException {
 
-        // Encontramos el cultivo por ID
         Optional<Crop> cropOptional = cropQueryService.handle(new GetCropByIdQuery(cropId));
 
         if (cropOptional.isEmpty()) {
-            return ResponseEntity.notFound().header("message", "Crop with id " + cropId + " not found").build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Resource not found", "Crop with id " + cropId + " not found"));
         }
 
-        Crop crop = cropOptional.get();
+        try {
+            Crop crop = cropOptional.get();
+            Optional<Crop> updatedCropOptional = cropCommandService.UpdateCropImage(file, crop);
 
-        // Subimos la nueva imagen a Cloudinary y eliminamos la anterior si existe
-        Optional<Crop> updatedCropOptional = cropCommandService.UpdateCropImage(file, crop);
+            if (updatedCropOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(ApiResponse.error("Internal server error", "Failed to update crop image"));
+            }
 
-        if (updatedCropOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            Crop updatedCrop = updatedCropOptional.get();
+            CropResource cropResource = CropResourceFromEntityAssembler.toResourceFromEntity(updatedCrop);
+
+            return ResponseEntity.ok(cropResource);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Internal server error", "Error processing image: " + e.getMessage()));
         }
-
-        Crop updatedCrop = updatedCropOptional.get();
-
-        // Convertimos el cultivo a un recurso para devolverlo al cliente
-        CropResource cropResource = CropResourceFromEntityAssembler.toResourceFromEntity(updatedCrop);
-
-        return ResponseEntity.ok(cropResource);
     }
 
-
-
-
-
     @Operation(
-            summary = "Update the irrigation type of a crop by cropId",
-            description = "Updates the irrigation type of the crop with the given cropId using the irrigation type [Manual, Automatic]"
+            summary = "Delete crop image",
+            description = "Removes the image from a crop while keeping the crop data"
     )
-    @PatchMapping("/{cropId}/irrigationType")
-    public ResponseEntity<CropResource> updateIrrigationType(@PathVariable Long cropId, @RequestBody UpdateIrrigationTypeResource updateIrrigationTypeResource) {
-        var updateIrrigationTypeCommand = new UpdateIrrigationTypeCommand(
-                cropId,
-                updateIrrigationTypeResource.irrigationType()
-        );
+    @DeleteMapping("/{cropId}/cropImage")
+    public ResponseEntity<?> deleteCropImage(@PathVariable Long cropId) throws IOException {
+        try {
+            Optional<Crop> updatedCropOptional = cropCommandService.deleteCropImage(cropId);
 
-        Optional<Crop> updatedIrrigation = cropCommandService.handle(updateIrrigationTypeCommand);
+            if (updatedCropOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("Resource not found", "Crop not found or has no image"));
+            }
 
-        if (updatedIrrigation.isEmpty()) {
-            return ResponseEntity.notFound().header(
-                    "message", "Crop with id " + cropId + " not found"
-            ).build();
+            Crop updatedCrop = updatedCropOptional.get();
+            CropResource cropResource = CropResourceFromEntityAssembler.toResourceFromEntity(updatedCrop);
+
+            return ResponseEntity.ok(cropResource);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Bad request", "Failed to delete image: " + e.getMessage()));
         }
-
-        var cropResource = CropResourceFromEntityAssembler.toResourceFromEntity(updatedIrrigation.get());
-        return ResponseEntity.ok(cropResource);
     }
 
-
-
-
+    // ============================================
+    // SOFT DELETE (RECOMMENDED)
+    // ============================================
+    
     @Operation(
-            summary = "Delete a crop by cropId",
-            description = "Deletes the crop with the given cropId"
+            summary = "Delete crop (with dependency validation)",
+            description = "Deletes a crop after validating no active diagnoses exist"
     )
     @DeleteMapping("/{cropId}")
     public ResponseEntity<?> deleteCrop(@PathVariable Long cropId) {
-        var deleteCropCommand = new DeleteCropCommand(cropId);
-        cropCommandService.handle(deleteCropCommand);
+        try {
+            var deleteCropCommand = new DeleteCropCommand(cropId);
+            cropCommandService.handle(deleteCropCommand);
 
-        return ResponseEntity.ok("Crop with id " + cropId + " deleted");
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Bad request", "Failed to delete crop: " + e.getMessage()));
+        }
     }
 
-
+    // ============================================
+    // UTILITY ENDPOINTS
+    // ============================================
 
     @Operation(
-            summary = "Delete a crop image by cropId",
-            description = "Deletes the image of the crop with the given cropId"
+            summary = "Search crops by name",
+            description = "Search crops by name pattern"
     )
-    @DeleteMapping("/{cropId}/cropImage")
-    public ResponseEntity<CropResource> deleteCropImage(@PathVariable Long cropId) throws IOException {
-        // Delegar al servicio para que maneje la eliminación de la imagen
-        Optional<Crop> updatedCropOptional = cropCommandService.deleteCropImage(cropId);
+    @GetMapping("/search")
+    public ResponseEntity<List<CropResource>> searchCropsByName(@RequestParam String name) {
+        var allCrops = cropQueryService.handle(new GetAllCropsQuery());
+        
+        // Simple name filtering (should be moved to repository for efficiency)
+        var filteredCrops = allCrops.stream()
+                .filter(crop -> crop.getCropName().toLowerCase().contains(name.toLowerCase()))
+                .toList();
 
-        if (updatedCropOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        var cropResources = filteredCrops.stream()
+                .map(CropResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
 
-        Crop updatedCrop = updatedCropOptional.get();
-
-        // Convertir el cultivo actualizado a un recurso para devolverlo al cliente
-        CropResource cropResource = CropResourceFromEntityAssembler.toResourceFromEntity(updatedCrop);
-
-        return ResponseEntity.ok(cropResource);
+        return ResponseEntity.ok(cropResources);
     }
 
+    // ============================================
+    // DEBUGGING ENDPOINTS (TEMPORARY)
+    // ============================================
 
+    @Operation(
+            summary = "Test authentication with JSON POST",
+            description = "Test endpoint to verify authentication works with JSON POST"
+    )
+    @PostMapping("/test-auth")
+    public ResponseEntity<?> testAuth(@RequestBody @Valid CreateCropResource createCropResource) {
+        return ResponseEntity.ok().body(java.util.Map.of(
+            "message", "Authentication successful",
+            "received", createCropResource
+        ));
+    }
 
+    @Operation(
+            summary = "Test authentication with multipart POST",
+            description = "Test endpoint to verify authentication works with multipart POST"
+    )
+    @PostMapping(value = "/test-multipart", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> testMultipartAuth(
+            @RequestPart("crop") @Valid CreateCropResource createCropResource) {
+        return ResponseEntity.ok().body(java.util.Map.of(
+            "message", "Multipart authentication successful",
+            "received", createCropResource
+        ));
+    }
+
+    // ============================================
+    // DTOs
+    // ============================================
+
+    public record FarmerCropMetrics(
+            Long farmerId,
+            Integer totalCrops,
+            Long totalArea,
+            Long averageArea,
+            Boolean hasImages
+    ) {}
 }

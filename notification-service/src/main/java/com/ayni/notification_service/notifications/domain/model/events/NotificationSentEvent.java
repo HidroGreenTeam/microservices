@@ -9,11 +9,17 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 public final class NotificationSentEvent extends ApplicationEvent {
     private final Long notificationId;
-    private final Long profileId;
+    private final Long userId;
 
-    public NotificationSentEvent(Object source, Long notificationId, Long profileId) {
+    public NotificationSentEvent(Object source, Long notificationId, Long userId) {
         super(source);
         this.notificationId = notificationId;
-        this.profileId = profileId;
+        this.userId = userId;
+    }
+    
+    // Getter para compatibilidad (deprecated)
+    @Deprecated
+    public Long getFarmerId() {
+        return userId; // Retorna userId para compatibilidad
     }
 }

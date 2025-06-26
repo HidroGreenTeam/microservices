@@ -9,10 +9,8 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Configuration
-@EnableJpaAuditing
 public class OpenApiConfiguration {
 
     @Bean
@@ -22,14 +20,14 @@ public class OpenApiConfiguration {
 
         openApi
                 .info(new Info()
-                        .title("Ainy API")
-                        .description("Ainy REST API documentation")
+                        .title("Ayni Crop Service API")
+                        .description("Ayni Crop Service REST API documentation")
                         .version("v1.0.0")
-                        .license(new License().name("Apache 2.0")
-                                .url("http://springdoc.org")))
+                        .license(new License().name("AYNI 2.0")
+                                .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
                 .externalDocs(new ExternalDocumentation().
-                        description("Ainy wiki Documentation")
-                        .url("https://Ainy.wiki.github.io/docs"));
+                        description("Ayni Documentation")
+                        .url("https://github.com/Ayni-Team/Ayni-Documentation"));
 
         final String securitySchemeName = "bearerAuth";
 

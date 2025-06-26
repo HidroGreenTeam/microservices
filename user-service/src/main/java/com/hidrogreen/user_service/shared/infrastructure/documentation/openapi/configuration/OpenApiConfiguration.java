@@ -18,10 +18,10 @@ public class OpenApiConfiguration {
         var openApi = new OpenAPI();
         openApi
                 .info(new Info()
-                        .title("HidroBots API")
-                        .description("HidroBots application REST API documentation.")
+                        .title("HidroBots User Service API")
+                        .description("User Service - Authentication, User Management and Farmer Profiles")
                         .version("v1.0.0")
-                        .license(new License().name("HIGN 2.0")
+                        .license(new License().name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
                 .externalDocs(new ExternalDocumentation()
                         .description("HidroBots Documentation")
@@ -29,7 +29,6 @@ public class OpenApiConfiguration {
 
         // Add security scheme
         final String securitySchemeName = "bearerAuth";
-
 
         openApi.addSecurityItem(new SecurityRequirement()
                         .addList(securitySchemeName))
@@ -40,7 +39,6 @@ public class OpenApiConfiguration {
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")));
-
 
         return openApi;
     }

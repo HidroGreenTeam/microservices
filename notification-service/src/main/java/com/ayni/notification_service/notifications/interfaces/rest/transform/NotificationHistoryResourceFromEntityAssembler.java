@@ -11,7 +11,7 @@ public class NotificationHistoryResourceFromEntityAssembler {
     public static NotificationHistoryResource toResourceFromEntity(Notification entity) {
         return new NotificationHistoryResource(
             entity.getId(),
-            entity.getProfileId(),
+            entity.getfarmerId(),
             entity.getTitle(),
             entity.getMessage(),
             entity.getNotificationType().name(),

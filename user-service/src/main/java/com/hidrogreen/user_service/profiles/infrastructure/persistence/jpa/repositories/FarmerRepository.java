@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface FarmerRepository extends JpaRepository<Farmer, Long> {
-    boolean existsByEmail(String email);
-    Optional<Farmer> findByEmail(String email);
+    boolean existsByUserId(Long userId);
+    Optional<Farmer> findByUserId(Long userId);
 }

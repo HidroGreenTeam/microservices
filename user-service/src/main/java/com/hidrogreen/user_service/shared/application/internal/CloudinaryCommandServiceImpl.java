@@ -20,7 +20,6 @@ public class CloudinaryCommandServiceImpl implements CloudinaryCommandService {
     private final Cloudinary cloudinary;
 
     public CloudinaryCommandServiceImpl() {
-
         Map<String, String> config = new HashMap<>();
         config.put("cloud_name", "deu4nwmqh");
         config.put("api_key", "789752667392435");
@@ -28,31 +27,28 @@ public class CloudinaryCommandServiceImpl implements CloudinaryCommandService {
         cloudinary = new Cloudinary(config);
     }
 
-    // method to convert multipart file to map
     private File convert(MultipartFile multipartFile) throws IOException {
-        File file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename())); // se crea un archivo con el nombre del archivo original
-        FileOutputStream fo = new FileOutputStream(file); // se crea un flujo de salida para escribir en el archivo
-        fo.write(multipartFile.getBytes()); // se escribe en el archivo los bytes del archivo original
-        fo.close(); // se cierra el flujo de salida
-        return file; // se retorna el archivo
+        File file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        FileOutputStream fo = new FileOutputStream(file);
+        fo.write(multipartFile.getBytes());
+        fo.close();
+        return file;
     }
 
-    // method to upload image
     @Override
     public Map uploadImage(MultipartFile multipartFile) throws IOException {
-        File file = convert(multipartFile); // se convierte el archivo
-        Map result = cloudinary.uploader().upload(file, ObjectUtils.emptyMap()); // se sube el archivo a cloudinary
+        File file = convert(multipartFile);
+        Map result = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
 
-        if (!Files.deleteIfExists(file.toPath())) { // si no se puede borrar el archivo
-            throw new IOException("Error while deleting file" + file.getAbsolutePath()); // se lanza una excepción
+        if (!Files.deleteIfExists(file.toPath())) {
+            throw new IOException("Error while deleting file" + file.getAbsolutePath());
         }
 
-        return result; // se retorna el resultado
+        return result;
     }
 
-    // method to delete image
     @Override
     public Map deleteImage(String imageId) throws IOException {
-        return cloudinary.uploader().destroy(imageId, ObjectUtils.emptyMap()); // se elimina la imagen de cloudinary
+        return cloudinary.uploader().destroy(imageId, ObjectUtils.emptyMap());
     }
 }

@@ -40,15 +40,15 @@ public class ReminderQueryServiceImpl implements ReminderQueryService {
     }
     
     @Override
-    public List<Reminder> getRemindersByProfileId(Long profileId) {
-        logger.debug("Retrieving reminders for profileId: {}", profileId);
+    public List<Reminder> getRemindersByfarmerId(Long farmerId) {
+        logger.debug("Retrieving reminders for farmerId: {}", farmerId);
           try {
-            List<Reminder> reminders = reminderRepository.findByProfileIdAndIsActive(profileId, true);
-            logger.info("Retrieved {} active reminders for profileId: {}", reminders.size(), profileId);
+            List<Reminder> reminders = reminderRepository.findByfarmerIdAndIsActive(farmerId, true);
+            logger.info("Retrieved {} active reminders for farmerId: {}", reminders.size(), farmerId);
             return reminders;
             
         } catch (Exception e) {
-            logger.error("Error retrieving reminders for profileId: {}: {}", profileId, e.getMessage(), e);
+            logger.error("Error retrieving reminders for farmerId: {}: {}", farmerId, e.getMessage(), e);
             throw e;
         }
     }

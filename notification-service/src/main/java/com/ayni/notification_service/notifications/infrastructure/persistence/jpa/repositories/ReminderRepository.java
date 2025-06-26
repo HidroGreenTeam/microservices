@@ -15,11 +15,11 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
 
     /**
      * Find active reminders by profile ID
-     * @param profileId the profile ID
+     * @param farmerId the profile ID
      * @param isActive the active status
      * @return a list of reminders
      */
-    List<Reminder> findByProfileIdAndIsActive(Long profileId, boolean isActive);
+    List<Reminder> findByfarmerIdAndIsActive(Long farmerId, boolean isActive);
     
     /**
      * Find due reminders that are active

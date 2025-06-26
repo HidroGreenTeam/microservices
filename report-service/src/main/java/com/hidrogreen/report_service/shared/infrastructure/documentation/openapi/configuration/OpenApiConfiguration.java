@@ -20,13 +20,13 @@ public class OpenApiConfiguration {
 
                 openApi
                                 .info(new Info()
-                                                .title("Ainy API")
-                                                .description("Ainy REST API documentation")
+                                                .title("Ayni Report Service API")
+                                                .description("Ayni Report Service REST API documentation")
                                                 .version("v1.0.0")
-                                                .license(new License().name("Apache 2.0")
-                                                                .url("http://springdoc.org")))
-                                .externalDocs(new ExternalDocumentation().description("Ainy wiki Documentation")
-                                                .url("https://Ainy.wiki.github.io/docs"));
+                                                .license(new License().name("AYNI 2.0")
+                                                                .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
+                                .externalDocs(new ExternalDocumentation().description("Ayni Documentation")
+                                                .url("https://github.com/Ayni-Team/Ayni-Documentation"));
 
                 final String securitySchemeName = "bearerAuth";
 

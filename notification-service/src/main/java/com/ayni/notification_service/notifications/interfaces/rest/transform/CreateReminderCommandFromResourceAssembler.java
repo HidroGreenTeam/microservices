@@ -13,7 +13,7 @@ public class CreateReminderCommandFromResourceAssembler {
     
     public static ScheduleReminderCommand toCommandFromResource(CreateReminderResource resource) {
         return new ScheduleReminderCommand(
-            resource.profileId(),
+            resource.farmerId(),
             NotificationChannel.valueOf(resource.notificationChannel().toUpperCase()),
             resource.title(),
             resource.message(),

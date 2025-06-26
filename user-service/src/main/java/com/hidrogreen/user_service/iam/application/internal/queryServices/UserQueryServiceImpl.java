@@ -37,4 +37,9 @@ public class UserQueryServiceImpl implements UserQueryService {
         return userRepository.findByEmail(query.email());
     }
 
+    // Method to get user by id (same as handle but more explicit name)
+    public Optional<User> getUserById(Long userId) {
+        return userRepository.findById(userId);
+    }
+
 }

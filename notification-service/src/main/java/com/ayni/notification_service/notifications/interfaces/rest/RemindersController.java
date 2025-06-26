@@ -61,10 +61,10 @@ public class RemindersController {
         }
     }
     
-    @GetMapping("/profile/{profileId}")
-    public ResponseEntity<List<ReminderResource>> getRemindersByProfileId(@PathVariable Long profileId) {
+    @GetMapping("/profile/{farmerId}")
+    public ResponseEntity<List<ReminderResource>> getRemindersByfarmerId(@PathVariable Long farmerId) {
         try {
-            List<Reminder> reminders = reminderQueryService.getRemindersByProfileId(profileId);
+            List<Reminder> reminders = reminderQueryService.getRemindersByfarmerId(farmerId);
             List<ReminderResource> reminderResources = reminders.stream()
                     .map(ReminderResourceFromEntityAssembler::toResourceFromEntity)
                     .toList();

@@ -20,7 +20,7 @@ public class ExternalCropService {
         Long cropId,
         String cropName,
         String cropType,
-        Long profileId,
+        Long farmerId,
         String status
     ) {}
     
@@ -29,11 +29,11 @@ public class ExternalCropService {
      * @param cropId The crop ID
      * @return The profile ID of the crop owner
      */
-    public Long getCropOwnerProfileId(Long cropId) {
+    public Long getCropOwnerfarmerId(Long cropId) {
         try {
             var cropDTO = cropServiceClient.getCrop(cropId);
-            Long profileId = cropDTO.profileId();
-            return profileId;
+            Long farmerId = cropDTO.farmerId();
+            return farmerId;
             
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve crop owner profile ID", e);
@@ -53,7 +53,7 @@ public class ExternalCropService {
                 cropDTO.id(),
                 cropDTO.name(),
                 cropDTO.type(),
-                cropDTO.profileId(),
+                cropDTO.farmerId(),
                 cropDTO.status()
             );
             
@@ -77,7 +77,7 @@ public class ExternalCropService {
             Long id,
             String name,
             String type,
-            Long profileId,
+            Long farmerId,
             String status,
             String location,
             java.time.LocalDate plantingDate

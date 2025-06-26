@@ -53,27 +53,27 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     }
       @Override
     public Long handle(SendNotificationCommand command) {
-        log.info("Processing SendNotificationCommand for profileId: {}, type: {}, channel: {}", 
-                command.profileId(), command.notificationType(), command.notificationChannel());
+        log.info("Processing SendNotificationCommand for farmerId: {}, type: {}, channel: {}", 
+                command.farmerId(), command.notificationType(), command.notificationChannel());
         
         try {
-            Long profileId = command.profileId();
+            Long farmerId = command.farmerId();
             
             Notification notification;
             if (command.activityId() != null) {
                 Long activityId = command.activityId();
-                notification = new Notification(profileId, activityId, command.notificationType(), 
+                notification = new Notification(farmerId, activityId, command.notificationType(), 
                                               command.notificationChannel(), command.title(), command.message());
                 log.debug("Created notification for activity: {}", activityId);
             } else if (command.cropId() != null) {
                 Long cropId = command.cropId();
-                notification = new Notification(profileId, cropId, command.notificationType(), 
+                notification = new Notification(farmerId, cropId, command.notificationType(), 
                                               command.notificationChannel(), command.title(), command.message(), true);
                 log.debug("Created notification for crop: {}", cropId);
             } else {
-                notification = new Notification(profileId, command.notificationType(), 
+                notification = new Notification(farmerId, command.notificationType(), 
                                               command.notificationChannel(), command.title(), command.message());
-                log.debug("Created general notification for profile: {}", profileId);
+                log.debug("Created general notification for profile: {}", farmerId);
             }
             
             // Save notification first
@@ -91,8 +91,8 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
             return savedNotification.getId();
             
         } catch (Exception e) {
-            log.error("Error handling SendNotificationCommand for profileId: {}: {}", 
-                     command.profileId(), e.getMessage(), e);
+            log.error("Error handling SendNotificationCommand for farmerId: {}: {}", 
+                     command.farmerId(), e.getMessage(), e);
             throw new RuntimeException("Failed to send notification", e);
         }
     }
@@ -102,7 +102,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
      */
     private void deliverNotification(Notification notification) {
         log.info("Starting delivery of notification {} via {} channel for profile: {}", 
-                notification.getId(), notification.getNotificationChannel(), notification.getProfileId());
+                notification.getId(), notification.getNotificationChannel(), notification.getfarmerId());
         
         try {
             switch (notification.getNotificationChannel()) {
@@ -127,50 +127,50 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     }
     
     private void deliverByEmail(Notification notification) {
-        log.debug("Retrieving email for profile: {}", notification.getProfileId());
-        String email = externalProfileService.getProfileEmail(notification.getProfileId());
-        log.debug("Retrieved email: {} for profile: {}", email, notification.getProfileId());
+        log.debug("Retrieving email for profile: {}", notification.getfarmerId());
+        String email = externalProfileService.getProfileEmail(notification.getfarmerId());
+        log.debug("Retrieved email: {} for profile: {}", email, notification.getfarmerId());
         
         try {
             emailNotificationService.sendEmail(email, notification.getTitle(), notification.getMessage());
             log.info("Email notification {} delivered successfully to profile: {} ({})", 
-                    notification.getId(), notification.getProfileId(), email);
+                    notification.getId(), notification.getfarmerId(), email);
         } catch (Exception e) {
             log.error("Failed to send email notification {} to profile: {} ({}): {}", 
-                     notification.getId(), notification.getProfileId(), email, e.getMessage(), e);
+                     notification.getId(), notification.getfarmerId(), email, e.getMessage(), e);
             throw e;
         }
     }
     
     private void deliverByWhatsApp(Notification notification) {
-        log.debug("Retrieving phone number for profile: {}", notification.getProfileId());
-        String phone = externalProfileService.getProfilePhoneNumber(notification.getProfileId());
-        log.debug("Retrieved phone: {} for profile: {}", phone, notification.getProfileId());
+        log.debug("Retrieving phone number for profile: {}", notification.getfarmerId());
+        String phone = externalProfileService.getProfilePhoneNumber(notification.getfarmerId());
+        log.debug("Retrieved phone: {} for profile: {}", phone, notification.getfarmerId());
         
         String message = notification.getTitle() + "\n\n" + notification.getMessage();
         
         try {
             whatsAppNotificationService.sendWhatsApp(phone, message);
             log.info("WhatsApp notification {} delivered successfully to profile: {} ({})", 
-                    notification.getId(), notification.getProfileId(), phone);
+                    notification.getId(), notification.getfarmerId(), phone);
         } catch (Exception e) {
             log.error("Failed to send WhatsApp notification {} to profile: {} ({}): {}", 
-                     notification.getId(), notification.getProfileId(), phone, e.getMessage(), e);
+                     notification.getId(), notification.getfarmerId(), phone, e.getMessage(), e);
             throw e;
         }
     }
     
     private void deliverByPush(Notification notification) {
         log.info("Push notification delivery for notification: {} to profile: {}", 
-                notification.getId(), notification.getProfileId());
+                notification.getId(), notification.getfarmerId());
         
         try {
             // Get device token for the user profile
-            String deviceToken = getDeviceTokenForProfile(notification.getProfileId());
+            String deviceToken = getDeviceTokenForProfile(notification.getfarmerId());
             
             if (deviceToken == null || deviceToken.isBlank()) {
                 log.warn("No device token found for profile: {}, skipping push notification", 
-                        notification.getProfileId());
+                        notification.getfarmerId());
                 return;
             }
             
@@ -180,11 +180,11 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
             // Mark as delivered after successful delivery
             notification.markAsDelivered();
             log.info("Push notification {} delivered successfully to profile: {}", 
-                    notification.getId(), notification.getProfileId());
+                    notification.getId(), notification.getfarmerId());
             
         } catch (Exception e) {
             log.error("Failed to send push notification {} to profile: {}: {}", 
-                     notification.getId(), notification.getProfileId(), e.getMessage(), e);
+                     notification.getId(), notification.getfarmerId(), e.getMessage(), e);
             throw e;
         }
     }
@@ -193,23 +193,23 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
      * Get device token for a profile (FCM registration token)
      * This would typically be stored in user preferences or device registrations
      */
-    private String getDeviceTokenForProfile(Long profileId) {
+    private String getDeviceTokenForProfile(Long farmerId) {
         try {
             // TODO: Implement actual device token retrieval from user preferences
             // This would typically query a DeviceToken table or call user-service
             // For now, return a mock token for demonstration
             
-            log.debug("Retrieving device token for profile: {}", profileId);
+            log.debug("Retrieving device token for profile: {}", farmerId);
             
             // In real implementation, you would:
             // 1. Call user-service to get device tokens for the profile
             // 2. Query a device_tokens table in your database
             // 3. Use the most recent/active device token
             
-            return "mock-device-token-" + profileId; // Replace with real token
+            return "mock-device-token-" + farmerId; // Replace with real token
             
         } catch (Exception e) {
-            log.error("Error retrieving device token for profile: {}", profileId, e);
+            log.error("Error retrieving device token for profile: {}", farmerId, e);
             return null;
         }
     }
@@ -272,12 +272,12 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     
     @Override
     public Long handle(SendActivityReminderCommand command) {
-        log.info("Processing SendActivityReminderCommand for profileId: {}, activityId: {}", 
-                command.profileId(), command.activityId());
+        log.info("Processing SendActivityReminderCommand for farmerId: {}, activityId: {}", 
+                command.farmerId(), command.activityId());
         
         try {
             SendNotificationCommand notificationCommand = new SendNotificationCommand(
-                command.profileId(),
+                command.farmerId(),
                 NotificationType.ACTIVITY_REMINDER,
                 command.notificationChannel(),
                 "Recordatorio de Actividad: " + command.activityTitle(),
@@ -288,8 +288,8 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
             return handle(notificationCommand);
             
         } catch (Exception e) {
-            log.error("Error handling SendActivityReminderCommand for profileId: {}, activityId: {}: {}", 
-                     command.profileId(), command.activityId(), e.getMessage(), e);
+            log.error("Error handling SendActivityReminderCommand for farmerId: {}, activityId: {}: {}", 
+                     command.farmerId(), command.activityId(), e.getMessage(), e);
             throw new RuntimeException("Failed to send activity reminder", e);
         }
     }

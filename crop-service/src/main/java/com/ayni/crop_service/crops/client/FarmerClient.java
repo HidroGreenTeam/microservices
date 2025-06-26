@@ -1,46 +1,18 @@
 package com.ayni.crop_service.crops.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.http.*;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import com.ayni.crop_service.shared.infrastructure.security.feign.FeignConfiguration;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.List;
+@FeignClient(
+    name = "user-service", 
+    url = "${user.service.url:http://localhost:8081}",
+    configuration = FeignConfiguration.class
+)
+public interface FarmerClient {
 
-@Component
-public class FarmerClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(FarmerClient.class);
-
-    @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
-    private DiscoveryClient discoveryClient;
-
-
-    public ResponseEntity<Boolean> existsFarmerById(Long farmerId) {
-        List<ServiceInstance> instances = discoveryClient.getInstances("user-service");
-        if (instances == null || instances.isEmpty()) {
-            logger.error("No se encontraron instancias de user-service");
-            throw new IllegalStateException("No se encontraron instancias de user-service");
-        }
-        String url = instances.get(0).getUri().toString() + "/api/v1/farmers/exists?id=" + farmerId;
-        try {
-            ResponseEntity<Boolean> response = restTemplate.getForEntity(url, Boolean.class);
-            return response;
-        } catch (HttpClientErrorException.NotFound e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
-        } catch (Exception e) {
-            logger.error("Error llamando a farmer-service: {}", e.getMessage());
-            throw new IllegalStateException("Error conectando a farmer-service", e);
-        }
-    }
-
-
+    @GetMapping("/api/v1/user-profiles/internal/farmers/{farmerId}/exists")
+    Boolean existsFarmerById(@PathVariable("farmerId") Long farmerId);
 }
+

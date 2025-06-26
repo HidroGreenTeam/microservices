@@ -5,7 +5,7 @@ package com.ayni.notification_service.notifications.interfaces.rest.resources;
  */
 public record NotificationResource(
     Long id,
-    Long profileId,
+    Long farmerId,
     String title,
     String message,
     String notificationType,

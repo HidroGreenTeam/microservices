@@ -14,27 +14,13 @@ import java.util.Date;
 public class AuditableAbstractAggregateRoot<T extends AbstractAggregateRoot<T>>
         extends AbstractAggregateRoot<T> {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @Getter
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private Date createdAt;
 
+    @Getter
     @LastModifiedDate
     @Column(nullable = false)
     private Date updatedAt;
-
-    public Long getId() {
-        return id;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
 }

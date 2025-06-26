@@ -3,6 +3,7 @@ package com.hidrogreen.user_service.profiles.application.internal.queryCommandSe
 import com.hidrogreen.user_service.profiles.domain.model.aggregates.Farmer;
 import com.hidrogreen.user_service.profiles.domain.model.queries.GetAllFarmersQuery;
 import com.hidrogreen.user_service.profiles.domain.model.queries.GetFarmerByIdQuery;
+import com.hidrogreen.user_service.profiles.domain.model.queries.GetFarmerByUserIdQuery;
 import com.hidrogreen.user_service.profiles.domain.services.FarmerQueryService;
 import com.hidrogreen.user_service.profiles.infrastructure.persistence.jpa.repositories.FarmerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +30,10 @@ public class FarmerQueryServiceImpl implements FarmerQueryService {
     @Override
     public Optional<Farmer> getFarmerById(GetFarmerByIdQuery query) {
         return farmerRepository.findById(query.farmerId());
+    }
+
+    @Override
+    public Optional<Farmer> getFarmerByUserId(GetFarmerByUserIdQuery query) {
+        return farmerRepository.findByUserId(query.userId());
     }
 }

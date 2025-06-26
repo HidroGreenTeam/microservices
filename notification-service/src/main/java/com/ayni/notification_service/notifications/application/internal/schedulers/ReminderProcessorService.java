@@ -54,11 +54,11 @@ public class ReminderProcessorService {
             for (Reminder reminder : dueReminders) {
                 try {
                     logger.debug("Processing reminder ID: {} for profile: {} due at: {}", 
-                             reminder.getId(), reminder.getProfileId(), reminder.getRemindAt());
+                             reminder.getId(), reminder.getfarmerId(), reminder.getRemindAt());
                     
                     // Create notification command
                     SendNotificationCommand command = new SendNotificationCommand(
-                        reminder.getProfileId(),
+                        reminder.getfarmerId(),
                         NotificationType.REMINDER,
                         reminder.getNotificationChannel(),
                         reminder.getTitle(),
@@ -70,7 +70,7 @@ public class ReminderProcessorService {
                     // Send notification via command service
                     Long notificationId = notificationCommandService.handle(command);
                     logger.info("Delivered notification {} for reminder ID: {} to profile: {}", 
-                            notificationId, reminder.getId(), reminder.getProfileId());
+                            notificationId, reminder.getId(), reminder.getfarmerId());
                     
                     // Handle reminder recurrence
                     if (!reminder.isRecurring()) {
@@ -88,7 +88,7 @@ public class ReminderProcessorService {
                 } catch (Exception e) {
                     errorCount++;
                     logger.error("Error processing reminder ID: {} for profile: {}: {}", 
-                             reminder.getId(), reminder.getProfileId(), e.getMessage(), e);
+                             reminder.getId(), reminder.getfarmerId(), e.getMessage(), e);
                 }
             }
             

@@ -11,7 +11,7 @@ public class ReminderResourceFromEntityAssembler {
     public static ReminderResource toResourceFromEntity(Reminder entity) {
         return new ReminderResource(
             entity.getId(),
-            entity.getProfileId(),
+            entity.getfarmerId(),
             entity.getTitle(),
             entity.getMessage(),
             entity.getNotificationChannel().name(),

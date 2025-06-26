@@ -1,12 +1,10 @@
 package com.hidrogreen.user_service.iam.domain.model.aggregates;
 
-
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
-import com.hidrogreen.user_service.iam.domain.model.entities.Role;
+import com.hidrogreen.user_service.iam.domain.model.entities.Role; 
 import com.hidrogreen.user_service.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 
 import java.util.HashSet;

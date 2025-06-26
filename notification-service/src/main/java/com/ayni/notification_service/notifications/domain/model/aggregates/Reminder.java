@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class Reminder extends AuditableAbstractAggregateRoot<Reminder> {
 
     @Column(name = "profile_id", nullable = false)
-    private Long profileId;
+    private Long farmerId;
 
     @Column(name = "activity_id")
     private Long activityId;
@@ -48,9 +48,9 @@ public class Reminder extends AuditableAbstractAggregateRoot<Reminder> {
     @Column(name = "recurrence_pattern")
     private String recurrencePattern; // DAILY, WEEKLY, MONTHLY
 
-    protected Reminder() {}    public Reminder(Long profileId, NotificationChannel notificationChannel, 
+    protected Reminder() {}    public Reminder(Long farmerId, NotificationChannel notificationChannel, 
                    String title, String message, LocalDateTime remindAt) {
-        this.profileId = profileId;
+        this.farmerId = farmerId;
         this.notificationChannel = notificationChannel;
         this.title = title;
         this.message = message;
@@ -63,18 +63,18 @@ public class Reminder extends AuditableAbstractAggregateRoot<Reminder> {
      * Publishes the ReminderCreatedEvent after the reminder is persisted
      */
     public void publishCreatedEvent() {
-        this.registerEvent(new ReminderCreatedEvent(this, getId(), this.profileId, this.remindAt));
+        this.registerEvent(new ReminderCreatedEvent(this, getId(), this.farmerId, this.remindAt));
     }
 
-    public Reminder(Long profileId, Long activityId, NotificationChannel notificationChannel, 
+    public Reminder(Long farmerId, Long activityId, NotificationChannel notificationChannel, 
                    String title, String message, LocalDateTime remindAt) {
-        this(profileId, notificationChannel, title, message, remindAt);
+        this(farmerId, notificationChannel, title, message, remindAt);
         this.activityId = activityId;
     } 
 
-    public Reminder(Long profileId, Long cropId, NotificationChannel notificationChannel, 
+    public Reminder(Long farmerId, Long cropId, NotificationChannel notificationChannel, 
                    String title, String message, LocalDateTime remindAt, boolean isForCrop) {
-        this(profileId, notificationChannel, title, message, remindAt);
+        this(farmerId, notificationChannel, title, message, remindAt);
         this.cropId = cropId;
     }
 
@@ -100,7 +100,7 @@ public class Reminder extends AuditableAbstractAggregateRoot<Reminder> {
     }
     
     // Additional getters for fields not covered by Lombok
-    public Long getProfileId() { return profileId; }
+    public Long getfarmerId() { return farmerId; }
     public Long getActivityId() { return activityId; }
     public Long getCropId() { return cropId; }
     public NotificationChannel getNotificationChannel() { return notificationChannel; }

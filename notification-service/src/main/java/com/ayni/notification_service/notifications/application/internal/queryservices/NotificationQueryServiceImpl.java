@@ -3,7 +3,7 @@ package com.ayni.notification_service.notifications.application.internal.queryse
 import com.ayni.notification_service.notifications.domain.model.aggregates.Notification;
 import com.ayni.notification_service.notifications.domain.model.queries.GetAllNotificationsQuery;
 import com.ayni.notification_service.notifications.domain.model.queries.GetNotificationByIdQuery;
-import com.ayni.notification_service.notifications.domain.model.queries.GetNotificationsByProfileIdQuery;
+import com.ayni.notification_service.notifications.domain.model.queries.GetNotificationsByfarmerIdQuery;
 import com.ayni.notification_service.notifications.domain.services.NotificationQueryService;
 import com.ayni.notification_service.notifications.infrastructure.persistence.jpa.repositories.NotificationRepository;
 import org.slf4j.Logger;
@@ -28,16 +28,16 @@ public class NotificationQueryServiceImpl implements NotificationQueryService {
     }
     
     @Override
-    public List<Notification> handle(GetNotificationsByProfileIdQuery query) {
-        logger.debug("Handling GetNotificationsByProfileIdQuery for profileId: {}", query.profileId());
+    public List<Notification> handle(GetNotificationsByfarmerIdQuery query) {
+        logger.debug("Handling GetNotificationsByfarmerIdQuery for farmerId: {}", query.farmerId());
         
         try {
-            List<Notification> notifications = notificationRepository.findByProfileIdOrderByCreatedAtDesc(query.profileId());
-            logger.info("Retrieved {} notifications for profileId: {}", notifications.size(), query.profileId());
+            List<Notification> notifications = notificationRepository.findByfarmerIdOrderByCreatedAtDesc(query.farmerId());
+            logger.info("Retrieved {} notifications for farmerId: {}", notifications.size(), query.farmerId());
             return notifications;
             
         } catch (Exception e) {
-            logger.error("Error retrieving notifications for profileId: {}: {}", query.profileId(), e.getMessage(), e);
+            logger.error("Error retrieving notifications for farmerId: {}: {}", query.farmerId(), e.getMessage(), e);
             throw e;
         }    }
     

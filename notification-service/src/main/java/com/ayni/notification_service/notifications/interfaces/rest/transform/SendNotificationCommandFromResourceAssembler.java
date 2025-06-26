@@ -12,7 +12,7 @@ public class SendNotificationCommandFromResourceAssembler {
     
     public static SendNotificationCommand toCommandFromResource(SendNotificationResource resource) {
         return new SendNotificationCommand(
-            resource.profileId(),
+            resource.farmerId(),
             NotificationType.valueOf(resource.notificationType().toUpperCase()),
             NotificationChannel.valueOf(resource.notificationChannel().toUpperCase()),
             resource.title(),

@@ -17,8 +17,12 @@ import java.time.LocalDateTime;
 @Setter
 public class Notification extends AuditableAbstractAggregateRoot<Notification> {
 
-    @Column(name = "profile_id", nullable = false)
-    private Long profileId;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "recipient_role", nullable = false)
+    private UserRole recipientRole;
 
     @Column(name = "activity_id")
     private Long activityId;
@@ -55,23 +59,26 @@ public class Notification extends AuditableAbstractAggregateRoot<Notification> {
 
     protected Notification() {}
 
-    public Notification(Long profileId, NotificationType notificationType, 
+    public Notification(Long userId, UserRole recipientRole, NotificationType notificationType, 
                        NotificationChannel notificationChannel, String title, String message) {
-        this.profileId = profileId;
+        this.userId = userId;
+        this.recipientRole = recipientRole;
         this.notificationType = notificationType;
         this.notificationChannel = notificationChannel;
         this.notificationStatus = NotificationStatus.PENDING;
         this.title = title;
         this.message = message;
-    }    public Notification(Long profileId, Long activityId, NotificationType notificationType, 
+    }
+
+    public Notification(Long userId, UserRole recipientRole, Long activityId, NotificationType notificationType, 
                        NotificationChannel notificationChannel, String title, String message) {
-        this(profileId, notificationType, notificationChannel, title, message);
+        this(userId, recipientRole, notificationType, notificationChannel, title, message);
         this.activityId = activityId;
     }
 
-    public Notification(Long profileId, Long cropId, NotificationType notificationType, 
+    public Notification(Long userId, UserRole recipientRole, Long cropId, NotificationType notificationType, 
                        NotificationChannel notificationChannel, String title, String message, boolean isForCrop) {
-        this(profileId, notificationType, notificationChannel, title, message);
+        this(userId, recipientRole, notificationType, notificationChannel, title, message);
         this.cropId = cropId;
     }
     
@@ -79,12 +86,14 @@ public class Notification extends AuditableAbstractAggregateRoot<Notification> {
      * Publishes the NotificationSentEvent after the notification is persisted
      */
     public void publishSentEvent() {
-        this.registerEvent(new NotificationSentEvent(this, getId(), this.profileId));
+        this.registerEvent(new NotificationSentEvent(this, getId(), this.userId));
     }
 
     public void scheduleFor(LocalDateTime scheduledAt) {
         this.scheduledAt = scheduledAt;
-    }    public void markAsSent() {
+    }
+
+    public void markAsSent() {
         this.notificationStatus = NotificationStatus.SENT;
         this.sentAt = LocalDateTime.now();
         
@@ -104,16 +113,18 @@ public class Notification extends AuditableAbstractAggregateRoot<Notification> {
         return this.scheduledAt != null && this.scheduledAt.isAfter(LocalDateTime.now());
     }
     
-    // Additional getters for fields not covered by Lombok
-    public Long getProfileId() { return profileId; }
-    public Long getActivityId() { return activityId; }
-    public Long getCropId() { return cropId; }
-    public NotificationType getNotificationType() { return notificationType; }
-    public NotificationChannel getNotificationChannel() { return notificationChannel; }
-    public NotificationStatus getNotificationStatus() { return notificationStatus; }
-    public String getTitle() { return title; }
-    public String getMessage() { return message; }
-    public LocalDateTime getScheduledAt() { return scheduledAt; }
-    public LocalDateTime getSentAt() { return sentAt; }
-    public LocalDateTime getDeliveredAt() { return deliveredAt; }
+    // Custom getter method for consistency with existing code (deprecated)
+    @Deprecated
+    public Long getfarmerId() { 
+        return userId; // Retorna userId para mantener compatibilidad
+    }
+    
+    // Getters para la nueva estructura
+    public Long getUserId() {
+        return userId;
+    }
+    
+    public UserRole getRecipientRole() {
+        return recipientRole;
+    }
 }

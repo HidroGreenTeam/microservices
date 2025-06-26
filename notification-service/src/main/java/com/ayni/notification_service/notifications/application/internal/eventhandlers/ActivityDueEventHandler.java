@@ -28,16 +28,16 @@ public class ActivityDueEventHandler {
      */
     @EventListener
     public void on(ActivityDueEvent event) {
-        log.info("Handling ActivityDueEvent for activityId: {}, profileId: {}", 
-                event.getActivityId(), event.getProfileId());
+        log.info("Handling ActivityDueEvent for activityId: {}, farmerId: {}", 
+                event.getActivityId(), event.getfarmerId());
           try {
-            // ProfileId is provided in the event, no need for external service lookup
-            log.debug("Using profileId from event: {} for activityId: {}", 
-                     event.getProfileId(), event.getActivityId());
+            // farmerId is provided in the event, no need for external service lookup
+            log.debug("Using farmerId from event: {} for activityId: {}", 
+                     event.getfarmerId(), event.getActivityId());
             
             // Send reminder notification via WhatsApp
             SendActivityReminderCommand whatsAppCommand = new SendActivityReminderCommand(
-                event.getProfileId(),
+                event.getfarmerId(),
                 event.getActivityId(),
                 NotificationChannel.WHATSAPP,
                 event.getActivityTitle(),
@@ -52,7 +52,7 @@ public class ActivityDueEventHandler {
             
             // Send reminder notification via Email as backup
             SendActivityReminderCommand emailCommand = new SendActivityReminderCommand(
-                event.getProfileId(),
+                event.getfarmerId(),
                 event.getActivityId(),
                 NotificationChannel.EMAIL,
                 event.getActivityTitle(),
@@ -69,8 +69,8 @@ public class ActivityDueEventHandler {
                     emailNotificationId, event.getActivityId());
             
         } catch (Exception e) {
-            log.error("Error handling ActivityDueEvent for activityId: {}, profileId: {}: {}", 
-                     event.getActivityId(), event.getProfileId(), e.getMessage(), e);
+            log.error("Error handling ActivityDueEvent for activityId: {}, farmerId: {}: {}", 
+                     event.getActivityId(), event.getfarmerId(), e.getMessage(), e);
             // Don't rethrow - we don't want to break the event publisher
         }
     }

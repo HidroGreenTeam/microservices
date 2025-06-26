@@ -7,6 +7,7 @@ import com.ayni.crop_service.crops.domain.model.queries.GetCropByIdQuery;
 import com.ayni.crop_service.crops.domain.model.queries.GetCropsFromAFarmerQuery;
 import com.ayni.crop_service.crops.domain.services.CropQueryService;
 import com.ayni.crop_service.crops.infrastructure.persistence.jpa.repositories.CropRepository;
+import com.ayni.crop_service.crops.application.internal.services.ExternalValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +17,13 @@ import java.util.Optional;
 @Service
 public class CropQueryServiceImpl implements CropQueryService {
 
-
     private final CropRepository cropRepository;
+    private final ExternalValidationService externalValidationService;
 
     @Autowired
-    public CropQueryServiceImpl(CropRepository cropRepository) {
+    public CropQueryServiceImpl(CropRepository cropRepository, ExternalValidationService externalValidationService) {
         this.cropRepository = cropRepository;
+        this.externalValidationService = externalValidationService;
     }
 
     @Override
@@ -31,6 +33,9 @@ public class CropQueryServiceImpl implements CropQueryService {
 
     @Override
     public List<Crop> handle(GetCropsFromAFarmerQuery query) {
+        // Validate that farmer exists before querying crops
+        externalValidationService.validateFarmerExists(query.farmerId());
+        
         return cropRepository.findCropByFarmerId(query.farmerId());
     }
 

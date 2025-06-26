@@ -24,27 +24,27 @@ public class ReminderCommandServiceImpl implements ReminderCommandService {
     
     @Override
     public Long handle(ScheduleReminderCommand command) {
-        log.info("Processing ScheduleReminderCommand for profileId: {}, remindAt: {}", 
-                command.profileId(), command.remindAt());
+        log.info("Processing ScheduleReminderCommand for farmerId: {}, remindAt: {}", 
+                command.farmerId(), command.remindAt());
         
         try {
-            Long profileId = command.profileId();
+            Long farmerId = command.farmerId();
             
             Reminder reminder;
             if (command.activityId() != null) {
                 Long activityId = command.activityId();
-                reminder = new Reminder(profileId, activityId, command.notificationChannel(), 
+                reminder = new Reminder(farmerId, activityId, command.notificationChannel(), 
                                       command.title(), command.message(), command.remindAt());
                 log.debug("Created reminder for activity: {}", activityId);
             } else if (command.cropId() != null) {
                 Long cropId = command.cropId();
-                reminder = new Reminder(profileId, cropId, command.notificationChannel(), 
+                reminder = new Reminder(farmerId, cropId, command.notificationChannel(), 
                                       command.title(), command.message(), command.remindAt(), true);
                 log.debug("Created reminder for crop: {}", cropId);
             } else {
-                reminder = new Reminder(profileId, command.notificationChannel(), 
+                reminder = new Reminder(farmerId, command.notificationChannel(), 
                                       command.title(), command.message(), command.remindAt());
-                log.debug("Created general reminder for profile: {}", profileId);
+                log.debug("Created general reminder for profile: {}", farmerId);
             }
             
             if (command.isRecurring()) {
@@ -60,8 +60,8 @@ public class ReminderCommandServiceImpl implements ReminderCommandService {
             return savedReminder.getId();
             
         } catch (Exception e) {
-            log.error("Error handling ScheduleReminderCommand for profileId: {}: {}", 
-                     command.profileId(), e.getMessage(), e);
+            log.error("Error handling ScheduleReminderCommand for farmerId: {}: {}", 
+                     command.farmerId(), e.getMessage(), e);
             throw new RuntimeException("Failed to schedule reminder", e);
         }
     }

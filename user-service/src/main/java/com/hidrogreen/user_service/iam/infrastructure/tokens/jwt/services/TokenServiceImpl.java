@@ -33,9 +33,50 @@ public class TokenServiceImpl implements BearerTokenService {
     @Value("${authorization.jwt.expiration.days}")
     private int expirationDays;
 
+    @Value("${service.auth.secret}")
+    private String serviceSecret;
+
+    @Value("${service.auth.expiration.hours}")
+    private int serviceExpirationHours;
+
     private SecretKey getSigningKey() {
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private SecretKey getServiceSignInKey() {
+        return Keys.hmacShaKeyFor(serviceSecret.getBytes());
+    }
+
+    /**
+     * Generate a service-to-service token for internal communication
+     */
+    public String generateServiceToken(String serviceName) {
+        var issuedAt = new Date();
+        var expiration = DateUtils.addHours(issuedAt, serviceExpirationHours);
+        
+        return Jwts.builder()
+                .subject(serviceName)
+                .issuedAt(issuedAt)
+                .expiration(expiration)
+                .claim("type", "service")
+                .claim("service", serviceName)
+                .signWith(getServiceSignInKey())
+                .compact();
+    }
+
+    /**
+     * Check if token is a service token
+     */
+    public boolean isServiceToken(String token) {
+        try {
+            // Try to parse with service key first
+            Claims claims = Jwts.parser().verifyWith(getServiceSignInKey()).build()
+                    .parseSignedClaims(token).getPayload();
+            return "service".equals(claims.get("type"));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private String buildTokenWithDefaultParameters(String username) {
@@ -55,10 +96,11 @@ public class TokenServiceImpl implements BearerTokenService {
     @Override
     public boolean validateToken(String token) {
         try {
-            Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token);
+            if (isServiceToken(token)) {
+                Jwts.parser().verifyWith(getServiceSignInKey()).build().parseSignedClaims(token);
+            } else {
+                Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token);
+            }
             LOGGER.info("Token is valid");
             return true;
 
@@ -93,11 +135,19 @@ public class TokenServiceImpl implements BearerTokenService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        if (isServiceToken(token)) {
+            return Jwts.parser()
+                    .verifyWith(getServiceSignInKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } else {
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        }
     }
 
     private boolean isTokenPresentIn(String authorizationParameter) {

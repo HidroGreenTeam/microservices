@@ -9,7 +9,6 @@ public class UpdateCropResourceCommandFromResourceAssembler {
         return new UpdateCropCommand(
                 id,
                 resource.cropName(),
-                resource.irrigationType(),
                 resource.area(),
                 resource.plantingDate(),
                 resource.farmerId()
