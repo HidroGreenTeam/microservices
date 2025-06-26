@@ -2,6 +2,7 @@ package com.hidrogreen.subscription_service.subscriptions.interfaces.rest.resour
 
 import com.hidrogreen.subscription_service.subscriptions.domain.model.valueobjects.SubscriptionType;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public record SubscriptionPlanResource(
@@ -9,7 +10,7 @@ public record SubscriptionPlanResource(
     SubscriptionType planType,
     String name,
     String description,
-    Double price,
+    BigDecimal price,
     Integer durationDays,
     Integer maxCrops,
     Integer maxReports,

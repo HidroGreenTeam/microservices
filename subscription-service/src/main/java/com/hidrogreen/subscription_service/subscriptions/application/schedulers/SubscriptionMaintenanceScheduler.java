@@ -9,17 +9,20 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 /**
- * Scheduler to automatically expire subscriptions that have passed their end date
+ * Scheduler to automatically expire subscriptions that have passed their end
+ * date
  */
 @Component
 public class SubscriptionMaintenanceScheduler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SubscriptionMaintenanceScheduler.class);
-    
+
     private final SubscriptionRepository subscriptionRepository;
 
     public SubscriptionMaintenanceScheduler(SubscriptionRepository subscriptionRepository) {
@@ -34,36 +37,38 @@ public class SubscriptionMaintenanceScheduler {
     @Transactional
     public void expireOldSubscriptions() {
         LOGGER.info("Starting scheduled check for expired subscriptions at: {}", LocalDateTime.now());
-        
+
         try {
             LocalDateTime now = LocalDateTime.now();
-            
+            Date nowAsDate = (Date) Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
+            Date beginningOfTime = (Date) Date.from(LocalDateTime.MIN.atZone(ZoneId.systemDefault()).toInstant());
+
             // Find active subscriptions that have passed their end date
             List<Subscription> expiredSubscriptions = subscriptionRepository
-                .findByStatusAndEndDateBetween(SubscriptionStatus.ACTIVE, 
-                                            LocalDateTime.MIN, // From the beginning of time
-                                            now); // Up to now
-            
+                    .findByStatusAndEndDateBetween(SubscriptionStatus.ACTIVE,
+                            beginningOfTime,
+                            nowAsDate);
+
             LOGGER.info("Found {} expired subscriptions to update", expiredSubscriptions.size());
-            
+
             int updatedCount = 0;
             for (Subscription subscription : expiredSubscriptions) {
-                if (subscription.getEndDate().isBefore(now)) {
+                if (subscription.getEndDate().before(nowAsDate)) {
                     try {
-                        subscription.expire(); // Assuming we add this method to the domain
+                        subscription.expire();
                         subscriptionRepository.save(subscription);
                         updatedCount++;
-                        
-                        LOGGER.debug("Expired subscription ID: {} for user: {}", 
-                                   subscription.getId(), subscription.getUserId());
+
+                        LOGGER.debug("Expired subscription ID: {} for user: {}",
+                                subscription.getId(), subscription.getUserId());
                     } catch (Exception e) {
                         LOGGER.error("Failed to expire subscription ID: {}", subscription.getId(), e);
                     }
                 }
             }
-            
+
             LOGGER.info("Successfully expired {} subscriptions", updatedCount);
-            
+
         } catch (Exception e) {
             LOGGER.error("Error during scheduled subscription expiration check", e);
         }
@@ -77,34 +82,34 @@ public class SubscriptionMaintenanceScheduler {
     @Transactional
     public void cleanupOldSubscriptions() {
         LOGGER.info("Starting monthly cleanup of old subscriptions at: {}", LocalDateTime.now());
-        
+
         try {
             LocalDateTime cutoffDate = LocalDateTime.now().minusMonths(12); // Keep 12 months of history
-            
+
             // Note: This is a soft cleanup - we might want to archive rather than delete
             // For now, we'll just log what we would clean up
-            
+
             List<Subscription> oldCancelledSubscriptions = subscriptionRepository
-                .findByStatusAndEndDateBetween(SubscriptionStatus.CANCELLED, 
-                                            LocalDateTime.MIN, 
-                                            cutoffDate);
-            
+                    .findByStatusAndEndDateBetween(SubscriptionStatus.CANCELLED,
+                            LocalDateTime.MIN,
+                            cutoffDate);
+
             List<Subscription> oldExpiredSubscriptions = subscriptionRepository
-                .findByStatusAndEndDateBetween(SubscriptionStatus.EXPIRED, 
-                                            LocalDateTime.MIN, 
-                                            cutoffDate);
-            
+                    .findByStatusAndEndDateBetween(SubscriptionStatus.EXPIRED,
+                            LocalDateTime.MIN,
+                            cutoffDate);
+
             int totalOldSubscriptions = oldCancelledSubscriptions.size() + oldExpiredSubscriptions.size();
-            
+
             LOGGER.info("Found {} old subscriptions that could be archived " +
-                       "(cancelled: {}, expired: {})", 
-                       totalOldSubscriptions, 
-                       oldCancelledSubscriptions.size(), 
-                       oldExpiredSubscriptions.size());
-            
+                    "(cancelled: {}, expired: {})",
+                    totalOldSubscriptions,
+                    oldCancelledSubscriptions.size(),
+                    oldExpiredSubscriptions.size());
+
             // TODO: Implement archiving logic here if needed
             // For now, we just log the count for monitoring purposes
-            
+
         } catch (Exception e) {
             LOGGER.error("Error during monthly subscription cleanup", e);
         }

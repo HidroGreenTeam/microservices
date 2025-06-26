@@ -22,7 +22,7 @@ public abstract class AuditableAbstractAggregateRoot<T extends AbstractAggregate
 
     @Getter
     @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private Date createdAt;
 
     @Getter

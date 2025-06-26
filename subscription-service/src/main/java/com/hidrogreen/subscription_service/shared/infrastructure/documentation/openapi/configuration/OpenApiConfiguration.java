@@ -26,7 +26,7 @@ public class OpenApiConfiguration {
                         .version(appVersion)
                         .license(new License().name("Apache 2.0").url("https://springdoc.org"))
                         .contact(new Contact().name("HidroGreen Team").email("contact@hidrogreen.com")))
-.servers(List.of(new Server().url("http://localhost:8087").description("Development Server")));
+                .servers(List.of(new Server().url("http://localhost:8087").description("Development Server")));
         return openApi;
     }
 }

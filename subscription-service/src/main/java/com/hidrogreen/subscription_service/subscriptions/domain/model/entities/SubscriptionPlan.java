@@ -1,5 +1,7 @@
 package com.hidrogreen.subscription_service.subscriptions.domain.model.entities;
 
+import java.math.BigDecimal;
+
 import com.hidrogreen.subscription_service.shared.domain.model.entities.AuditableModel;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.valueobjects.SubscriptionType;
 import jakarta.persistence.*;
@@ -36,7 +38,7 @@ public class SubscriptionPlan extends AuditableModel {
     @Getter
     @Setter
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
-    private Double price;
+    private BigDecimal price;
 
     @Getter
     @Setter
@@ -69,7 +71,7 @@ public class SubscriptionPlan extends AuditableModel {
     private Boolean isActive;
 
     public SubscriptionPlan(SubscriptionType planType, String name, String description, 
-                           Double price, Integer durationDays, Integer maxCrops, 
+                           BigDecimal price, Integer durationDays, Integer maxCrops, 
                            Integer maxReports, Boolean hasPrioritySupport, 
                            Boolean hasAdvancedAnalytics, Boolean isActive) {
         this.planType = planType;

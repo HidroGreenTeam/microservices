@@ -12,10 +12,10 @@ public class RabbitMQConfig {
 
     // Queue names
     public static final String SUBSCRIPTION_NOTIFICATION_QUEUE = "subscription.notification.queue";
-    
+
     // Exchange names
     public static final String SUBSCRIPTION_EXCHANGE = "subscription.exchange";
-    
+
     // Routing keys
     public static final String SUBSCRIPTION_CREATED_ROUTING_KEY = "subscription.created";
     public static final String SUBSCRIPTION_CANCELLED_ROUTING_KEY = "subscription.cancelled";

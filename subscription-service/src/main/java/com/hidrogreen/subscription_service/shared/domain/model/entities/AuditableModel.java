@@ -15,7 +15,7 @@ import java.util.Date;
 public abstract class AuditableModel {
     @Getter
     @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private Date createdAt;
 
     @Getter

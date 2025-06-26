@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -34,7 +35,7 @@ public class SubscriptionNotificationDto {
     private String planName;
     
     @JsonProperty("price")
-    private Double price;
+    private BigDecimal price;
     
     @JsonProperty("currency")
     private String currency;

@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +33,11 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     
     @Query("SELECT s FROM Subscription s WHERE s.status = :status AND s.endDate BETWEEN :startDate AND :endDate")
     List<Subscription> findByStatusAndEndDateBetween(@Param("status") SubscriptionStatus status,
-                                                   @Param("startDate") LocalDateTime startDate, 
-                                                   @Param("endDate") LocalDateTime endDate);
+                                                   @Param("startDate") LocalDateTime min, 
+                                                   @Param("endDate") LocalDateTime cutoffDate);
+
+    @Query("SELECT s FROM Subscription s WHERE s.status = :active AND s.endDate BETWEEN :beginningOfTime AND :now")
+    List<Subscription> findByStatusAndEndDateBetween(@Param("active") SubscriptionStatus active,
+                                                     @Param("beginningOfTime") java.sql.Date beginningOfTime,
+                                                     @Param("now") java.sql.Date nowAsDate);
 }

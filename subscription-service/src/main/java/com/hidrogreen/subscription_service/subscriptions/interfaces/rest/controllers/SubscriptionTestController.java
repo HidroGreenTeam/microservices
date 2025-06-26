@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -60,7 +61,7 @@ public class SubscriptionTestController {
             notification.setSubscriptionId(999L); // Test subscription ID
             notification.setSubscriptionType("BASIC");
             notification.setPlanName("Plan Básico de Prueba");
-            notification.setPrice(19.99);
+            notification.setPrice(BigDecimal.valueOf(19.99));
             notification.setCurrency("USD");
             notification.setEventTime(LocalDateTime.now());
             notification.setSubject("Notificación de Prueba - HidroGreen");

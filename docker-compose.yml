@@ -1,5 +1,5 @@
 services:
-  mysql:
+  mysql-db:
     image: mysql:8.0
     container_name: hidrogreen-mysql
     environment:
@@ -56,7 +56,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
@@ -64,7 +64,7 @@ services:
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_RABBITMQ_HOST=rabbitmq
     depends_on:
-      - mysql
+      - mysql-db
       - rabbitmq
       - discovery-service
     networks:
@@ -81,7 +81,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
@@ -90,7 +90,7 @@ services:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - USER_SERVICE_URL=http://user-service:8081
     depends_on:
-      - mysql
+      - mysql-db
       - rabbitmq
       - discovery-service
       - user-service
@@ -108,7 +108,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
@@ -116,7 +116,7 @@ services:
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_RABBITMQ_HOST=rabbitmq
     depends_on:
-      - mysql
+      - mysql-db
       - rabbitmq
       - discovery-service
     networks:
@@ -156,7 +156,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
@@ -164,7 +164,7 @@ services:
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_RABBITMQ_HOST=rabbitmq
     depends_on:
-      - mysql
+      - mysql-db
       - rabbitmq
       - discovery-service
     networks:
@@ -181,7 +181,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
@@ -197,12 +197,37 @@ services:
       - TWILIO_WHATSAPP_FROM=${TWILIO_WHATSAPP_FROM:-whatsapp:+14155238886}
       - FIREBASE_SERVER_KEY=${FIREBASE_SERVER_KEY:-dummy_firebase_server_key}
     depends_on:
-      - mysql
+      - mysql-db
       - rabbitmq
       - discovery-service
     networks:
       - hidrogreen-network
     restart: unless-stopped
+
+  subscription-service:
+    build:
+      context: ./subscription-service
+      dockerfile: Dockerfile
+    container_name: hidrogreen-subscription-service
+    ports:
+      - "8087:8087"
+    environment:
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC  # Cambiar 3307 por 3306
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - mysql-db
+      - rabbitmq
+      - discovery-service
+      - api-gateway
+    networks:
+      - hidrogreen-network
+    # restart: unless-stopped
 
   api-gateway:
     build:

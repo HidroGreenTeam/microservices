@@ -68,7 +68,7 @@ public class SubscriptionCommandServiceImpl implements SubscriptionCommandServic
             subscription.getSubscriptionPlan().getPlanType().name(),
             subscription.getSubscriptionPlan().getName(),
             subscription.getSubscriptionPlan().getPrice(),
-            "" // Email will be fetched by the event handler
+            "" 
         );
         eventPublisher.publishEvent(event);
         
