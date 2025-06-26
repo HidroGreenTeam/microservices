@@ -70,6 +70,8 @@ public class SubscriptionEventHandler {
             
             LOGGER.info("Successfully handled subscription created event for subscription ID: {}", event.getSubscriptionId());
             
+        } catch (RuntimeException e) {
+            LOGGER.error("Error while handling subscription created event for subscription ID: {}. Could not fetch user details.", event.getSubscriptionId(), e);
         } catch (Exception e) {
             LOGGER.error("Failed to handle subscription created event for subscription ID: {}", event.getSubscriptionId(), e);
         }

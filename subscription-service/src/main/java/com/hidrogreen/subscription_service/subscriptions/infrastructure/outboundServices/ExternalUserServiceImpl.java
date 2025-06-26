@@ -19,8 +19,8 @@ public class ExternalUserServiceImpl implements ExternalUserService {
     
     private final RestTemplate restTemplate;
 
-    public ExternalUserServiceImpl() {
-        this.restTemplate = new RestTemplate();
+    public ExternalUserServiceImpl(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -49,8 +49,8 @@ public class ExternalUserServiceImpl implements ExternalUserService {
             
         } catch (Exception e) {
             LOGGER.error("Failed to fetch user information for user ID: {}", userId, e);
-            // Return a default user info for demo purposes
-            return Optional.of(new UserInfo(userId, "demo@hidrogreen.com", "Demo", "User"));
+            // Do not return a default user, instead throw an exception
+            throw new RuntimeException("Error fetching user details for user ID: " + userId, e);
         }
     }
     
