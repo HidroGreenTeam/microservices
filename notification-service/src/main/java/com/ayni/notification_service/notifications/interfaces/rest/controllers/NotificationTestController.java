@@ -5,7 +5,6 @@ import com.ayni.notification_service.notifications.domain.model.valueobjects.Not
 import com.ayni.notification_service.notifications.domain.model.valueobjects.NotificationType;
 import com.ayni.notification_service.notifications.domain.services.NotificationCommandService;
 import com.ayni.notification_service.notifications.infrastructure.messaging.dto.SubscriptionNotificationDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
@@ -27,12 +26,9 @@ public class NotificationTestController {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationTestController.class);
     
     private final NotificationCommandService notificationCommandService;
-    private final ObjectMapper objectMapper;
 
-    public NotificationTestController(NotificationCommandService notificationCommandService,
-                                    ObjectMapper objectMapper) {
+    public NotificationTestController(NotificationCommandService notificationCommandService) {
         this.notificationCommandService = notificationCommandService;
-        this.objectMapper = objectMapper;
     }
 
     @PostMapping("/subscription")
@@ -53,27 +49,19 @@ public class NotificationTestController {
             notification.setPrice(request.getPrice());
             notification.setCurrency("USD");
             notification.setEventTime(LocalDateTime.now());
-            notification.setSubject("Prueba de Notificación - HidroGreen");
-            notification.setFeatures("• Característica de prueba 1\n• Característica de prueba 2");
-            notification.setInvoiceNumber("TEST-" + System.currentTimeMillis());
-            
-            // Convert to JSON string to simulate RabbitMQ message
-            String message = objectMapper.writeValueAsString(notification);
-            
+
             // Process the message as if it came from RabbitMQ
             String title = getNotificationTitle(notification.getNotificationType());
             String notificationMessage = getNotificationMessage(notification);
             
             SendNotificationCommand command = new SendNotificationCommand(
                 notification.getUserId(),
-                notification.getUserEmail(),
-                title,
-                title,
-                notificationMessage,
                 NotificationType.INFO,
                 NotificationChannel.EMAIL,
-                null,
-                null
+                title,
+                notificationMessage,
+                null, // activityId
+                null  // cropId
             );
             
             Long notificationId = notificationCommandService.handle(command);
@@ -104,17 +92,15 @@ public class NotificationTestController {
     public ResponseEntity<Map<String, Object>> testDirectNotification(@RequestBody TestDirectNotificationRequest request) {
         try {
             LOGGER.info("Testing direct notification for email: {}", request.getEmail());
-            
+
             SendNotificationCommand command = new SendNotificationCommand(
                 request.getUserId(),
-                request.getEmail(),
-                request.getTitle(),
-                request.getTitle(),
-                request.getMessage(),
                 NotificationType.INFO,
                 NotificationChannel.valueOf(request.getChannel().toUpperCase()),
-                null,
-                null
+                request.getTitle(),
+                request.getMessage(),
+                null, // activityId
+                null  // cropId
             );
             
             Long notificationId = notificationCommandService.handle(command);

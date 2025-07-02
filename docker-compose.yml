@@ -54,7 +54,6 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
@@ -79,7 +78,6 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
@@ -106,7 +104,6 @@ services:
     ports:
       - "8085:8085"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
@@ -154,7 +151,6 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
@@ -179,7 +175,6 @@ services:
     ports:
       - "8084:8084"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
@@ -237,7 +232,6 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
     depends_on:
       - discovery-service
@@ -250,4 +244,4 @@ volumes:
 
 networks:
   hidrogreen-network:
-    driver: bridge 
+    driver: bridge

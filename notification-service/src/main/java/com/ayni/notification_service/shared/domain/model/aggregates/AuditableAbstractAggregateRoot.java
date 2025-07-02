@@ -30,17 +30,4 @@ public abstract class AuditableAbstractAggregateRoot<T extends AbstractAggregate
     @Column(nullable = false)
     private Date updatedAt;
 
-    // Explicit getters to ensure inheritance works properly
-    public Long getId() {
-        return id;
-    }
-    
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-    
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
 } 

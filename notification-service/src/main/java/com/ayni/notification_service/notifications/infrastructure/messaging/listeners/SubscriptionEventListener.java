@@ -40,12 +40,10 @@ public class SubscriptionEventListener {
             
             SendNotificationCommand command = new SendNotificationCommand(
                 notification.getUserId(),
-                notification.getUserEmail(),
-                title,
-                title,
-                notificationMessage,
                 NotificationType.INFO,
                 NotificationChannel.EMAIL,
+                title,
+                notificationMessage,
                 null, // activityId
                 null  // cropId
             );
@@ -75,16 +73,12 @@ public class SubscriptionEventListener {
                 String.format("¡Bienvenido a HidroGreen! Tu suscripción %s ha sido activada exitosamente.\n\n" +
                              "Detalles de tu suscripción:\n" + 
                              "• Plan: %s\n" +
-                             "• Precio: $%.2f %s\n" +
-                             "• Características incluidas:\n%s\n\n" +
-                             "Tu número de factura es: %s\n\n" +
+                             "• Precio: $%.2f %s\n\n" +
                              "¡Gracias por confiar en nosotros!",
                              notification.getSubscriptionType(),
                              notification.getPlanName(),
                              notification.getPrice(),
-                             notification.getCurrency() != null ? notification.getCurrency() : "USD",
-                             notification.getFeatures() != null ? notification.getFeatures() : "Ver detalles en tu cuenta",
-                             notification.getInvoiceNumber() != null ? notification.getInvoiceNumber() : "N/A");
+                             notification.getCurrency() != null ? notification.getCurrency() : "USD");
             case "SUBSCRIPTION_CANCELLED" -> 
                 String.format("Tu suscripción %s ha sido cancelada.\n\n" +
                              "Lamentamos verte partir. Gracias por haber usado HidroGreen.\n" +
@@ -94,23 +88,17 @@ public class SubscriptionEventListener {
                 String.format("¡Tu suscripción %s ha sido renovada exitosamente!\n\n" +
                              "Detalles de la renovación:\n" + 
                              "• Plan: %s\n" +
-                             "• Precio: $%.2f %s\n" +
-                             "• Nuevas características:\n%s\n\n" +
-                             "Tu número de factura es: %s\n\n" +
+                             "• Precio: $%.2f %s\n\n" +
                              "¡Continúa disfrutando de nuestros servicios!",
                              notification.getSubscriptionType(),
                              notification.getPlanName(),
                              notification.getPrice(),
-                             notification.getCurrency() != null ? notification.getCurrency() : "USD",
-                             notification.getFeatures() != null ? notification.getFeatures() : "Ver detalles en tu cuenta",
-                             notification.getInvoiceNumber() != null ? notification.getInvoiceNumber() : "N/A");
+                             notification.getCurrency() != null ? notification.getCurrency() : "USD");
             case "SUBSCRIPTION_EXPIRING" -> 
                 String.format("Tu suscripción %s está por vencer pronto.\n\n" +
-                             "No te quedes sin acceso a nuestros servicios. Renueva tu suscripción para continuar disfrutando de:\n" +
-                             "%s\n\n" +
+                             "No te quedes sin acceso a nuestros servicios. Renueva tu suscripción para continuar disfrutando de nuestros servicios.\n\n" +
                              "¡Renueva ahora y mantén tu cuenta activa!",
-                             notification.getSubscriptionType(),
-                             notification.getFeatures() != null ? notification.getFeatures() : "Todas las características de tu plan");
+                             notification.getSubscriptionType());
             default -> 
                 "Tu estado de suscripción ha sido actualizado.";
         };

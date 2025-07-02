@@ -2,7 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
+	<!--~~(org.springframework.boot:spring-boot-starter-parent failed. Unable to download metadata. Tried repositories:
+https://repo.maven.apache.org/maven2: repo.maven.apache.org)~~>--><parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.0</version>
@@ -22,23 +23,28 @@
 	
 	<dependencies>
 		<!-- Spring Boot Starters -->
-		<dependency>
+		<!--~~(org.springframework.boot:spring-boot-starter-web failed. Unable to download metadata. Tried repositories:
+https://repo.maven.apache.org/maven2: repo.maven.apache.org)~~>--><dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<dependency>
+		<!--~~(org.springframework.boot:spring-boot-starter-data-jpa failed. Unable to download metadata. Tried repositories:
+https://repo.maven.apache.org/maven2: repo.maven.apache.org)~~>--><dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
-		<dependency>
+		<!--~~(org.springframework.boot:spring-boot-starter-mail failed. Unable to download metadata. Tried repositories:
+https://repo.maven.apache.org/maven2: repo.maven.apache.org)~~>--><dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-		<dependency>
+		<!--~~(org.springframework.boot:spring-boot-starter-validation failed. Unable to download metadata. Tried repositories:
+https://repo.maven.apache.org/maven2: repo.maven.apache.org)~~>--><dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-		<dependency>
+		<!--~~(org.springframework.boot:spring-boot-starter-actuator failed. Unable to download metadata. Tried repositories:
+https://repo.maven.apache.org/maven2: repo.maven.apache.org)~~>--><dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
@@ -54,7 +60,8 @@
 		</dependency>
 		
 		<!-- RabbitMQ -->
-		<dependency>
+		<!--~~(org.springframework.boot:spring-boot-starter-amqp failed. Unable to download metadata. Tried repositories:
+https://repo.maven.apache.org/maven2: repo.maven.apache.org)~~>--><dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
 		</dependency>
@@ -101,7 +108,8 @@
 		</dependency>
 		
 		<!-- Development -->
-		<dependency>
+		<!--~~(org.springframework.boot:spring-boot-devtools failed. Unable to download metadata. Tried repositories:
+https://repo.maven.apache.org/maven2: repo.maven.apache.org)~~>--><dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
@@ -109,7 +117,8 @@
 		</dependency>
 		
 		<!-- Test -->
-		<dependency>
+		<!--~~(org.springframework.boot:spring-boot-starter-test failed. Unable to download metadata. Tried repositories:
+https://repo.maven.apache.org/maven2: repo.maven.apache.org)~~>--><dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
