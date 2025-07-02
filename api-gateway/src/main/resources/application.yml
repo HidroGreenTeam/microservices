@@ -25,10 +25,17 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_SERVER_URL:https://discovery-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io/eureka/}
   instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:api-gateway.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io}
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
     securePortEnabled: true
+    securePort: ${EUREKA_INSTANCE_SECURE_PORT:443}
+    nonSecurePortEnabled: false
+    preferIpAddress: false
+    statusPageUrl: https://${eureka.instance.hostname}/actuator/info
+    healthCheckUrl: https://${eureka.instance.hostname}/actuator/health
+    homePageUrl: https://${eureka.instance.hostname}/
 
 management:
   endpoints:

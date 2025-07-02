@@ -25,16 +25,22 @@ model = load_model(MODEL_PATH)
 
 class_names = ['miner', 'nodisease', 'phoma', 'redspider', 'rust']
 
-EUREKA_SERVER = os.getenv("EUREKA_SERVER", "http://localhost:8761/eureka")
+EUREKA_SERVER = os.getenv("EUREKA_SERVER", "https://discovery-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io/eureka")
 SERVICE_PORT = 8000
+SERVICE_HOST = os.getenv("EUREKA_INSTANCE_HOSTNAME", "detection-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io")
+SERVICE_SECURE_PORT = int(os.getenv("EUREKA_INSTANCE_SECURE_PORT", "443"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await eureka_client.init_async(
         eureka_server=EUREKA_SERVER,
         app_name="detection-service",
-        instance_port=SERVICE_PORT,
-        instance_host="localhost",
+        instance_port=SERVICE_SECURE_PORT,
+        instance_host=SERVICE_HOST,
+        instance_secure_port_enabled=True,
+        home_page_url=f"https://{SERVICE_HOST}/",
+        status_page_url=f"https://{SERVICE_HOST}/api/v1/health",
+        health_check_url=f"https://{SERVICE_HOST}/api/v1/health",
     )
     yield
     # Cerrar conexión con RabbitMQ al finalizar
@@ -142,5 +148,10 @@ async def diagnose(
 @router.get("/")
 async def read_root():
     return {"Hello": "World"}
+
+# Health check endpoint
+@app.get("/api/v1/health")
+async def health_check():
+    return {"status": "UP", "service": "detection-service"}
 
 app.include_router(router)
