@@ -31,8 +31,16 @@ public class GatewayConfig {
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                // Auth routes
+                // Health check route para el path raíz
+                .route("health-check", r -> r.path("/")
+                        .and().method("GET")
+                        .uri("lb://user-service"))
+                
+                // Auth routes - agregando sign-in además de login
                 .route("auth-login", r -> r.path("/api/v1/auth/login")
+                        .and().method("POST")
+                        .uri("lb://user-service"))
+                .route("auth-sign-in", r -> r.path("/api/v1/auth/sign-in")
                         .and().method("POST")
                         .uri("lb://user-service"))
                 .route("auth-register", r -> r.path("/api/v1/auth/register")
@@ -43,6 +51,9 @@ public class GatewayConfig {
                         .uri("lb://user-service"))
                 .route("auth-logout", r -> r.path("/api/v1/auth/logout")
                         .and().method("POST")
+                        .uri("lb://user-service"))
+                // Ruta genérica para auth (captura cualquier endpoint no específico)
+                .route("auth-fallback", r -> r.path("/api/v1/auth/**")
                         .uri("lb://user-service"))
                 
                 // User service routes
