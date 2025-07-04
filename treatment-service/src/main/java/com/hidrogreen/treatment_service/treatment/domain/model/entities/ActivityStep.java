@@ -5,9 +5,7 @@ import com.hidrogreen.treatment_service.shared.domain.model.entities.AuditableMo
 import jakarta.persistence.*;
 import lombok.Getter;
 
-/**
- * Activity Step entity
- */
+
 @Entity
 @Getter
 public class ActivityStep extends AuditableModel {

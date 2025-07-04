@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Standalone activity query service implementation 🆓
- */
+
 @Service
 @AllArgsConstructor
 public class StandaloneActivityQueryServiceImpl {

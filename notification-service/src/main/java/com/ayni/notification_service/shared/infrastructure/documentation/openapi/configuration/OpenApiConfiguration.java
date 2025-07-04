@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfiguration {
     @Bean
     public OpenAPI learningPlatformOpenApi() {
-        // General Configuration without security for development
+        
         var openApi = new OpenAPI();
         openApi
                 .info(new Info()

@@ -1,8 +1,6 @@
 package com.hidrogreen.treatment_service.treatment.domain.model.queries;
 
-/**
- * Query to get treatment activities 💊
- */
+
 public record GetTreatmentActivitiesQuery(
     Long cropId,
     Long treatmentId

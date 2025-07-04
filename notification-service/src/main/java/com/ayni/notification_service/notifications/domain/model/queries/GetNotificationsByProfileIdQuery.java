@@ -1,8 +1,6 @@
 package com.ayni.notification_service.notifications.domain.model.queries;
 
-/**
- * GetNotificationsByProfileIdQuery
- */
+
 public record GetNotificationsByProfileIdQuery(Long profileId) {
     public GetNotificationsByProfileIdQuery {
         if (profileId == null || profileId <= 0) {

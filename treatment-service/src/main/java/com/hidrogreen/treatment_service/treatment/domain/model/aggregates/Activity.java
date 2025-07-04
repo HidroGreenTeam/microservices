@@ -5,15 +5,11 @@ import com.hidrogreen.treatment_service.treatment.domain.model.entities.Activity
 import com.hidrogreen.treatment_service.treatment.domain.model.entities.ActivityNote;
 import com.hidrogreen.treatment_service.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Base Activity aggregate root - Abstract class
- */
+
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "activity_type", discriminatorType = DiscriminatorType.STRING)
@@ -120,7 +116,7 @@ public abstract class Activity extends AuditableAbstractAggregateRoot<Activity> 
 
     protected void calculateDueDate() {
         if (scheduledAt != null) {
-            // Default: due 24 hours after scheduled time
+            
             this.dueDate = scheduledAt.plusHours(24);
         }
     }    public Long getActivityId() {

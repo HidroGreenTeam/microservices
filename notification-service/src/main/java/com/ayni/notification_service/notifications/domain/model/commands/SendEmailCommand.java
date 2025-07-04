@@ -1,8 +1,6 @@
 package com.ayni.notification_service.notifications.domain.model.commands;
 
-/**
- * Command to send email directly
- */
+
 public record SendEmailCommand(
     String to,
     String subject,

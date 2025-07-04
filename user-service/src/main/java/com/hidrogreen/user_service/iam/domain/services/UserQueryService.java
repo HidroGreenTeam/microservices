@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserQueryService {
-    List<User> handle(GetAllUsersQuery query); // retorna todos los usuarios
-    Optional<User> handle(GetUserByIdQuery query); // retorna un usuario por id
-    Optional<User> handle(GetUserByEmailQuery query); // retorna un usuario por username
+    List<User> handle(GetAllUsersQuery query);
+    Optional<User> handle(GetUserByIdQuery query);
+    Optional<User> handle(GetUserByEmailQuery query);
 }

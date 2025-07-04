@@ -2,9 +2,7 @@ package com.hidrogreen.treatment_service.treatment.domain.model.queries;
 
 import java.time.LocalDate;
 
-/**
- * Query to get today's activities
- */
+
 public record GetTodaysActivitiesQuery(
     LocalDate date,
     Long cropId

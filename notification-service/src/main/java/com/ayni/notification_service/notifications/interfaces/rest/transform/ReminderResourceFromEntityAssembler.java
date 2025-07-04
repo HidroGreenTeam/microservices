@@ -3,9 +3,7 @@ package com.ayni.notification_service.notifications.interfaces.rest.transform;
 import com.ayni.notification_service.notifications.domain.model.aggregates.Reminder;
 import com.ayni.notification_service.notifications.interfaces.rest.resources.ReminderResource;
 
-/**
- * ReminderResourceFromEntityAssembler
- */
+
 public class ReminderResourceFromEntityAssembler {
     
     public static ReminderResource toResourceFromEntity(Reminder entity) {

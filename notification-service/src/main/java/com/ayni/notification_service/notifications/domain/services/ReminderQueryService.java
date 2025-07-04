@@ -5,9 +5,7 @@ import com.ayni.notification_service.notifications.domain.model.queries.GetPendi
 
 import java.util.List;
 
-/**
- * ReminderQueryService
- */
+
 public interface ReminderQueryService {
     List<Reminder> handle(GetPendingRemindersQuery query);
     List<Reminder> getRemindersByProfileId(Long profileId);

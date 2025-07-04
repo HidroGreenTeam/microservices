@@ -114,26 +114,20 @@ public class FarmerController {
             @PathVariable Long farmerId,
             @RequestPart("file")MultipartFile file) throws IOException {
 
-        // buscamos el id
         Optional<Farmer> farmerOptional = farmerQueryService.getFarmerById(new GetFarmerByIdQuery(farmerId));
 
-
-        // si no existe el farmer
         if (farmerOptional.isEmpty()) {
             return ResponseEntity.notFound().header("message", "Farmer with id " + farmerId + " not found").build();
         }
 
         Farmer farmer = farmerOptional.get();
 
-        // actualizamos la imagen
         Optional<Farmer> updatedFarmerOptional = farmerCommandService.UpdateFarmerImage(file, farmer);
 
-        // si no se pudo actualizar la imagen
         if (updatedFarmerOptional.isEmpty()) {
             return ResponseEntity.badRequest().header("message", "Error while updating farmer image").build();
         }
 
-        // retornamos el farmer actualizado
         return ResponseEntity.ok(FarmerResourceFromEntityAssembler.toResourceFromEntity(updatedFarmerOptional.get()));
 
     }
@@ -155,23 +149,16 @@ public class FarmerController {
     @DeleteMapping("/{farmerId}/farmerImage")
     public ResponseEntity<FarmerResource> deleteFarmerImage(@PathVariable Long farmerId) throws IOException {
 
-        // delegar la eliminación de la imagen al servicio
         Optional<Farmer> updatedFarmerOptional = farmerCommandService.deleteFarmerImage(farmerId);
 
-        // si no se pudo eliminar la imagen
         if (updatedFarmerOptional.isEmpty()) {
             return ResponseEntity.badRequest().header("message", "Error while deleting farmer image").build();
         }
 
-        // retornamos el farmer actualizado
         Farmer updatedFarmer = updatedFarmerOptional.get();
 
         return ResponseEntity.ok(FarmerResourceFromEntityAssembler.toResourceFromEntity(updatedFarmer));
     }
-
-    // ============================================
-    // ENDPOINTS FOR MICROSERVICE COMMUNICATION
-    // ============================================
 
     @Operation(
             summary = "Get farmer email by id",

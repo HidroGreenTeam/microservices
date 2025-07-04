@@ -4,9 +4,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
-/**
- * Activity status value object
- */
+
 @Embeddable
 public record ActivityStatus(@Enumerated(EnumType.STRING) Status status) {
     public ActivityStatus() {

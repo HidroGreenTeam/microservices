@@ -4,9 +4,7 @@ import com.hidrogreen.treatment_service.treatment.domain.model.aggregates.Standa
 import com.hidrogreen.treatment_service.shared.domain.model.events.DomainEvent;
 import lombok.Getter;
 
-/**
- * Event fired when a standalone activity is created 🆓
- */
+
 @Getter
 public final class StandaloneActivityCreatedEvent implements DomainEvent {
     private final String eventId;

@@ -18,6 +18,9 @@ public class Report extends AuditableAbstractAggregateRoot<Report> {
     private Long id;
 
     @NotNull
+    private Long farmerId;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     private DiagnosedDisease diagnosedDisease;
 

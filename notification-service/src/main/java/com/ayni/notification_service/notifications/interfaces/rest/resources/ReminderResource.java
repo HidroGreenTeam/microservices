@@ -1,8 +1,6 @@
 package com.ayni.notification_service.notifications.interfaces.rest.resources;
 
-/**
- * ReminderResource
- */
+
 public record ReminderResource(
     Long id,
     Long profileId,
@@ -14,7 +12,5 @@ public record ReminderResource(
     boolean isRecurring,
     String recurrencePattern
 ) {
-    public ReminderResource(Long id, String message) {
-        this(id, null, null, message, null, null, false, false, null);
-    }
+   
 }

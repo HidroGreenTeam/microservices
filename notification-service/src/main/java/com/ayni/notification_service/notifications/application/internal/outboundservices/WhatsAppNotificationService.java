@@ -8,9 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-/**
- * WhatsApp Notification Service using Twilio
- */
+
 @Service
 public class WhatsAppNotificationService {
 
@@ -25,17 +23,15 @@ public class WhatsAppNotificationService {
     @Value("${twilio.whatsapp.from}")
     private String fromNumber;
 
-    /**
-     * Send WhatsApp message via Twilio
-     */
+    
     public void sendWhatsApp(String to, String message) {
         try {
-            // Initialize Twilio
+            
             Twilio.init(accountSid, authToken);
             
             log.info("Sending WhatsApp message to: {}", to);
             
-            // Create WhatsApp message
+            
             Message twilioMessage = Message.creator(
                 new PhoneNumber("whatsapp:" + to),
                 new PhoneNumber(fromNumber),

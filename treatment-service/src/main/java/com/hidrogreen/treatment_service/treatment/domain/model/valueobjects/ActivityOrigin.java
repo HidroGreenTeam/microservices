@@ -4,9 +4,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
-/**
- * Activity origin value object
- */
+
 @Embeddable
 public record ActivityOrigin(@Enumerated(EnumType.STRING) Origin origin) {
     public ActivityOrigin() {

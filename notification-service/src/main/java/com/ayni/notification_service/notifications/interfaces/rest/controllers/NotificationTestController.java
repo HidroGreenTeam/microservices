@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-/**
- * Controller for testing notification functionality and integrations
- */
+
 @RestController
 @RequestMapping("/api/v1/notifications/test")
 @Tag(name = "Notification Testing", description = "Endpoints for testing notification functionality")
@@ -37,7 +35,7 @@ public class NotificationTestController {
         try {
             LOGGER.info("Testing subscription notification processing for user: {}", request.getUserEmail());
             
-            // Create test subscription notification DTO
+            
             SubscriptionNotificationDto notification = new SubscriptionNotificationDto();
             notification.setNotificationType(request.getNotificationType());
             notification.setUserId(request.getUserId());
@@ -50,7 +48,7 @@ public class NotificationTestController {
             notification.setCurrency("USD");
             notification.setEventTime(LocalDateTime.now());
 
-            // Process the message as if it came from RabbitMQ
+            
             String title = getNotificationTitle(notification.getNotificationType());
             String notificationMessage = getNotificationMessage(notification);
             
@@ -60,8 +58,8 @@ public class NotificationTestController {
                 NotificationChannel.EMAIL,
                 title,
                 notificationMessage,
-                null, // activityId
-                null  // cropId
+                null, 
+                null  
             );
             
             Long notificationId = notificationCommandService.handle(command);
@@ -99,8 +97,8 @@ public class NotificationTestController {
                 NotificationChannel.valueOf(request.getChannel().toUpperCase()),
                 request.getTitle(),
                 request.getMessage(),
-                null, // activityId
-                null  // cropId
+                null, 
+                null  
             );
             
             Long notificationId = notificationCommandService.handle(command);
@@ -199,7 +197,7 @@ public class NotificationTestController {
         };
     }
 
-    // DTOs for test requests
+    
     public static class TestSubscriptionNotificationRequest {
         private String notificationType = "SUBSCRIPTION_CREATED";
         private Long userId = 1L;
@@ -210,7 +208,7 @@ public class NotificationTestController {
         private String planName = "Plan Básico";
         private Double price = 19.99;
 
-        // Getters and setters
+        
         public String getNotificationType() { return notificationType; }
         public void setNotificationType(String notificationType) { this.notificationType = notificationType; }
         public Long getUserId() { return userId; }
@@ -236,7 +234,7 @@ public class NotificationTestController {
         private String message = "Este es un mensaje de prueba desde el notification-service.";
         private String channel = "EMAIL";
 
-        // Getters and setters
+        
         public Long getUserId() { return userId; }
         public void setUserId(Long userId) { this.userId = userId; }
         public String getEmail() { return email; }

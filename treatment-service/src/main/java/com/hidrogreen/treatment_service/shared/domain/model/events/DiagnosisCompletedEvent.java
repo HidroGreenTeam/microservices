@@ -2,10 +2,7 @@ package com.hidrogreen.treatment_service.shared.domain.model.events;
 
 import java.time.LocalDateTime;
 
-/**
- * Diagnosis Completed Event (Stub for external integration)
- * This represents a disease diagnosis completed event from crop-service
- */
+
 public class DiagnosisCompletedEvent implements DomainEvent {
     
     private final String eventId;

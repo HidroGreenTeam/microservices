@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface UserCommandService {
 
-    Optional<User> handle(SignUpCommand command); // comando para registrar un usuario
+    Optional<User> handle(SignUpCommand command);
 
-    Optional<ImmutablePair<User, String>> handle(SignInCommand command); // comando para iniciar sesión, devuelve un par de usuario y token
+    Optional<ImmutablePair<User, String>> handle(SignInCommand command);
 }

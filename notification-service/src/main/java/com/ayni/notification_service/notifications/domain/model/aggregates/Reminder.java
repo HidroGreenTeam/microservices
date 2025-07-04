@@ -9,9 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * Reminder aggregate root
- */
+
 @Entity
 @Getter
 @Setter
@@ -46,7 +44,7 @@ public class Reminder extends AuditableAbstractAggregateRoot<Reminder> {
     private boolean isRecurring;
 
     @Column(name = "recurrence_pattern")
-    private String recurrencePattern; // DAILY, WEEKLY, MONTHLY
+    private String recurrencePattern; 
 
     protected Reminder() {}    public Reminder(Long profileId, NotificationChannel notificationChannel, 
                    String title, String message, LocalDateTime remindAt) {
@@ -59,9 +57,7 @@ public class Reminder extends AuditableAbstractAggregateRoot<Reminder> {
         this.isRecurring = false;
     }
     
-    /**
-     * Publishes the ReminderCreatedEvent after the reminder is persisted
-     */
+    
     public void publishCreatedEvent() {
         this.registerEvent(new ReminderCreatedEvent(this, getId(), this.profileId, this.remindAt));
     }
@@ -99,7 +95,7 @@ public class Reminder extends AuditableAbstractAggregateRoot<Reminder> {
         this.remindAt = newRemindAt;
     }
     
-    // Additional getters for fields not covered by Lombok
+    
     public Long getProfileId() { return profileId; }
     public Long getActivityId() { return activityId; }
     public Long getCropId() { return cropId; }

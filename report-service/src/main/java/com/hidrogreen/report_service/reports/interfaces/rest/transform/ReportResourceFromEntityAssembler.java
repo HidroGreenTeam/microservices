@@ -7,6 +7,7 @@ public class ReportResourceFromEntityAssembler {
     public static ReportResource toResourceFromEntity(Report report) {
         return new ReportResource(
                 report.getId(),
+                report.getFarmerId(),
                 report.getDiagnosedDisease().toString(),
                 report.getAccuracyPercentage());
     }

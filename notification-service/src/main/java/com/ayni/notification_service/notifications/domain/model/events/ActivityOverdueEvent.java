@@ -24,7 +24,7 @@ public class ActivityOverdueEvent extends DomainEvent {
         this.dueDate = dueDate;
     }
     
-    // Explicit getters to avoid compilation issues
+    
     public Long getActivityId() { return activityId; }
     public Long getCropId() { return cropId; }
     public String getTitle() { return title; }

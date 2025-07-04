@@ -4,9 +4,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
-/**
- * Activity frequency value object
- */
+
 @Embeddable
 public record ActivityFrequency(@Enumerated(EnumType.STRING) Frequency frequency) {
     public ActivityFrequency() {

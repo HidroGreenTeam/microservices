@@ -20,9 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-/**
- * NotificationCommandServiceImpl
- */
+
 @Service
 public class NotificationCommandServiceImpl implements NotificationCommandService {
     
@@ -76,14 +74,14 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                 log.debug("Created general notification for profile: {}", profileId);
             }
             
-            // Save notification first
+            
             Notification savedNotification = notificationRepository.save(notification);
             log.info("Notification saved successfully with ID: {}", savedNotification.getId());
             
-            // Deliver notification based on channel
+            
             deliverNotification(savedNotification);
             
-            // Mark as sent and publish domain event
+            
             savedNotification.markAsSent();
             notificationRepository.save(savedNotification);
             savedNotification.publishSentEvent();
@@ -97,9 +95,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         }
     }
     
-    /**
-     * Deliver notification based on channel
-     */
+    
     private void deliverNotification(Notification notification) {
         log.info("Starting delivery of notification {} via {} channel for profile: {}", 
                 notification.getId(), notification.getNotificationChannel(), notification.getProfileId());
@@ -165,7 +161,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                 notification.getId(), notification.getProfileId());
         
         try {
-            // Get device token for the user profile
+            
             String deviceToken = getDeviceTokenForProfile(notification.getProfileId());
             
             if (deviceToken == null || deviceToken.isBlank()) {
@@ -174,10 +170,10 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                 return;
             }
             
-            // Send real push notification via Firebase Cloud Messaging
+            
             sendFirebasePushNotification(deviceToken, notification.getTitle(), notification.getMessage());
             
-            // Mark as delivered after successful delivery
+            
             notification.markAsDelivered();
             log.info("Push notification {} delivered successfully to profile: {}", 
                     notification.getId(), notification.getProfileId());
@@ -189,24 +185,21 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         }
     }
     
-    /**
-     * Get device token for a profile (FCM registration token)
-     * This would typically be stored in user preferences or device registrations
-     */
+    
     private String getDeviceTokenForProfile(Long profileId) {
         try {
-            // TODO: Implement actual device token retrieval from user preferences
-            // This would typically query a DeviceToken table or call user-service
-            // For now, return a mock token for demonstration
+            
+            
+            
             
             log.debug("Retrieving device token for profile: {}", profileId);
             
-            // In real implementation, you would:
-            // 1. Call user-service to get device tokens for the profile
-            // 2. Query a device_tokens table in your database
-            // 3. Use the most recent/active device token
             
-            return "mock-device-token-" + profileId; // Replace with real token
+            
+            
+            
+            
+            return "mock-device-token-" + profileId; 
             
         } catch (Exception e) {
             log.error("Error retrieving device token for profile: {}", profileId, e);
@@ -214,21 +207,19 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
         }
     }
     
-    /**
-     * Send push notification via Firebase Cloud Messaging
-     */
+    
     private void sendFirebasePushNotification(String deviceToken, String title, String message) {
         log.info("Sending FCM push notification to device: {}", deviceToken);
         
         try {
-            // Create FCM payload
+            
             Map<String, Object> notification = Map.of(
                 "title", title,
                 "body", message,
-                "click_action", "FLUTTER_NOTIFICATION_CLICK", // For Flutter apps
+                "click_action", "FLUTTER_NOTIFICATION_CLICK", 
                 "sound", "default",
-                "icon", "ic_notification", // App icon for notification
-                "color", "#00FF00" // Notification color
+                "icon", "ic_notification", 
+                "color", "#00FF00" 
             );
             
             Map<String, Object> data = Map.of(
@@ -243,17 +234,17 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                 "notification", notification,
                 "data", data,
                 "priority", "high",
-                "content_available", true // For iOS background processing
+                "content_available", true 
             );
             
-            // Set headers
+            
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.set("Authorization", "key=" + firebaseServerKey);
             
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
             
-            // Send request to FCM
+            
             ResponseEntity<String> response = restTemplate.postForEntity(fcmUrl, entity, String.class);
             
             if (response.getStatusCode().is2xxSuccessful()) {

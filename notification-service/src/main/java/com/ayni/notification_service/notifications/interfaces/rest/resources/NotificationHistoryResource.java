@@ -1,8 +1,6 @@
 package com.ayni.notification_service.notifications.interfaces.rest.resources;
 
-/**
- * NotificationHistoryResource
- */
+
 public record NotificationHistoryResource(
     Long notificationId,
     Long profileId,

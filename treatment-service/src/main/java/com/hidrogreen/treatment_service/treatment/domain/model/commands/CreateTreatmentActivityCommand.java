@@ -2,9 +2,7 @@ package com.hidrogreen.treatment_service.treatment.domain.model.commands;
 
 import java.time.LocalDateTime;
 
-/**
- * Command to create a treatment activity 💊
- */
+
 public record CreateTreatmentActivityCommand(
     Long cropId,
     Long treatmentId,

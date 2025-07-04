@@ -12,22 +12,23 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenApiConfiguration {
+
     @Bean
-    public OpenAPI learningPlatformOpenApi() {
-        // General Configuration
+    public OpenAPI AinyOpenApi() {
+
         var openApi = new OpenAPI();
+
         openApi
                 .info(new Info()
-                        .title("HidroBots Crop API")
-                        .description("HidroBots Crop Service REST API documentation.")
+                        .title("Ayni Crop Service API")
+                        .description("Ayni Crop Service REST API documentation")
                         .version("v1.0.0")
-                        .license(new License().name("HIGN 2.0")
+                        .license(new License().name("AYNI 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
-                .externalDocs(new ExternalDocumentation()
-                        .description("HidroBots Documentation")
-                        .url("https://github.com/IoT-Solutions-SW71-Grupo-4/HidroBots-Report"));
+                .externalDocs(new ExternalDocumentation().
+                        description("Ayni Documentation")
+                        .url("https://github.com/Ayni-Team/Ayni-Documentation"));
 
-        // Add security scheme
         final String securitySchemeName = "bearerAuth";
 
         openApi.addSecurityItem(new SecurityRequirement()

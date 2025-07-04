@@ -38,7 +38,6 @@ public class Role {
         return new Role(Roles.ROLE_USER);
     }
 
-    // este metodo es para convertir un string a un objeto Role
     public static Role toRoleFromName(String name) {
         return new Role(Roles.valueOf(name));
     }

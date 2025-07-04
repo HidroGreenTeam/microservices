@@ -7,6 +7,7 @@ import com.hidrogreen.report_service.reports.interfaces.rest.resources.CreateRep
 public class CreateReportResourceCommandFromResourceAssembler {
     public static CreateReportCommand toCommandFromResource(CreateReportResource resource) {
         return new CreateReportCommand(
+                resource.farmerId(),
                 DiagnosedDisease.fromString(resource.diagnosedDisease()),
                 resource.accuracyPercentage());
     }

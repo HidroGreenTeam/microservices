@@ -14,10 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-/**
- * Scheduler to automatically expire subscriptions that have passed their end
- * date
- */
+
 @Component
 public class SubscriptionMaintenanceScheduler {
 
@@ -29,11 +26,8 @@ public class SubscriptionMaintenanceScheduler {
         this.subscriptionRepository = subscriptionRepository;
     }
 
-    /**
-     * Check for subscriptions that have expired and update their status
-     * Runs every hour
-     */
-    @Scheduled(fixedRate = 3600000) // 1 hour in milliseconds
+    
+    @Scheduled(fixedRate = 3600000) 
     @Transactional
     public void expireOldSubscriptions() {
         LOGGER.info("Starting scheduled check for expired subscriptions at: {}", LocalDateTime.now());
@@ -43,7 +37,7 @@ public class SubscriptionMaintenanceScheduler {
             Date nowAsDate = (Date) Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
             Date beginningOfTime = (Date) Date.from(LocalDateTime.MIN.atZone(ZoneId.systemDefault()).toInstant());
 
-            // Find active subscriptions that have passed their end date
+            
             List<Subscription> expiredSubscriptions = subscriptionRepository
                     .findByStatusAndEndDateBetween(SubscriptionStatus.ACTIVE,
                             beginningOfTime,
@@ -74,20 +68,17 @@ public class SubscriptionMaintenanceScheduler {
         }
     }
 
-    /**
-     * Cleanup task to remove very old cancelled/expired subscriptions
-     * Runs monthly on the 1st at 2:00 AM
-     */
+    
     @Scheduled(cron = "0 0 2 1 * *")
     @Transactional
     public void cleanupOldSubscriptions() {
         LOGGER.info("Starting monthly cleanup of old subscriptions at: {}", LocalDateTime.now());
 
         try {
-            LocalDateTime cutoffDate = LocalDateTime.now().minusMonths(12); // Keep 12 months of history
+            LocalDateTime cutoffDate = LocalDateTime.now().minusMonths(12); 
 
-            // Note: This is a soft cleanup - we might want to archive rather than delete
-            // For now, we'll just log what we would clean up
+            
+            
 
             List<Subscription> oldCancelledSubscriptions = subscriptionRepository
                     .findByStatusAndEndDateBetween(SubscriptionStatus.CANCELLED,
@@ -107,8 +98,8 @@ public class SubscriptionMaintenanceScheduler {
                     oldCancelledSubscriptions.size(),
                     oldExpiredSubscriptions.size());
 
-            // TODO: Implement archiving logic here if needed
-            // For now, we just log the count for monitoring purposes
+            
+            
 
         } catch (Exception e) {
             LOGGER.error("Error during monthly subscription cleanup", e);

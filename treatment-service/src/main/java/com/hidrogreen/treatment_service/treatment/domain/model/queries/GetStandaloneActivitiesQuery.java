@@ -1,8 +1,6 @@
 package com.hidrogreen.treatment_service.treatment.domain.model.queries;
 
-/**
- * Query to get standalone activities 🆓
- */
+
 public record GetStandaloneActivitiesQuery(
     Long cropId,
     String createdByUser

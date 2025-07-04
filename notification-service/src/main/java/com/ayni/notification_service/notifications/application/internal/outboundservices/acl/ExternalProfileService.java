@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-/**
- * External Profile Service - Feign Client for User Service communication
- */
+
 @Service
 public class ExternalProfileService {
     
@@ -21,12 +19,7 @@ public class ExternalProfileService {
         this.userServiceClient = userServiceClient;
     }
 
-    /**
-     * Get profile email by ProfileId
-     *
-     * @param profileId the profile ID
-     * @return the profile email address
-     */
+    
     public String getProfileEmail(Long profileId) {
         log.debug("Retrieving email for profileId: {}", profileId);
         
@@ -36,16 +29,11 @@ public class ExternalProfileService {
             return email;
         } catch (Exception e) {
             log.warn("Failed to retrieve email for profileId: {}, using fallback: {}", profileId, e.getMessage());
-            return "user@example.com"; // Fallback email
+            return "user@example.com"; 
         }
     }
 
-    /**
-     * Get profile phone number by ProfileId
-     *
-     * @param profileId the profile ID
-     * @return the profile phone number
-     */
+    
     public String getProfilePhoneNumber(Long profileId) {
         log.debug("Retrieving phone for profileId: {}", profileId);
         
@@ -55,16 +43,11 @@ public class ExternalProfileService {
             return phone;
         } catch (Exception e) {
             log.warn("Failed to retrieve phone for profileId: {}, using fallback: {}", profileId, e.getMessage());
-            return "+1234567890"; // Fallback phone number
+            return "+1234567890"; 
         }
     }
 
-    /**
-     * Get profile name by ProfileId
-     *
-     * @param profileId the profile ID
-     * @return the profile full name
-     */
+    
     public String getProfileName(Long profileId) {
         log.debug("Retrieving name for profileId: {}", profileId);
         
@@ -74,16 +57,11 @@ public class ExternalProfileService {
             return name;
         } catch (Exception e) {
             log.warn("Failed to retrieve name for profileId: {}, using fallback: {}", profileId, e.getMessage());
-            return "Unknown User"; // Fallback name
+            return "Unknown User"; 
         }
     }
 
-    /**
-     * Check if profile exists by ProfileId
-     *
-     * @param profileId the profile ID
-     * @return true if profile exists
-     */
+    
     public boolean existsProfile(Long profileId) {
         log.debug("Checking if profileId exists: {}", profileId);
         
@@ -93,14 +71,12 @@ public class ExternalProfileService {
             return exists;
         } catch (Exception e) {
             log.warn("Failed to check if profileId exists: {}, assuming false: {}", profileId, e.getMessage());
-            return false; // Assume profile doesn't exist on error
+            return false; 
         }
     }
 
-    /**
-     * Feign Client for User Service communication
-     */
-    @FeignClient(name = "user-service")
+    
+    @FeignClient(name = "user-service", configuration = com.ayni.notification_service.shared.infrastructure.config.FeignConfig.class)
     public interface UserServiceClient {
         
         @GetMapping("/api/v1/farmers/{farmerId}/email")

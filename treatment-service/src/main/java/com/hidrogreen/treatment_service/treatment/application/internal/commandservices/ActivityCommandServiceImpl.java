@@ -12,9 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-/**
- * Activity command service implementation
- */
+
 @Service
 public class ActivityCommandServiceImpl implements ActivityCommandService {
 
@@ -38,15 +36,15 @@ public class ActivityCommandServiceImpl implements ActivityCommandService {
                 
                 activity.complete();
                 
-                // Add completion note if provided
+                
                 if (command.completionNotes() != null && !command.completionNotes().isBlank()) {
-                    // This would typically add a note to the activity
-                    // For now, we'll store it in instructions or add it as a note entity
+                    
+                    
                 }
                 
                 Activity savedActivity = activityRepository.save(activity);
                 
-                // Publish completed event
+                
                 ActivityCompletedEvent event = new ActivityCompletedEvent(savedActivity);
                 eventPublisher.publishEvent(event);
                 
@@ -70,7 +68,7 @@ public class ActivityCommandServiceImpl implements ActivityCommandService {
         return activityRepository.findById(activityId)
             .map(activity -> {
                 activity.cancel();
-                // Store cancellation reason
+                
                 activity.updateInstructions("CANCELLED: " + reason);
                 return activityRepository.save(activity);
             });

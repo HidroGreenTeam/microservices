@@ -9,9 +9,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * Notification aggregate root
- */
+
 @Entity
 @Getter
 @Setter
@@ -75,9 +73,7 @@ public class Notification extends AuditableAbstractAggregateRoot<Notification> {
         this.cropId = cropId;
     }
     
-    /**
-     * Publishes the NotificationSentEvent after the notification is persisted
-     */
+    
     public void publishSentEvent() {
         this.registerEvent(new NotificationSentEvent(this, getId(), this.profileId));
     }
@@ -88,7 +84,7 @@ public class Notification extends AuditableAbstractAggregateRoot<Notification> {
         this.notificationStatus = NotificationStatus.SENT;
         this.sentAt = LocalDateTime.now();
         
-        // The event should be published separately using publishSentEvent() method
+        
     }
 
     public void markAsDelivered() {
@@ -104,7 +100,7 @@ public class Notification extends AuditableAbstractAggregateRoot<Notification> {
         return this.scheduledAt != null && this.scheduledAt.isAfter(LocalDateTime.now());
     }
     
-    // Additional getters for fields not covered by Lombok
+    
     public Long getProfileId() { return profileId; }
     public Long getActivityId() { return activityId; }
     public Long getCropId() { return cropId; }

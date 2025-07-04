@@ -4,28 +4,35 @@ import com.ayni.notification_service.notifications.domain.model.aggregates.Remin
 import com.ayni.notification_service.notifications.domain.model.commands.ScheduleReminderCommand;
 import com.ayni.notification_service.notifications.domain.services.ReminderCommandService;
 import com.ayni.notification_service.notifications.infrastructure.persistence.jpa.repositories.ReminderRepository;
+import com.ayni.notification_service.notifications.application.internal.outboundservices.acl.ExternalProfileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-/**
- * ReminderCommandServiceImpl
- */
+
 @Service
 public class ReminderCommandServiceImpl implements ReminderCommandService {
     
     private static final Logger log = LoggerFactory.getLogger(ReminderCommandServiceImpl.class);
     
     private final ReminderRepository reminderRepository;
+    private final ExternalProfileService externalProfileService;
     
-    public ReminderCommandServiceImpl(ReminderRepository reminderRepository) {
+    public ReminderCommandServiceImpl(ReminderRepository reminderRepository, ExternalProfileService externalProfileService) {
         this.reminderRepository = reminderRepository;
+        this.externalProfileService = externalProfileService;
     }
     
     @Override
     public Long handle(ScheduleReminderCommand command) {
         log.info("Processing ScheduleReminderCommand for profileId: {}, remindAt: {}", 
                 command.profileId(), command.remindAt());
+        
+        
+        if (!externalProfileService.existsProfile(command.profileId())) {
+            log.warn("Profile not found with id: {}", command.profileId());
+            throw new IllegalArgumentException("Profile not found with id: " + command.profileId());
+        }
         
         try {
             Long profileId = command.profileId();
@@ -54,7 +61,7 @@ public class ReminderCommandServiceImpl implements ReminderCommandService {
             Reminder savedReminder = reminderRepository.save(reminder);
             log.info("Reminder scheduled successfully with ID: {}", savedReminder.getId());
             
-            // Publish domain event after persistence
+            
             savedReminder.publishCreatedEvent();
             
             return savedReminder.getId();

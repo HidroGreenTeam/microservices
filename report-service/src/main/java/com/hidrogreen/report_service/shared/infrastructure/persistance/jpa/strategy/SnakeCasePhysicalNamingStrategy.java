@@ -6,10 +6,7 @@ import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 
 import static io.github.encryptorcode.pluralize.Pluralize.pluralize;
 
-/**
- * A custom PhysicalNamingStrategy for Hibernate that converts entity and attribute names
- * from camel case to snake case and pluralizes table names.
- */
+
 public class SnakeCasePhysicalNamingStrategy implements PhysicalNamingStrategy {
     @Override
     public Identifier toPhysicalCatalogName(Identifier identifier, JdbcEnvironment jdbcEnvironment) {

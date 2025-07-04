@@ -7,9 +7,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-/**
- * Email Notification Service
- */
+
 @Service
 public class EmailNotificationService {
 
@@ -27,9 +25,7 @@ public class EmailNotificationService {
         this.mailSender = mailSender;
     }
 
-    /**
-     * Send email notification
-     */
+    
     public void sendEmail(String to, String subject, String message) {
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();

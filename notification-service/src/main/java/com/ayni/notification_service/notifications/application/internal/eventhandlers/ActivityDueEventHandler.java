@@ -9,9 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-/**
- * ActivityDueEventHandler - Handles events from Activities BC
- */
+
 @Service
 public class ActivityDueEventHandler {
     
@@ -23,19 +21,17 @@ public class ActivityDueEventHandler {
         this.notificationCommandService = notificationCommandService;
     }
     
-    /**
-     * Handles ActivityDueEvent by sending notification reminders
-     */
+    
     @EventListener
     public void on(ActivityDueEvent event) {
         log.info("Handling ActivityDueEvent for activityId: {}, profileId: {}", 
                 event.getActivityId(), event.getProfileId());
           try {
-            // ProfileId is provided in the event, no need for external service lookup
+            
             log.debug("Using profileId from event: {} for activityId: {}", 
                      event.getProfileId(), event.getActivityId());
             
-            // Send reminder notification via WhatsApp
+            
             SendActivityReminderCommand whatsAppCommand = new SendActivityReminderCommand(
                 event.getProfileId(),
                 event.getActivityId(),
@@ -50,7 +46,7 @@ public class ActivityDueEventHandler {
             log.info("WhatsApp reminder sent with ID: {} for activity: {}", 
                     whatsAppNotificationId, event.getActivityId());
             
-            // Send reminder notification via Email as backup
+            
             SendActivityReminderCommand emailCommand = new SendActivityReminderCommand(
                 event.getProfileId(),
                 event.getActivityId(),
@@ -71,7 +67,7 @@ public class ActivityDueEventHandler {
         } catch (Exception e) {
             log.error("Error handling ActivityDueEvent for activityId: {}, profileId: {}: {}", 
                      event.getActivityId(), event.getProfileId(), e.getMessage(), e);
-            // Don't rethrow - we don't want to break the event publisher
+            
         }
     }
 }

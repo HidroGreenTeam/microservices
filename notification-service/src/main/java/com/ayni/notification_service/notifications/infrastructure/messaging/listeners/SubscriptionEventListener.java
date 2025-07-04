@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-/**
- * Listener for subscription events from subscription-service
- */
+
 @Component
 public class SubscriptionEventListener {
     
@@ -44,8 +42,8 @@ public class SubscriptionEventListener {
                 NotificationChannel.EMAIL,
                 title,
                 notificationMessage,
-                null, // activityId
-                null  // cropId
+                null, 
+                null  
             );
             
             Long notificationId = notificationCommandService.handle(command);

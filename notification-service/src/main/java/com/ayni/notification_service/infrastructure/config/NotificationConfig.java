@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 import jakarta.annotation.PostConstruct;
 import java.util.Properties;
 
-/**
- * Configuration for notification services (Email, SMS, Push Notifications)
- */
+
 @Configuration
 public class NotificationConfig {
     

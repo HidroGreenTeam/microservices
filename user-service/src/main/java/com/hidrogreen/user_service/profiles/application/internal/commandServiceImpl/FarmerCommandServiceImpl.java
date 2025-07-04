@@ -21,7 +21,7 @@ import java.util.Optional;
 public class FarmerCommandServiceImpl implements FarmerCommandService {
 
     private final FarmerRepository farmerRepository;
-    private final ApplicationEventPublisher eventPublisher; // se usa para publicar eventos
+    private final ApplicationEventPublisher eventPublisher;
     private final FarmerImageService farmerImageService;
 
     @Autowired
@@ -34,7 +34,6 @@ public class FarmerCommandServiceImpl implements FarmerCommandService {
     @Override
     public Long createFarmer(CreateFarmerCommand command) {
 
-        // Verificar si ya existe un Farmer con el mismo email
         if (farmerRepository.existsByEmail(command.email())) {
             throw new IllegalArgumentException("Farmer with email " + command.email() + " already exists");
         }
@@ -42,7 +41,6 @@ public class FarmerCommandServiceImpl implements FarmerCommandService {
         Farmer farmer = new Farmer(command);
         farmerRepository.save(farmer);
 
-        // Publicamos el evento
         FarmerCreatedEvent event = new FarmerCreatedEvent(this, farmer.getId(), farmer.getEmail());
         eventPublisher.publishEvent(event);
 
@@ -69,10 +67,8 @@ public class FarmerCommandServiceImpl implements FarmerCommandService {
 
     @Override
     public void deleteFarmer(Long farmerId) {
-        // Buscar el farmer
         var farmer = farmerRepository.findById(farmerId).orElseThrow(() -> new IllegalArgumentException("Farmer with id " + farmerId + "doesn't exist!!"));
 
-        // verificar si el farmer tiene una imagen, eliminar de cloudinary
         if (farmer.getFarmerImage() != null) {
             try {
                 farmerImageService.deleteImage(farmer.getFarmerImage());
@@ -93,7 +89,6 @@ public class FarmerCommandServiceImpl implements FarmerCommandService {
             farmerImageService.deleteImage(farmer.getFarmerImage());
         }
 
-        // Subir la imagen
         FarmerImage newImage = farmerImageService.uploadImage(file);
         farmer.setFarmerImage(newImage);
 
@@ -102,14 +97,12 @@ public class FarmerCommandServiceImpl implements FarmerCommandService {
 
     @Override
     public Optional<Farmer> deleteFarmerImage(Long farmerId) throws IOException {
-        // Buscar el farmer
         Farmer farmer = farmerRepository.findById(farmerId).orElseThrow(() -> new IllegalArgumentException("Farmer with id " + farmerId + "doesn't exist!!"));
 
-        // verificamos si el farmer tiene una imagen
         if (farmer.getFarmerImage() != null) {
-            farmerImageService.deleteImage(farmer.getFarmerImage()); // eliminamos la imagen de cloudinary
-            farmer.setFarmerImage(null); // eliminamos la imagen del farmer
-            farmerRepository.save(farmer); // guardamos los cambios
+            farmerImageService.deleteImage(farmer.getFarmerImage());
+            farmer.setFarmerImage(null);
+            farmerRepository.save(farmer);
         } else {
             throw new IllegalArgumentException("Farmer with id " + farmerId + " doesn't have an image!!");
         }

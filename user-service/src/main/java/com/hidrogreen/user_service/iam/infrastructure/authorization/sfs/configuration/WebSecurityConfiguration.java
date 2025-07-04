@@ -1,6 +1,7 @@
 package com.hidrogreen.user_service.iam.infrastructure.authorization.sfs.configuration;
 
 import com.hidrogreen.user_service.iam.infrastructure.authorization.sfs.pipeline.BearerAuthorizationRequestFilter;
+import com.hidrogreen.user_service.iam.infrastructure.authorization.sfs.pipeline.ServiceAuthorizationFilter;
 import com.hidrogreen.user_service.iam.infrastructure.hashing.bcrypt.BCryptHashingService;
 import com.hidrogreen.user_service.iam.infrastructure.tokens.jwt.BearerTokenService;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,13 +29,15 @@ public class WebSecurityConfiguration {
     private final BearerTokenService tokenService;
     private final BCryptHashingService hashingService;
     private final AuthenticationEntryPoint unauthorizedRequestHandler;
+    private final ServiceAuthorizationFilter serviceAuthorizationFilter;
 
 
-    public WebSecurityConfiguration(@Qualifier("defaultUserDetailsService") UserDetailsService userDetailsService, BearerTokenService tokenService, BCryptHashingService hashingService, AuthenticationEntryPoint authenticationEntryPoint) {
+    public WebSecurityConfiguration(@Qualifier("defaultUserDetailsService") UserDetailsService userDetailsService, BearerTokenService tokenService, BCryptHashingService hashingService, AuthenticationEntryPoint authenticationEntryPoint, ServiceAuthorizationFilter serviceAuthorizationFilter) {
         this.userDetailsService = userDetailsService;
         this.tokenService = tokenService;
         this.hashingService = hashingService;
         this.unauthorizedRequestHandler = authenticationEntryPoint;
+        this.serviceAuthorizationFilter = serviceAuthorizationFilter;
     }
 
     @Bean
@@ -62,7 +65,6 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // CORS default configuration
         http.cors(configurer -> configurer.configurationSource(source -> {
             var cors = new CorsConfiguration();
             cors.setAllowedOrigins(List.of("*"));
@@ -71,15 +73,18 @@ public class WebSecurityConfiguration {
             return cors;
         }));
 
-        // CSRF disabled
         http.csrf(csrfConfigurer -> csrfConfigurer.disable());
 
-        // Identity and Access Management Configuration
         http.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(unauthorizedRequestHandler))
                 .sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(
                                 "/api/v1/auth/**",
+                                "/api/v1/farmers/*/exists",
+                                "/api/v1/farmers/*/email",
+                                "/api/v1/farmers/*/phone",
+                                "/api/v1/farmers/*/name",
+                                "/internal/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
@@ -87,6 +92,7 @@ public class WebSecurityConfiguration {
                                 "/webjars/**").permitAll()
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
+        http.addFilterBefore(serviceAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(authorizationRequestFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

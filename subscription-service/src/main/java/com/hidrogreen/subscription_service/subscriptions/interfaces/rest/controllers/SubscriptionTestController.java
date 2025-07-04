@@ -15,9 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Controller for testing subscription notifications and integrations
- */
+
 @RestController
 @RequestMapping("/api/v1/subscriptions/test")
 @Tag(name = "Subscription Testing", description = "Endpoints for testing subscription notifications and integrations")
@@ -40,7 +38,7 @@ public class SubscriptionTestController {
         try {
             LOGGER.info("Testing notification for user ID: {}", request.getUserId());
             
-            // Get user information
+            
             Optional<ExternalUserService.UserInfo> userInfoOpt = externalUserService.getUserById(request.getUserId());
             
             String userEmail = request.getEmail();
@@ -52,13 +50,13 @@ public class SubscriptionTestController {
                 userName = userInfo.firstName() + " " + userInfo.lastName();
             }
             
-            // Create test notification
+            
             SubscriptionNotificationDto notification = new SubscriptionNotificationDto();
             notification.setNotificationType(request.getNotificationType());
             notification.setUserId(request.getUserId());
             notification.setUserEmail(userEmail);
             notification.setUserName(userName);
-            notification.setSubscriptionId(999L); // Test subscription ID
+            notification.setSubscriptionId(999L); 
             notification.setSubscriptionType("BASIC");
             notification.setPlanName("Plan Básico de Prueba");
             notification.setPrice(BigDecimal.valueOf(19.99));
@@ -68,7 +66,7 @@ public class SubscriptionTestController {
             notification.setFeatures("• Funcionalidad de prueba\n• Notificaciones\n• Integración completa");
             notification.setInvoiceNumber("TEST-INV-" + System.currentTimeMillis());
             
-            // Publish notification based on type
+            
             switch (request.getNotificationType()) {
                 case "SUBSCRIPTION_CREATED":
                     notificationPublisher.publishSubscriptionCreated(notification);
@@ -142,9 +140,9 @@ public class SubscriptionTestController {
     @Operation(summary = "Check subscription service health and integrations")
     public ResponseEntity<Map<String, Object>> healthCheck() {
         try {
-            // Test basic functionality
-            boolean rabbitMQHealthy = true; // Could add actual RabbitMQ health check
-            boolean userServiceHealthy = true; // Could add actual user service health check
+            
+            boolean rabbitMQHealthy = true; 
+            boolean userServiceHealthy = true; 
             
             return ResponseEntity.ok(Map.of(
                 "service", "subscription-service",
@@ -169,13 +167,13 @@ public class SubscriptionTestController {
         }
     }
 
-    // DTO for test notification request
+    
     public static class TestNotificationRequest {
         private Long userId;
         private String email;
         private String notificationType = "SUBSCRIPTION_CREATED";
 
-        // Getters and setters
+        
         public Long getUserId() {
             return userId;
         }

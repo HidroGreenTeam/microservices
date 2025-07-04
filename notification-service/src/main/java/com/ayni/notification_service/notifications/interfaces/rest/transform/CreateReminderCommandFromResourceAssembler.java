@@ -6,9 +6,7 @@ import com.ayni.notification_service.notifications.interfaces.rest.resources.Cre
 
 import java.time.LocalDateTime;
 
-/**
- * CreateReminderCommandFromResourceAssembler
- */
+
 public class CreateReminderCommandFromResourceAssembler {
     
     public static ScheduleReminderCommand toCommandFromResource(CreateReminderResource resource) {

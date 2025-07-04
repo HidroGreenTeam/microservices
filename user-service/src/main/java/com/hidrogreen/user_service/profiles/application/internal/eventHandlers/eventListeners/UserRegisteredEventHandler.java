@@ -22,13 +22,11 @@ public class UserRegisteredEventHandler {
 
     @EventListener
     public void handleUserRegisteredEvent(UserRegisteredEvent event) {
-        // Crea el Farmer solo si no existe
         try {
             CreateFarmerCommand createFarmerCommand = new CreateFarmerCommand(event.getFullName(), event.getEmail(), "", event.getPassword());
-            Long farmerId = farmerCommandService.createFarmer(createFarmerCommand);  // Obtén el ID del Farmer recién creado
+            Long farmerId = farmerCommandService.createFarmer(createFarmerCommand);
 
-            // Una vez que se crea el Farmer, publicar un nuevo evento que BC Crops pueda escuchar
-            FarmerCreatedEvent farmerCreatedEvent = new FarmerCreatedEvent(this, farmerId, event.getEmail());  // Usa el ID en lugar de Strings
+            FarmerCreatedEvent farmerCreatedEvent = new FarmerCreatedEvent(this, farmerId, event.getEmail());
             eventPublisher.publishEvent(farmerCreatedEvent);
 
         } catch (IllegalArgumentException e) {

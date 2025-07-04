@@ -25,9 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Activities REST Controller
- */
+
 @RestController
 @RequestMapping(value = "/api/v1/activities", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Activities", description = "Agricultural Activities Management")
@@ -50,9 +48,7 @@ public class ActivitiesController {
         this.notificationService = notificationService;
     }
 
-    /**
-     * 📋 Get all activities
-     */
+    
     @GetMapping
     @Operation(summary = "Get all activities", description = "Retrieve all agricultural activities")
     public ResponseEntity<List<ActivityResponse>> getAllActivities(
@@ -66,7 +62,7 @@ public class ActivitiesController {
                 var query = new GetActivitiesByCropIdQuery(cropId);
                 activities = activityQueryService.handle(query);
             } else {
-                // Get today's activities as default
+                
                 var query = new GetTodaysActivitiesQuery(LocalDate.now(), null);
                 activities = activityQueryService.handle(query);
             }
@@ -83,15 +79,13 @@ public class ActivitiesController {
         }
     }
 
-    /**
-     * 📋 Create new activity
-     */
+    
     @PostMapping
     @Operation(summary = "Create activity", description = "Create a new agricultural activity")
     public ResponseEntity<ActivityResponse> createActivity(@RequestBody CreateActivityRequest request) {
         
         try {
-            // Create standalone activity command
+            
             var command = new CreateStandaloneActivityCommand(
                 request.cropId(),
                 request.title(),
@@ -106,7 +100,7 @@ public class ActivitiesController {
             
             Long activityId = standaloneActivityCommandService.handle(command);
             
-            // Get the created activity to return as response
+            
             Optional<Activity> createdActivity = activityQueryService.getActivityById(activityId);
             
             if (createdActivity.isEmpty()) {
@@ -123,9 +117,7 @@ public class ActivitiesController {
         }
     }
 
-    /**
-     * Complete an activity
-     */
+    
     @PostMapping("/{activityId}/complete")
     @Operation(summary = "Complete activity", description = "Mark an activity as completed")
     public ResponseEntity<ActivityResponse> completeActivity(@PathVariable Long activityId) {
@@ -133,7 +125,7 @@ public class ActivitiesController {
             CompleteActivityCommand command = new CompleteActivityCommand(activityId, "Completed via API");
             activityCommandService.handle(command);
             
-            // Get updated activity
+            
             Optional<Activity> activityOpt = activityQueryService.getActivityById(activityId);
             if (activityOpt.isPresent()) {
                 Activity activity = activityOpt.get();
@@ -148,9 +140,7 @@ public class ActivitiesController {
         }
     }
 
-    /**
-     * ⏰ Get overdue activities
-     */
+    
     @GetMapping("/overdue")
     @Operation(summary = "Get overdue activities", description = "Get activities that are past their scheduled time")
     public ResponseEntity<List<ActivityResponse>> getOverdueActivities() {
@@ -170,15 +160,13 @@ public class ActivitiesController {
         }
     }
 
-    /**
-     * 📊 Get activity statistics
-     */
+    
     @GetMapping("/stats")
     @Operation(summary = "Get activity statistics", description = "Get statistics about activities")
     public ResponseEntity<ActivityStatsResponse> getActivityStats(@RequestParam(required = false) Long cropId) {
         
         try {
-            // Get activities for statistics
+            
             List<Activity> activities;
             if (cropId != null) {
                 var query = new GetActivitiesByCropIdQuery(cropId);
@@ -203,9 +191,7 @@ public class ActivitiesController {
         }
     }
 
-    /**
-     * 🔔 Send activity reminders
-     */
+    
     @PostMapping("/{activityId}/remind")
     @Operation(summary = "Send activity reminder", description = "Send reminder notification for an activity")
     public ResponseEntity<String> sendActivityReminder(
@@ -233,9 +219,7 @@ public class ActivitiesController {
         }
     }
     
-    /**
-     * Map Activity entity to ActivityResponse
-     */
+    
     private ActivityResponse mapToActivityResponse(Activity activity) {
         return new ActivityResponse(
             activity.getId(),
@@ -260,9 +244,7 @@ public class ActivitiesController {
             .orElse("");
     }
     
-    /**
-     * Convert priority number to string
-     */
+    
     private String getPriorityString(int priority) {
         return switch (priority) {
             case 1 -> "LOW";
@@ -274,17 +256,4 @@ public class ActivitiesController {
         };
     }
     
-    /**
-     * Convert priority string to number
-     */
-    private Integer getPriorityNumber(String priority) {
-        return switch (priority.toUpperCase()) {
-            case "LOW" -> 1;
-            case "MEDIUM" -> 2;
-            case "HIGH" -> 3;
-            case "URGENT" -> 4;
-            case "CRITICAL" -> 5;
-            default -> 2; // Default to MEDIUM
-        };
-    }
 }

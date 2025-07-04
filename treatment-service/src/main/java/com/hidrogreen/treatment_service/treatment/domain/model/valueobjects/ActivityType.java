@@ -4,9 +4,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
-/**
- * Activity type value object
- */
+
 @Embeddable
 public record ActivityType(@Enumerated(EnumType.STRING) Type type) {
     public ActivityType() {

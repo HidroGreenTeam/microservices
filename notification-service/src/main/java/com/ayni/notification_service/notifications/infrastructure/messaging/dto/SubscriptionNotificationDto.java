@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO for subscription notification messages
- */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

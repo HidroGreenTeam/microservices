@@ -1,107 +1,72 @@
 package com.ayni.crop_service.crops.domain.model.aggregates;
 
-import com.ayni.crop_service.crops.domain.model.valueobjects.*;
-import com.ayni.crop_service.crops.domain.model.events.CropCreatedEvent;
-import com.ayni.crop_service.crops.domain.model.events.CropStatusUpdatedEvent;
+import com.ayni.crop_service.crops.domain.model.commands.CreateCropCommand;
+import com.ayni.crop_service.crops.domain.model.entities.CropImage;
+
 import com.ayni.crop_service.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 
 import java.time.LocalDate;
 
-/**
- * Crop aggregate root
- */
+
 @Entity
-@Table(name = "crops")
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
 public class Crop extends AuditableAbstractAggregateRoot<Crop> {
 
-    @Column(name = "profile_id", nullable = false)
-    private Long profileId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "crop_name", nullable = false)
+    @NotBlank(message = "Name is required")
     private String cropName;
 
-    @Column(name = "planting_date", nullable = false)
+
+
+    @NotNull(message = "Area is required")
+    private Long area;
+
+    @NotNull(message = "Planting date is required")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "America/Lima")
     private LocalDate plantingDate;
 
-    @Column(name = "location")
-    private String location;
+    @NotNull
+    private Long farmerId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "health_status", nullable = false)
-    private CropHealthStatus healthStatus;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "crop_image_id", referencedColumnName = "id")
+    private CropImage cropImage;
 
-    @Column(name = "notes", length = 1000)
-    private String notes;
 
-    protected Crop() {}
+    public Crop(CreateCropCommand command) {
+        super();
+        this.cropName = command.cropName();
 
-    public Crop(Long profileId, String cropName, LocalDate plantingDate, String location) {
-        this.profileId = profileId;
+        this.area = command.area();
+        this.plantingDate = command.plantingDate();
+        this.farmerId = command.farmerId();
+    }
+
+    public Crop update(
+            String cropName,
+            Long area,
+            LocalDate plantingDate,
+            Long farmerId
+    ) {
         this.cropName = cropName;
+        this.area = area;
         this.plantingDate = plantingDate;
-        this.location = location;
-        this.healthStatus = CropHealthStatus.HEALTHY;
-        
-        this.registerEvent(new CropCreatedEvent(this));
-    }
-
-    public void updateHealthStatus(CropHealthStatus newStatus) {
-        CropHealthStatus oldStatus = this.healthStatus;
-        this.healthStatus = newStatus;
-        this.registerEvent(new CropStatusUpdatedEvent(this, oldStatus, newStatus));
-    }
-
-    public void updateNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public Long getCropId() {
-        return this.getId();
-    }
-
-    public Long getProfileId() {
-        return profileId;
-    }
-
-    public String getCropName() {
-        return cropName;
-    }
-
-    public LocalDate getPlantingDate() {
-        return plantingDate;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public CropHealthStatus getHealthStatus() {
-        return healthStatus;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public boolean isHealthy() {
-        return healthStatus.isHealthy();
-    }
-
-    public boolean isDiseased() {
-        return healthStatus.isDiseased();
-    }
-
-    public boolean isAtRisk() {
-        return healthStatus.isAtRisk();
-    }
-
-    public boolean isCritical() {
-        return healthStatus.isCritical();
-    }
-
-    public int getHealthScore() {
-        return healthStatus.getHealthScore();
+        this.farmerId = farmerId;
+        return this;
     }
 }

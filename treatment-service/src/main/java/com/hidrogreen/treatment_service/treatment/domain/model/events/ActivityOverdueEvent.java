@@ -6,9 +6,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-/**
- * Event fired when an activity becomes overdue
- */
+
 @Getter
 public final class ActivityOverdueEvent implements DomainEvent {
     private final String eventId;

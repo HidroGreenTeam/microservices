@@ -6,9 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * Configuration class to load environment variables from .env file
- */
+
 @Configuration
 public class EnvironmentConfig {
     
@@ -17,13 +15,13 @@ public class EnvironmentConfig {
     @PostConstruct
     public void loadEnvironmentVariables() {
         try {
-            // Try to load .env file from the current directory
+            
             Dotenv dotenv = Dotenv.configure()
                     .directory("./")
                     .ignoreIfMissing()
                     .load();
             
-            // Set environment variables as system properties
+            
             setEnvVar(dotenv, "EMAIL_USERNAME");
             setEnvVar(dotenv, "EMAIL_PASSWORD");
             setEnvVar(dotenv, "EMAIL_FROM_ADDRESS");

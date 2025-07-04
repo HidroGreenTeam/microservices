@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
-/**
- * NotificationContextFacadeImpl
- */
+
 @Service
 public class NotificationContextFacadeImpl implements NotificationContextFacade {
     

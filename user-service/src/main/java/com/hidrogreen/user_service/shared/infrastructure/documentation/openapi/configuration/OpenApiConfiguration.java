@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfiguration {
     @Bean
     public OpenAPI learningPlatformOpenApi() {
-        // General Configuration
         var openApi = new OpenAPI();
         openApi
                 .info(new Info()
@@ -27,7 +26,6 @@ public class OpenApiConfiguration {
                         .description("HidroBots Documentation")
                         .url("https://github.com/IoT-Solutions-SW71-Grupo-4/HidroBots-Report"));
 
-        // Add security scheme
         final String securitySchemeName = "bearerAuth";
 
 

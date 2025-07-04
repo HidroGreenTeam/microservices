@@ -13,7 +13,7 @@ import java.util.Date;
 @MappedSuperclass
 public class AuditableAbstractAggregateRoot<T extends AbstractAggregateRoot<T>> extends AbstractAggregateRoot<T> {
 
-    //It is used to publish domain events
+    
     @Id
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)

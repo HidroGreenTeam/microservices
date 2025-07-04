@@ -5,9 +5,7 @@ import com.ayni.notification_service.notifications.domain.model.commands.SendAct
 import com.ayni.notification_service.notifications.domain.model.commands.SendEmailCommand;
 import com.ayni.notification_service.notifications.domain.model.commands.SendWhatsAppCommand;
 
-/**
- * NotificationCommandService
- */
+
 public interface NotificationCommandService {
     Long handle(SendNotificationCommand command);
     Long handle(SendActivityReminderCommand command);

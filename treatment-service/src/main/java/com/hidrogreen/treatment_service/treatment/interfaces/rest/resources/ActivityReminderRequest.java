@@ -2,9 +2,7 @@ package com.hidrogreen.treatment_service.treatment.interfaces.rest.resources;
 
 import jakarta.validation.constraints.*;
 
-/**
- * Activity Reminder Request
- */
+
 public record ActivityReminderRequest(
     @NotBlank(message = "Activity name is required")
     String activityName,

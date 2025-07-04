@@ -4,11 +4,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-/**
- * Feign Client for Treatment Service
- * Real integration with treatment-service microservice
- */
-@FeignClient(name = "treatment-service", path = "/api/v1")
+
+@FeignClient(name = "treatment-service", path = "/api/v1", configuration = com.ayni.notification_service.shared.infrastructure.config.FeignConfig.class)
 public interface TreatmentServiceClient {
     
     @GetMapping("/activities/{id}")
@@ -17,7 +14,7 @@ public interface TreatmentServiceClient {
     @GetMapping("/activities/crop/{cropId}")
     java.util.List<ActivityDTO> getActivitiesByCropId(@PathVariable("cropId") Long cropId);
     
-    // DTO for Activity information
+    
     record ActivityDTO(
         Long id,
         String title,

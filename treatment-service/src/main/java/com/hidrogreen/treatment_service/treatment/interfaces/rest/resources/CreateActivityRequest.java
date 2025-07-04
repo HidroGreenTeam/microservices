@@ -4,9 +4,7 @@ import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 
-/**
- * Create Activity Request
- */
+
 public record CreateActivityRequest(
     @NotNull(message = "Crop ID is required")
     Long cropId,

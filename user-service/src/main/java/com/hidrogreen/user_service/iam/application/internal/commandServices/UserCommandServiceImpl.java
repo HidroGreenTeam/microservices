@@ -54,7 +54,6 @@ public class UserCommandServiceImpl implements UserCommandService {
             var user = new User(command.fullName(), command.email(), hashingService.encode(command.password()), roles);
             userRepository.save(user);
 
-            // publicamos el evento de usuario registrado
         System.out.println("Publishing UserRegisteredEvent for user: " + user.getEmail());
         applicationEventPublisher.publishEvent(
                 new UserRegisteredEvent(this, user.getFullName(), user.getEmail(), user.getPassword())

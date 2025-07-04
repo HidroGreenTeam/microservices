@@ -16,12 +16,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * RemindersController
- */
+
 @RestController
 @RequestMapping(value = "/api/v1/reminders", produces = "application/json")
-@Tag(name = "Reminders", description = "Reminder Management Endpoints")
+@Tag(name = "Reminders", description = "⏰ Reminder Management - Schedule, view, and cancel reminders for farming activities (PUBLIC ENDPOINTS)")
 public class RemindersController {
     
     private final ReminderCommandService reminderCommandService;
@@ -38,8 +36,20 @@ public class RemindersController {
         try {
             ScheduleReminderCommand command = CreateReminderCommandFromResourceAssembler.toCommandFromResource(resource);
             Long reminderId = reminderCommandService.handle(command);
+            
+            
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new ReminderResource(reminderId, "Reminder scheduled successfully"));
+                    .body(new ReminderResource(
+                        reminderId,
+                        resource.profileId(),
+                        resource.title(),
+                        resource.message(),
+                        resource.notificationChannel(),
+                        resource.remindAt(),
+                        true,
+                        resource.isRecurring(),
+                        resource.recurrencePattern()
+                    ));
                     
         } catch (Exception e) {
             throw e;

@@ -1,8 +1,6 @@
 package com.hidrogreen.treatment_service.treatment.domain.model.commands;
 
-/**
- * Command to complete an activity
- */
+
 public record CompleteActivityCommand(
     Long activityId,
     String completionNotes

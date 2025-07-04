@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Activity scheduler for background tasks
- */
+
 @Service
 @AllArgsConstructor
 public class ActivityScheduler {
@@ -21,10 +19,8 @@ public class ActivityScheduler {
     private final ActivityRepository activityRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    /**
-     * Check for overdue activities every hour
-     */
-    @Scheduled(fixedRate = 3600000) // 1 hour = 3,600,000 milliseconds
+    
+    @Scheduled(fixedRate = 3600000) 
     public void checkOverdueActivities() {
         try {
             LocalDateTime currentTime = LocalDateTime.now();
@@ -35,14 +31,14 @@ public class ActivityScheduler {
                     activity.markAsOverdue();
                     activityRepository.save(activity);
                     
-                    // Publish overdue event
+                    
                     ActivityOverdueEvent event = new ActivityOverdueEvent(activity);
                     eventPublisher.publishEvent(event);
                 }
             }
             
         } catch (Exception e) {
-            // Silent error handling - no logging to avoid compilation errors
+            
         }
     }
 }

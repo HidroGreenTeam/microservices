@@ -5,9 +5,7 @@ import com.hidrogreen.treatment_service.shared.domain.model.entities.AuditableMo
 import jakarta.persistence.*;
 import lombok.Getter;
 
-/**
- * Activity Note entity
- */
+
 @Entity
 @Getter
 public class ActivityNote extends AuditableModel {
@@ -44,7 +42,7 @@ public class ActivityNote extends AuditableModel {
         this.noteType = noteType;
     }
 
-    // Explicit getter for content to ensure compatibility
+    
     public String getContent() {
         return this.content;
     }

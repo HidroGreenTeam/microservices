@@ -6,21 +6,26 @@ import com.hidrogreen.treatment_service.treatment.domain.model.valueobjects.Acti
 import com.hidrogreen.treatment_service.treatment.domain.model.valueobjects.ActivityStatus;
 import com.hidrogreen.treatment_service.treatment.domain.services.ActivityQueryService;
 import com.hidrogreen.treatment_service.treatment.infrastructure.persistence.jpa.repositories.ActivityRepository;
+import com.hidrogreen.treatment_service.diagnosis.infrastructure.clients.CropServiceClient;
+import com.hidrogreen.treatment_service.shared.domain.exceptions.ResourceNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Activity query service implementation
- */
+
 @Service
 @AllArgsConstructor
 public class ActivityQueryServiceImpl implements ActivityQueryService {
 
+    private static final Logger log = LoggerFactory.getLogger(ActivityQueryServiceImpl.class);
+    
     private final ActivityRepository activityRepository;
+    private final CropServiceClient cropServiceClient;
 
     @Override
     public Optional<Activity> getActivityById(Long activityId) {
@@ -29,6 +34,18 @@ public class ActivityQueryServiceImpl implements ActivityQueryService {
 
     @Override
     public List<Activity> handle(GetActivitiesByCropIdQuery query) {
+        
+        try {
+            CropServiceClient.CropDTO crop = cropServiceClient.getCropById(query.getCropId());
+            if (crop == null) {
+                log.warn("Crop not found with id: {}", query.getCropId());
+                throw new ResourceNotFoundException("Crop", query.getCropId());
+            }
+        } catch (Exception e) {
+            log.error("Error validating crop with id: {}: {}", query.getCropId(), e.getMessage());
+            throw new ResourceNotFoundException("Crop", query.getCropId());
+        }
+        
         return activityRepository.findByCropId(query.getCropId());
     }
 
@@ -39,8 +56,20 @@ public class ActivityQueryServiceImpl implements ActivityQueryService {
         
         List<Activity> activities = activityRepository.findByScheduledAtBetween(startOfDay, endOfDay);
         
-        // Filter by crop ID if provided
+        
         if (query.cropId() != null) {
+            
+            try {
+                CropServiceClient.CropDTO crop = cropServiceClient.getCropById(query.cropId());
+                if (crop == null) {
+                    log.warn("Crop not found with id: {}", query.cropId());
+                    throw new ResourceNotFoundException("Crop", query.cropId());
+                }
+            } catch (Exception e) {
+                log.error("Error validating crop with id: {}: {}", query.cropId(), e.getMessage());
+                throw new ResourceNotFoundException("Crop", query.cropId());
+            }
+            
             return activities.stream()
                 .filter(activity -> activity.getCropId().equals(query.cropId()))
                 .toList();
@@ -51,7 +80,7 @@ public class ActivityQueryServiceImpl implements ActivityQueryService {
 
     @Override
     public List<Activity> handle(GetStandaloneActivitiesQuery query) {
-        // Since there's no direct method, we'll get all activities and filter
+        
         return activityRepository.findAll().stream()
             .filter(activity -> activity.getCropId() != null && 
                    activity.getActivityType().type() == ActivityType.Type.GENERAL)
@@ -61,7 +90,7 @@ public class ActivityQueryServiceImpl implements ActivityQueryService {
     @Override
     public List<Activity> handle(GetTreatmentActivitiesQuery query) {
         if (query.getTreatmentId() != null) {
-            // Since there's no direct method, we'll get all activities and filter
+            
             return activityRepository.findAll().stream()
                 .filter(activity -> activity.getActivityType().type() == ActivityType.Type.SPRAYING ||
                                   activity.getActivityType().type() == ActivityType.Type.PEST_CONTROL)
@@ -85,11 +114,11 @@ public class ActivityQueryServiceImpl implements ActivityQueryService {
             ActivityStatus activityStatus = new ActivityStatus(statusEnum);
             return activityRepository.findByStatus(activityStatus);
         } catch (IllegalArgumentException e) {
-            return List.of(); // Return empty list for invalid status
+            return List.of(); 
         }
     }
 
-    // Additional utility methods
+    
     public List<Activity> getActivitiesByPriority(int priority) {
         return activityRepository.findByPriorityOrderByScheduledAtAsc(priority);
     }

@@ -12,14 +12,7 @@ import com.hidrogreen.user_service.profiles.domain.model.commands.CreateFarmerCo
 import com.hidrogreen.user_service.profiles.domain.model.entities.FarmerImage;
 import com.hidrogreen.user_service.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 
-/**
- * Farmer
- *
- * <p>
- *     This class represents a Farmer.
- * </p>
- *
- */
+
 
 @Entity
 @Getter

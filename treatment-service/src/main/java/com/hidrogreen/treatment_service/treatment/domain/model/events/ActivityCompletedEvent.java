@@ -4,9 +4,7 @@ import com.hidrogreen.treatment_service.treatment.domain.model.aggregates.Activi
 import com.hidrogreen.treatment_service.shared.domain.model.events.DomainEvent;
 import lombok.Getter;
 
-/**
- * Event fired when an activity is completed
- */
+
 @Getter
 public final class ActivityCompletedEvent implements DomainEvent {
     private final String eventId;
@@ -27,7 +25,7 @@ public final class ActivityCompletedEvent implements DomainEvent {
         this.activityType = activity.getActivityType().type().name();
         this.origin = activity.getOrigin().origin().name();
         
-        // Extract treatment ID if it's a treatment activity
+        
         if (activity instanceof com.hidrogreen.treatment_service.treatment.domain.model.aggregates.TreatmentActivity treatmentActivity) {
             this.treatmentId = treatmentActivity.getTreatmentId();
         } else {

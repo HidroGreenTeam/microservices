@@ -1,8 +1,6 @@
 package com.ayni.notification_service.notifications.domain.model.commands;
 
-/**
- * Command to send WhatsApp directly
- */
+
 public record SendWhatsAppCommand(
     String to,
     String message

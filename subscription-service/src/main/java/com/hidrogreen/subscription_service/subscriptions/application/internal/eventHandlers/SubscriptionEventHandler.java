@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -35,7 +34,7 @@ public class SubscriptionEventHandler {
         LOGGER.info("Handling subscription created event for subscription ID: {}", event.getSubscriptionId());
         
         try {
-            // Get user information
+            
             Optional<ExternalUserService.UserInfo> userInfoOpt = externalUserService.getUserById(event.getUserId());
             
             String userEmail = event.getUserEmail();
@@ -47,10 +46,10 @@ public class SubscriptionEventHandler {
                 userName = userInfo.firstName() + " " + userInfo.lastName();
             }
             
-            // Generate invoice number
+            
             String invoiceNumber = generateInvoiceNumber(event.getSubscriptionId(), event.getEventTime());
             
-            // Create notification DTO
+            
             SubscriptionNotificationDto notification = new SubscriptionNotificationDto();
             notification.setNotificationType("SUBSCRIPTION_CREATED");
             notification.setUserId(event.getUserId());
@@ -66,7 +65,7 @@ public class SubscriptionEventHandler {
             notification.setInvoiceNumber(invoiceNumber);
             notification.setFeatures(getPlanFeatures(event.getSubscriptionType()));
             
-            // Publish notification
+            
             notificationPublisher.publishSubscriptionCreated(notification);
             
             LOGGER.info("Successfully handled subscription created event for subscription ID: {}", event.getSubscriptionId());
@@ -99,7 +98,7 @@ public class SubscriptionEventHandler {
         LOGGER.info("Handling subscription cancelled event for subscription ID: {}", event.getSubscriptionId());
         
         try {
-            // Get user information
+            
             Optional<ExternalUserService.UserInfo> userInfoOpt = externalUserService.getUserById(event.getUserId());
             
             String userEmail = event.getUserEmail();
@@ -111,7 +110,7 @@ public class SubscriptionEventHandler {
                 userName = userInfo.firstName() + " " + userInfo.lastName();
             }
             
-            // Create notification DTO
+            
             SubscriptionNotificationDto notification = new SubscriptionNotificationDto();
             notification.setNotificationType("SUBSCRIPTION_CANCELLED");
             notification.setUserId(event.getUserId());
@@ -123,7 +122,7 @@ public class SubscriptionEventHandler {
             notification.setEventTime(event.getEventTime());
             notification.setSubject("Cancelación de Suscripción - HidroGreen");
             
-            // Publish notification
+            
             notificationPublisher.publishSubscriptionCancelled(notification);
             
             LOGGER.info("Successfully handled subscription cancelled event for subscription ID: {}", event.getSubscriptionId());
@@ -138,7 +137,7 @@ public class SubscriptionEventHandler {
         LOGGER.info("Handling subscription renewed event for subscription ID: {}", event.getSubscriptionId());
         
         try {
-            // Get user information
+            
             Optional<ExternalUserService.UserInfo> userInfoOpt = externalUserService.getUserById(event.getUserId());
             
             String userEmail = event.getUserEmail();
@@ -150,10 +149,10 @@ public class SubscriptionEventHandler {
                 userName = userInfo.firstName() + " " + userInfo.lastName();
             }
             
-            // Generate invoice number
+            
             String invoiceNumber = generateInvoiceNumber(event.getSubscriptionId(), event.getEventTime());
             
-            // Create notification DTO
+            
             SubscriptionNotificationDto notification = new SubscriptionNotificationDto();
             notification.setNotificationType("SUBSCRIPTION_RENEWED");
             notification.setUserId(event.getUserId());
@@ -169,7 +168,7 @@ public class SubscriptionEventHandler {
             notification.setInvoiceNumber(invoiceNumber);
             notification.setFeatures(getPlanFeatures(event.getNewSubscriptionType()));
             
-            // Publish notification
+            
             notificationPublisher.publishSubscriptionRenewed(notification);
             
             LOGGER.info("Successfully handled subscription renewed event for subscription ID: {}", event.getSubscriptionId());

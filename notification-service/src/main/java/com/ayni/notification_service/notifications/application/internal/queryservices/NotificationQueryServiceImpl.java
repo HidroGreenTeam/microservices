@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * NotificationQueryServiceImpl
- */
+
 @Service
 public class NotificationQueryServiceImpl implements NotificationQueryService {
     

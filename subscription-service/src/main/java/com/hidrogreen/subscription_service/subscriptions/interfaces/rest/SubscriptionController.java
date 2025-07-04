@@ -19,6 +19,9 @@ import com.hidrogreen.subscription_service.subscriptions.interfaces.rest.transfo
 import com.hidrogreen.subscription_service.subscriptions.interfaces.rest.transform.SubscriptionResourceFromEntityAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +31,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/subscriptions")
-@Tag(name = "Subscriptions", description = "Subscription Management Endpoints")
+@Tag(name = "Subscriptions", description = "💳 Subscription Management - Create, manage, and cancel user subscriptions (AUTHENTICATED ENDPOINTS)")
 public class SubscriptionController {
 
     private final SubscriptionCommandService subscriptionCommandService;
@@ -41,7 +44,17 @@ public class SubscriptionController {
     }
 
     @PostMapping
-    @Operation(summary = "Create a new subscription")
+    @Operation(
+            summary = "💳 Create a new subscription", 
+            description = "Create a new subscription for a user with specified plan and payment details"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Subscription created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid subscription data"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token required"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SubscriptionResource> createSubscription(@RequestBody CreateSubscriptionResource resource) {
         try {
             CreateSubscriptionCommand command = CreateSubscriptionCommandFromResourceAssembler.toCommandFromResource(resource);
@@ -130,7 +143,16 @@ public class SubscriptionController {
     }
 
     @GetMapping("/plans")
-    @Operation(summary = "Get all available subscription plans")
+    @Operation(
+            summary = "📋 Get all available subscription plans", 
+            description = "Retrieve all available subscription plans with pricing and features"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Subscription plans retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token required"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<SubscriptionPlanResource>> getAllSubscriptionPlans() {
         try {
             GetAllSubscriptionPlansQuery query = new GetAllSubscriptionPlansQuery();

@@ -30,7 +30,7 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.routing.key.treatment}")
     private String treatmentRoutingKey;
     
-    // Subscription-related configuration
+    
     public static final String SUBSCRIPTION_NOTIFICATION_QUEUE = "subscription.notification.queue";
     public static final String SUBSCRIPTION_EXCHANGE = "subscription.exchange";
     
@@ -92,7 +92,7 @@ public class RabbitMQConfig {
                 .with(treatmentRoutingKey);
     }
     
-    // Subscription-related beans
+    
     @Bean
     public TopicExchange subscriptionExchange() {
         logger.info("Creating Subscription TopicExchange: {}", SUBSCRIPTION_EXCHANGE);

@@ -22,7 +22,7 @@ public class ActivityDueEvent extends DomainEvent {
         this.dueDate = dueDate;
     }
     
-    // Explicit getters to avoid compilation issues
+    
     public Long getActivityId() { return activityId; }
     public Long getProfileId() { return profileId; }
     public String getActivityTitle() { return activityTitle; }

@@ -11,7 +11,7 @@ public class FarmerResourceFromEntityAssembler {
                 farmer.getEmail(),
                 farmer.getPhoneNumber(),
                 farmer.getPassword(),
-                farmer.getFarmerImage() != null ? farmer.getFarmerImage().getImageUrl() : null // Aquí evitamos el NullPointerException
+                farmer.getFarmerImage() != null ? farmer.getFarmerImage().getImageUrl() : null
 
         );
     }

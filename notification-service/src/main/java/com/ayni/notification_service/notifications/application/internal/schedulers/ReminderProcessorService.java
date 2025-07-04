@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * ReminderProcessorService - Handles the processing of due reminders
- */
+
 @Service
 public class ReminderProcessorService {
     
@@ -30,10 +28,8 @@ public class ReminderProcessorService {
         this.notificationCommandService = notificationCommandService;
     }
     
-    /**
-     * Process due reminders - runs every minute
-     */
-    @Scheduled(fixedRate = 60000) // Every minute
+    
+    @Scheduled(fixedRate = 60000) 
     public void processReminders() {
         LocalDateTime now = LocalDateTime.now();
         logger.debug("Starting reminder processing cycle at: {}", now);
@@ -56,7 +52,7 @@ public class ReminderProcessorService {
                     logger.debug("Processing reminder ID: {} for profile: {} due at: {}", 
                              reminder.getId(), reminder.getProfileId(), reminder.getRemindAt());
                     
-                    // Create notification command
+                    
                     SendNotificationCommand command = new SendNotificationCommand(
                         reminder.getProfileId(),
                         NotificationType.REMINDER,
@@ -67,18 +63,18 @@ public class ReminderProcessorService {
                         reminder.getCropId()
                     );
                     
-                    // Send notification via command service
+                    
                     Long notificationId = notificationCommandService.handle(command);
                     logger.info("Delivered notification {} for reminder ID: {} to profile: {}", 
                             notificationId, reminder.getId(), reminder.getProfileId());
                     
-                    // Handle reminder recurrence
+                    
                     if (!reminder.isRecurring()) {
                         reminder.deactivate();
                         reminderRepository.save(reminder);
                         logger.info("Reminder {} deactivated after sending", reminder.getId());
                     } else {
-                        // Update next reminder time based on pattern
+                        
                         updateRecurringReminder(reminder);
                         logger.info("Recurring reminder {} updated for next occurrence", reminder.getId());
                     }
@@ -100,15 +96,13 @@ public class ReminderProcessorService {
         }
     }
     
-    /**
-     * Update recurring reminder with next occurrence time
-     */
+    
     private void updateRecurringReminder(Reminder reminder) {
         LocalDateTime nextRemindAt = switch (reminder.getRecurrencePattern()) {
             case "DAILY" -> reminder.getRemindAt().plusDays(1);
             case "WEEKLY" -> reminder.getRemindAt().plusWeeks(1);
             case "MONTHLY" -> reminder.getRemindAt().plusMonths(1);
-            default -> reminder.getRemindAt().plusDays(1); // Default to daily
+            default -> reminder.getRemindAt().plusDays(1); 
         };
         
         reminder.updateRemindTime(nextRemindAt);

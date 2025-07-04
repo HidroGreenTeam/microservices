@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-/**
- * External Crop Service (ACL) - Real Implementation
- * Anti-Corruption Layer to communicate with Crop Service
- */
+
 @Service
 public class ExternalCropService {
 
@@ -24,15 +21,11 @@ public class ExternalCropService {
         String status
     ) {}
     
-    /**
-     * Gets the profile ID of the crop owner
-     * @param cropId The crop ID
-     * @return The profile ID of the crop owner
-     */
+    
     public Long getCropOwnerProfileId(Long cropId) {
         try {
             var cropDTO = cropServiceClient.getCrop(cropId);
-            Long profileId = cropDTO.profileId();
+            Long profileId = cropDTO.farmerId();
             return profileId;
             
         } catch (Exception e) {
@@ -40,21 +33,17 @@ public class ExternalCropService {
         }
     }
     
-    /**
-     * Gets basic crop information
-     * @param cropId The crop ID
-     * @return Crop information
-     */
+    
     public CropInfo getCropInfo(Long cropId) {
         try {
             var cropDTO = cropServiceClient.getCrop(cropId);
             
             CropInfo cropInfo = new CropInfo(
                 cropDTO.id(),
-                cropDTO.name(),
-                cropDTO.type(),
-                cropDTO.profileId(),
-                cropDTO.status()
+                cropDTO.cropName(),
+                "Unknown", 
+                cropDTO.farmerId(),
+                "Active"   
             );
             
             return cropInfo;
@@ -64,10 +53,8 @@ public class ExternalCropService {
         }
     }
     
-    /**
-     * Feign Client for Crop Service
-     */
-    @FeignClient(name = "crop-service", path = "/api/v1")
+    
+    @FeignClient(name = "crop-service", path = "/api/v1", configuration = com.ayni.notification_service.shared.infrastructure.config.FeignConfig.class)
     public interface CropServiceClient {
         
         @GetMapping("/crops/{id}")
@@ -75,12 +62,11 @@ public class ExternalCropService {
         
         record CropDTO(
             Long id,
-            String name,
-            String type,
-            Long profileId,
-            String status,
-            String location,
-            java.time.LocalDate plantingDate
+            String cropName,
+            Long area,
+            String plantingDate,
+            Long farmerId,
+            String imageUrl
         ) {}
     }
 }

@@ -4,9 +4,7 @@ import com.ayni.notification_service.notifications.domain.model.valueobjects.Not
 
 import java.time.LocalDateTime;
 
-/**
- * ScheduleReminderCommand
- */
+
 public record ScheduleReminderCommand(
     Long profileId,
     NotificationChannel notificationChannel,

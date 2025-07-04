@@ -1,11 +1,8 @@
 package com.hidrogreen.treatment_service.treatment.interfaces.rest.resources;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-/**
- * Activity Response
- */
+
 public record ActivityResponse(
     Long id,
     String name,

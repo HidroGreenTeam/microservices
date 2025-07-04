@@ -1,8 +1,6 @@
 package com.ayni.notification_service.notifications.domain.model.queries;
 
-/**
- * GetNotificationByIdQuery
- */
+
 public record GetNotificationByIdQuery(Long notificationId) {
     public GetNotificationByIdQuery {
         if (notificationId == null || notificationId <= 0) {

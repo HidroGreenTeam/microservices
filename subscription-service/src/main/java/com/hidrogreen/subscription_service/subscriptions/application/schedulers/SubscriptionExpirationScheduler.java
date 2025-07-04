@@ -16,9 +16,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Scheduler to check for expiring subscriptions and send notifications
- */
+
 @Component
 public class SubscriptionExpirationScheduler {
 
@@ -36,19 +34,16 @@ public class SubscriptionExpirationScheduler {
         this.externalUserService = externalUserService;
     }
 
-    /**
-     * Check for subscriptions expiring in the next 7 days
-     * Runs daily at 9:00 AM
-     */
+    
     @Scheduled(cron = "0 0 9 * * *")
     public void checkExpiringSubscriptions() {
         LOGGER.info("Starting scheduled check for expiring subscriptions at: {}", LocalDateTime.now());
 
         try {
             LocalDateTime now = LocalDateTime.now();
-            LocalDateTime expirationThreshold = now.plusDays(7); // 7 days from now
+            LocalDateTime expirationThreshold = now.plusDays(7); 
 
-            // Find active subscriptions expiring within the next 7 days
+            
             List<Subscription> expiringSubscriptions = subscriptionRepository
                     .findByStatusAndEndDateBetween(SubscriptionStatus.ACTIVE, now, expirationThreshold);
 
@@ -70,19 +65,16 @@ public class SubscriptionExpirationScheduler {
         }
     }
 
-    /**
-     * Check for subscriptions expiring in the next 24 hours
-     * Runs every 4 hours
-     */
-    @Scheduled(fixedRate = 14400000) // 4 hours in milliseconds
+    
+    @Scheduled(fixedRate = 14400000) 
     public void checkCriticalExpiringSubscriptions() {
         LOGGER.info("Starting critical expiration check at: {}", LocalDateTime.now());
 
         try {
             LocalDateTime now = LocalDateTime.now();
-            LocalDateTime criticalThreshold = now.plusHours(24); // 24 hours from now
+            LocalDateTime criticalThreshold = now.plusHours(24); 
 
-            // Find active subscriptions expiring within the next 24 hours
+            
             List<Subscription> criticallyExpiringSubscriptions = subscriptionRepository
                     .findByStatusAndEndDateBetween(SubscriptionStatus.ACTIVE, now, criticalThreshold);
 
@@ -105,7 +97,7 @@ public class SubscriptionExpirationScheduler {
     private void sendExpirationNotification(Subscription subscription) {
         LOGGER.info("Sending expiration notification for subscription ID: {}", subscription.getId());
 
-        // Get user information
+        
         Optional<ExternalUserService.UserInfo> userInfoOpt = externalUserService.getUserById(subscription.getUserId());
 
         String userEmail = "unknown@email.com";
@@ -117,7 +109,7 @@ public class SubscriptionExpirationScheduler {
             userName = userInfo.firstName() + " " + userInfo.lastName();
         }
 
-        // Create notification DTO
+        
         SubscriptionNotificationDto notification = new SubscriptionNotificationDto();
         notification.setNotificationType("SUBSCRIPTION_EXPIRING");
         notification.setUserId(subscription.getUserId());
@@ -135,8 +127,8 @@ public class SubscriptionExpirationScheduler {
         notification.setSubject("⏰ Tu suscripción vence pronto - HidroGreen");
         notification.setFeatures(getPlanFeatures(subscription.getSubscriptionPlan().getPlanType().name()));
 
-        // Publish notification
-        notificationPublisher.publishSubscriptionCreated(notification); // Using same publisher method
+        
+        notificationPublisher.publishSubscriptionCreated(notification); 
 
         LOGGER.info("Expiration notification sent for subscription ID: {}", subscription.getId());
     }
@@ -144,7 +136,7 @@ public class SubscriptionExpirationScheduler {
     private void sendCriticalExpirationNotification(Subscription subscription) {
         LOGGER.info("Sending CRITICAL expiration notification for subscription ID: {}", subscription.getId());
 
-        // Get user information
+        
         Optional<ExternalUserService.UserInfo> userInfoOpt = externalUserService.getUserById(subscription.getUserId());
 
         String userEmail = "unknown@email.com";
@@ -156,7 +148,7 @@ public class SubscriptionExpirationScheduler {
             userName = userInfo.firstName() + " " + userInfo.lastName();
         }
 
-        // Create notification DTO with urgency
+        
         SubscriptionNotificationDto notification = new SubscriptionNotificationDto();
         notification.setNotificationType("SUBSCRIPTION_EXPIRING");
         notification.setUserId(subscription.getUserId());
@@ -174,7 +166,7 @@ public class SubscriptionExpirationScheduler {
         notification.setSubject("🚨 URGENTE: Tu suscripción vence en menos de 24 horas - HidroGreen");
         notification.setFeatures(getPlanFeatures(subscription.getSubscriptionPlan().getPlanType().name()));
 
-        // Publish notification
+        
         notificationPublisher.publishSubscriptionCreated(notification);
 
         LOGGER.info("Critical expiration notification sent for subscription ID: {}", subscription.getId());

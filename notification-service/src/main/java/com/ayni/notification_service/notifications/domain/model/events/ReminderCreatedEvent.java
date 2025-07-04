@@ -5,9 +5,7 @@ import org.springframework.context.ApplicationEvent;
 
 import java.time.LocalDateTime;
 
-/**
- * ReminderCreatedEvent domain event
- */
+
 @Getter
 public final class ReminderCreatedEvent extends ApplicationEvent {
     private final Long reminderId;

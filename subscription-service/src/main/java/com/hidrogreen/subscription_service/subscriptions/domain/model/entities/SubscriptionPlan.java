@@ -94,7 +94,7 @@ public class SubscriptionPlan extends AuditableModel {
         this.durationDays = planType.getDurationDays();
         this.isActive = true;
         
-        // Set default limits based on plan type
+        
         switch (planType) {
             case FREE:
                 this.maxCrops = 1;
@@ -115,8 +115,8 @@ public class SubscriptionPlan extends AuditableModel {
                 this.hasAdvancedAnalytics = true;
                 break;
             case ENTERPRISE:
-                this.maxCrops = -1; // unlimited
-                this.maxReports = -1; // unlimited
+                this.maxCrops = -1; 
+                this.maxReports = -1; 
                 this.hasPrioritySupport = true;
                 this.hasAdvancedAnalytics = true;
                 break;

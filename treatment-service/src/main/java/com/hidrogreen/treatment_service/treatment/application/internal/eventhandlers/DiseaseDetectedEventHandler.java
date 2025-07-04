@@ -21,7 +21,7 @@ public class DiseaseDetectedEventHandler {
 
     @EventListener
     public void on(DiagnosisCompletedEvent event) {
-        // Only process if disease was actually detected
+        
         if (!event.isDiseaseDetected()) {
             log.info("No disease detected in diagnosis " + event.getDiagnosisId() + ", skipping treatment activity creation");
             return;
@@ -40,7 +40,7 @@ public class DiseaseDetectedEventHandler {
             detectedDisease, event.getConfidenceScore() * 100
         );
 
-        // Schedule for next day at 8 AM
+        
         LocalDateTime scheduledAt = LocalDateTime.now().plusDays(1).withHour(8).withMinute(0);
 
         try {

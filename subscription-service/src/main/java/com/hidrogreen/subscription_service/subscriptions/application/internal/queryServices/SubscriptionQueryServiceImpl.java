@@ -10,7 +10,10 @@ import com.hidrogreen.subscription_service.subscriptions.domain.model.valueobjec
 import com.hidrogreen.subscription_service.subscriptions.domain.services.SubscriptionQueryService;
 import com.hidrogreen.subscription_service.subscriptions.infrastructure.persistence.jpa.repositories.SubscriptionPlanRepository;
 import com.hidrogreen.subscription_service.subscriptions.infrastructure.persistence.jpa.repositories.SubscriptionRepository;
+import com.hidrogreen.subscription_service.subscriptions.application.internal.outboundServices.ExternalUserService;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
@@ -19,13 +22,18 @@ import java.util.Optional;
 @Service
 public class SubscriptionQueryServiceImpl implements SubscriptionQueryService {
 
+    private static final Logger log = LoggerFactory.getLogger(SubscriptionQueryServiceImpl.class);
+    
     private final SubscriptionRepository subscriptionRepository;
     private final SubscriptionPlanRepository subscriptionPlanRepository;
+    private final ExternalUserService externalUserService;
 
     public SubscriptionQueryServiceImpl(SubscriptionRepository subscriptionRepository,
-                                      SubscriptionPlanRepository subscriptionPlanRepository) {
+                                      SubscriptionPlanRepository subscriptionPlanRepository,
+                                      ExternalUserService externalUserService) {
         this.subscriptionRepository = subscriptionRepository;
         this.subscriptionPlanRepository = subscriptionPlanRepository;
+        this.externalUserService = externalUserService;
     }
 
     @Override
@@ -35,6 +43,12 @@ public class SubscriptionQueryServiceImpl implements SubscriptionQueryService {
 
     @Override
     public Optional<Subscription> handle(GetSubscriptionByUserIdQuery query) {
+        
+        if (externalUserService.getUserById(query.userId()).isEmpty()) {
+            log.warn("User not found with id: {}", query.userId());
+            throw new IllegalArgumentException("User not found with id: " + query.userId());
+        }
+        
         return subscriptionRepository.findByUserId(query.userId());
     }
 

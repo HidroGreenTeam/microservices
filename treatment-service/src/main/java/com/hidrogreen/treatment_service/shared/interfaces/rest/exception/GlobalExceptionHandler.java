@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Global Exception Handler for REST endpoints
- */
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 

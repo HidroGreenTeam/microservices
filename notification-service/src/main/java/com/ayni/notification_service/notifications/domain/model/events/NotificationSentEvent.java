@@ -3,9 +3,7 @@ package com.ayni.notification_service.notifications.domain.model.events;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
-/**
- * NotificationSentEvent domain event
- */
+
 @Getter
 public final class NotificationSentEvent extends ApplicationEvent {
     private final Long notificationId;

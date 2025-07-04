@@ -12,34 +12,48 @@ import com.hidrogreen.subscription_service.subscriptions.domain.model.events.Sub
 import com.hidrogreen.subscription_service.subscriptions.domain.services.SubscriptionCommandService;
 import com.hidrogreen.subscription_service.subscriptions.infrastructure.persistence.jpa.repositories.SubscriptionPlanRepository;
 import com.hidrogreen.subscription_service.subscriptions.infrastructure.persistence.jpa.repositories.SubscriptionRepository;
+import com.hidrogreen.subscription_service.subscriptions.application.internal.outboundServices.ExternalUserService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 @Service
 public class SubscriptionCommandServiceImpl implements SubscriptionCommandService {
 
+    private static final Logger log = LoggerFactory.getLogger(SubscriptionCommandServiceImpl.class);
+    
     private final SubscriptionRepository subscriptionRepository;
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final ExternalUserService externalUserService;
 
     public SubscriptionCommandServiceImpl(SubscriptionRepository subscriptionRepository,
                                         SubscriptionPlanRepository subscriptionPlanRepository,
-                                        ApplicationEventPublisher eventPublisher) {
+                                        ApplicationEventPublisher eventPublisher,
+                                        ExternalUserService externalUserService) {
         this.subscriptionRepository = subscriptionRepository;
         this.subscriptionPlanRepository = subscriptionPlanRepository;
         this.eventPublisher = eventPublisher;
+        this.externalUserService = externalUserService;
     }
 
     @Override
     public Optional<Subscription> handle(CreateSubscriptionCommand command) {
-        // Check if user already has an active subscription
+        
+        if (externalUserService.getUserById(command.userId()).isEmpty()) {
+            log.warn("User not found with id: {}", command.userId());
+            throw new IllegalArgumentException("User not found with id: " + command.userId());
+        }
+        
+        
         if (subscriptionRepository.existsByUserIdAndStatus(command.userId(), SubscriptionStatus.ACTIVE)) {
             throw new IllegalStateException("User already has an active subscription");
         }
 
-        // Get the subscription plan
+        
         Optional<SubscriptionPlan> planOptional = subscriptionPlanRepository.findByPlanType(command.subscriptionType());
         if (planOptional.isEmpty()) {
             throw new IllegalArgumentException("Subscription plan not found for type: " + command.subscriptionType());
@@ -50,7 +64,7 @@ public class SubscriptionCommandServiceImpl implements SubscriptionCommandServic
             throw new IllegalArgumentException("Subscription plan is not active: " + command.subscriptionType());
         }
 
-        // Create subscription
+        
         Subscription subscription;
         if (command.paymentReference() != null && !command.paymentReference().trim().isEmpty()) {
             subscription = new Subscription(command.userId(), plan, command.autoRenew(), command.paymentReference());
@@ -60,7 +74,7 @@ public class SubscriptionCommandServiceImpl implements SubscriptionCommandServic
 
         subscription = subscriptionRepository.save(subscription);
         
-        // Publish subscription created event
+        
         SubscriptionCreatedEvent event = new SubscriptionCreatedEvent(
             this,
             subscription.getId(),
@@ -90,7 +104,7 @@ public class SubscriptionCommandServiceImpl implements SubscriptionCommandServic
         subscription.cancel(command.reason());
         subscription = subscriptionRepository.save(subscription);
         
-        // Publish subscription cancelled event
+        
         SubscriptionCancelledEvent cancelEvent = new SubscriptionCancelledEvent(
             this,
             subscription.getId(),
@@ -98,7 +112,7 @@ public class SubscriptionCommandServiceImpl implements SubscriptionCommandServic
             subscription.getSubscriptionPlan().getPlanType().name(),
             subscription.getSubscriptionPlan().getName(),
             command.reason(),
-            "" // Email will be fetched by the event handler
+            "" 
         );
         eventPublisher.publishEvent(cancelEvent);
         
@@ -117,10 +131,10 @@ public class SubscriptionCommandServiceImpl implements SubscriptionCommandServic
             throw new IllegalStateException("Subscription cannot be renewed");
         }
 
-        // Store old subscription type for event
+        
         String oldSubscriptionType = subscription.getSubscriptionPlan().getPlanType().name();
 
-        // Get the new subscription plan
+        
         Optional<SubscriptionPlan> planOptional = subscriptionPlanRepository.findByPlanType(command.newSubscriptionType());
         if (planOptional.isEmpty()) {
             throw new IllegalArgumentException("Subscription plan not found for type: " + command.newSubscriptionType());
@@ -138,7 +152,7 @@ public class SubscriptionCommandServiceImpl implements SubscriptionCommandServic
 
         subscription = subscriptionRepository.save(subscription);
         
-        // Publish subscription renewed event
+        
         SubscriptionRenewedEvent renewEvent = new SubscriptionRenewedEvent(
             this,
             subscription.getId(),
@@ -147,7 +161,7 @@ public class SubscriptionCommandServiceImpl implements SubscriptionCommandServic
             subscription.getSubscriptionPlan().getPlanType().name(),
             subscription.getSubscriptionPlan().getName(),
             subscription.getSubscriptionPlan().getPrice(),
-            "" // Email will be fetched by the event handler
+            "" 
         );
         eventPublisher.publishEvent(renewEvent);
         

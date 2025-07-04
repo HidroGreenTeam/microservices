@@ -4,9 +4,7 @@ import com.hidrogreen.treatment_service.treatment.domain.model.aggregates.Treatm
 import com.hidrogreen.treatment_service.shared.domain.model.events.DomainEvent;
 import lombok.Getter;
 
-/**
- * Event fired when a treatment activity is created 💊
- */
+
 @Getter
 public final class TreatmentActivityCreatedEvent implements DomainEvent {
     private final String eventId;

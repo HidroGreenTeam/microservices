@@ -5,9 +5,7 @@ import org.springframework.context.ApplicationEvent;
 
 import java.time.LocalDateTime;
 
-/**
- * ActivityDueEvent - Event published when an activity becomes due
- */
+
 @Getter
 public final class ActivityDueEvent extends ApplicationEvent {
     private final Long activityId;

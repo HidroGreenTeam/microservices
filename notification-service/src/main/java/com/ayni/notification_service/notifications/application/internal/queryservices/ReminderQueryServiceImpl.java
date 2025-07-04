@@ -4,6 +4,7 @@ import com.ayni.notification_service.notifications.domain.model.aggregates.Remin
 import com.ayni.notification_service.notifications.domain.model.queries.GetPendingRemindersQuery;
 import com.ayni.notification_service.notifications.domain.services.ReminderQueryService;
 import com.ayni.notification_service.notifications.infrastructure.persistence.jpa.repositories.ReminderRepository;
+import com.ayni.notification_service.notifications.application.internal.outboundservices.acl.ExternalProfileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -11,18 +12,18 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * ReminderQueryServiceImpl
- */
+
 @Service
 public class ReminderQueryServiceImpl implements ReminderQueryService {
     
     private static final Logger logger = LoggerFactory.getLogger(ReminderQueryServiceImpl.class);
     
     private final ReminderRepository reminderRepository;
+    private final ExternalProfileService externalProfileService;
     
-    public ReminderQueryServiceImpl(ReminderRepository reminderRepository) {
+    public ReminderQueryServiceImpl(ReminderRepository reminderRepository, ExternalProfileService externalProfileService) {
         this.reminderRepository = reminderRepository;
+        this.externalProfileService = externalProfileService;
     }
     
     @Override
@@ -42,7 +43,14 @@ public class ReminderQueryServiceImpl implements ReminderQueryService {
     @Override
     public List<Reminder> getRemindersByProfileId(Long profileId) {
         logger.debug("Retrieving reminders for profileId: {}", profileId);
-          try {
+        
+        
+        if (!externalProfileService.existsProfile(profileId)) {
+            logger.warn("Profile not found with id: {}", profileId);
+            throw new IllegalArgumentException("Profile not found with id: " + profileId);
+        }
+        
+        try {
             List<Reminder> reminders = reminderRepository.findByProfileIdAndIsActive(profileId, true);
             logger.info("Retrieved {} active reminders for profileId: {}", reminders.size(), profileId);
             return reminders;

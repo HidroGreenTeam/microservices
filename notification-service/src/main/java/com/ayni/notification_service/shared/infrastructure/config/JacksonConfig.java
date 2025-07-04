@@ -7,9 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-/**
- * Jackson configuration for proper JSON serialization/deserialization
- */
+
 @Configuration
 public class JacksonConfig {
 
