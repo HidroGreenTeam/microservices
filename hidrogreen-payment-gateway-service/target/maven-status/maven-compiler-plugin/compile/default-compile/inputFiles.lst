@@ -22,3 +22,4 @@ D:\abela\Documentos\Desarrollo-de-Proyectos\Java\Spring\hidrogreen-payment-gatew
 D:\abela\Documentos\Desarrollo-de-Proyectos\Java\Spring\hidrogreen-payment-gateway-service\src\main\java\com\hidrogreen\payment\gateway\platform\interfaces\rest\dto\PaymentCompletionResponse.java
 D:\abela\Documentos\Desarrollo-de-Proyectos\Java\Spring\hidrogreen-payment-gateway-service\src\main\java\com\hidrogreen\payment\gateway\platform\interfaces\rest\mapper\PaymentRestMapper.java
 D:\abela\Documentos\Desarrollo-de-Proyectos\Java\Spring\hidrogreen-payment-gateway-service\src\main\java\com\hidrogreen\payment\gateway\platform\interfaces\rest\mapper\PaymentRestMapperImpl.java
+D:\abela\Documentos\Desarrollo-de-Proyectos\Java\Spring\hidrogreen-payment-gateway-service\src\main\java\com\hidrogreen\payment\gateway\shared\infrastructure\documentation\openapi\configuration\OpenApiConfiguration.java
