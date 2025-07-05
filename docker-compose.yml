@@ -1,3 +1,6 @@
+# Configuración optimizada para builds rápidos
+version: '3.8'
+
 services:
   mysql-db:
     image: mysql:8.0
@@ -42,6 +45,8 @@ services:
     container_name: hidrogreen-discovery
     ports:
       - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
     networks:
       - hidrogreen-network
     restart: unless-stopped
@@ -54,17 +59,9 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_SHOW_SQL=true
-      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - mysql-db
-      - rabbitmq
       - discovery-service
     networks:
       - hidrogreen-network
@@ -78,15 +75,7 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_SHOW_SQL=true
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - USER_SERVICE_URL=http://user-service:8081
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - mysql-db
       - rabbitmq
@@ -104,14 +93,7 @@ services:
     ports:
       - "8085:8085"
     environment:
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_SHOW_SQL=true
-      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - mysql-db
       - rabbitmq
@@ -151,17 +133,9 @@ services:
     ports:
       - "8083:8083"
     environment:
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_SHOW_SQL=true
-      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - mysql-db
-      - rabbitmq
       - discovery-service
     networks:
       - hidrogreen-network
@@ -175,14 +149,7 @@ services:
     ports:
       - "8084:8084"
     environment:
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_SHOW_SQL=true
-      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_PROFILES_ACTIVE=docker
       # Variables de entorno para servicios externos
       - EMAIL_USERNAME=${EMAIL_USERNAME:-contact.pocketpartners@gmail.com}
       - EMAIL_PASSWORD=${EMAIL_PASSWORD:-dummy_password}
@@ -190,7 +157,7 @@ services:
       - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-ACdummy_account_sid_for_development}
       - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-dummy_auth_token_for_development}
       - TWILIO_WHATSAPP_FROM=${TWILIO_WHATSAPP_FROM:-whatsapp:+14155238886}
-      - FIREBASE_SERVER_KEY=${FIREBASE_SERVER_KEY:-dummy_firebase_server_key}
+
     depends_on:
       - mysql-db
       - rabbitmq
@@ -207,22 +174,30 @@ services:
     ports:
       - "8087:8087"
     environment:
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC  # Cambiar 3307 por 3306
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_SHOW_SQL=true
-      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - mysql-db
       - rabbitmq
       - discovery-service
-      - api-gateway
+      - user-service
     networks:
       - hidrogreen-network
-    # restart: unless-stopped
+    restart: unless-stopped
+
+  payment-gateway:
+    build:
+      context: ./hidrogreen-payment-gateway-service
+      dockerfile: Dockerfile
+    container_name: hidrogreen-payment-gateway
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - discovery-service
+    networks:
+      - hidrogreen-network
+    restart: unless-stopped
 
   api-gateway:
     build:
@@ -232,7 +207,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       - discovery-service
     networks:

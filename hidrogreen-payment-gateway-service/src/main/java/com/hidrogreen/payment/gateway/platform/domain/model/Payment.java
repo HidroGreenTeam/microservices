@@ -4,7 +4,6 @@ import com.hidrogreen.payment.gateway.platform.domain.valueobjects.Amount;
 import com.hidrogreen.payment.gateway.platform.domain.valueobjects.PaymentId;
 import com.hidrogreen.payment.gateway.platform.domain.valueobjects.PaymentStatus;
 
-import java.math.BigDecimal; // Usar BigDecimal para dinero es una buena práctica
 import java.util.Objects;
 import java.util.UUID;
 

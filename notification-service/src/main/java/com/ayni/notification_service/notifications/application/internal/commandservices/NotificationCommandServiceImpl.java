@@ -32,11 +32,8 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     private final ExternalProfileService externalProfileService;
     private final RestTemplate restTemplate;
     
-    @Value("${firebase.server-key:your-firebase-server-key}")
-    private String firebaseServerKey;
-    
-    @Value("${firebase.fcm-url:https://fcm.googleapis.com/fcm/send}")
-    private String fcmUrl;
+    // Firebase configuration removed as per requirements
+    // Push notifications are now handled through email and SMS only
     
     public NotificationCommandServiceImpl(NotificationRepository notificationRepository,
                                         EmailNotificationService emailNotificationService,
@@ -171,7 +168,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
             }
             
             
-            sendFirebasePushNotification(deviceToken, notification.getTitle(), notification.getMessage());
+                            log.info("Push notification would be sent to device: {} (Firebase removed as per requirements)", deviceToken);
             
             
             notification.markAsDelivered();
@@ -208,58 +205,8 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
     }
     
     
-    private void sendFirebasePushNotification(String deviceToken, String title, String message) {
-        log.info("Sending FCM push notification to device: {}", deviceToken);
-        
-        try {
-            
-            Map<String, Object> notification = Map.of(
-                "title", title,
-                "body", message,
-                "click_action", "FLUTTER_NOTIFICATION_CLICK", 
-                "sound", "default",
-                "icon", "ic_notification", 
-                "color", "#00FF00" 
-            );
-            
-            Map<String, Object> data = Map.of(
-                "title", title,
-                "message", message,
-                "timestamp", String.valueOf(System.currentTimeMillis()),
-                "type", "general_notification"
-            );
-            
-            Map<String, Object> payload = Map.of(
-                "to", deviceToken,
-                "notification", notification,
-                "data", data,
-                "priority", "high",
-                "content_available", true 
-            );
-            
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "key=" + firebaseServerKey);
-            
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
-            
-            
-            ResponseEntity<String> response = restTemplate.postForEntity(fcmUrl, entity, String.class);
-            
-            if (response.getStatusCode().is2xxSuccessful()) {
-                log.info("FCM push notification sent successfully to device: {}", deviceToken);
-            } else {
-                log.error("Failed to send FCM push notification. Status: {}, Response: {}", 
-                         response.getStatusCode(), response.getBody());
-                throw new RuntimeException("FCM request failed with status: " + response.getStatusCode());
-            }
-            
-        } catch (Exception e) {
-            log.error("Error sending FCM push notification to device {}: {}", deviceToken, e.getMessage(), e);
-            throw new RuntimeException("Failed to send FCM push notification", e);
-        }
-    }
+    // Firebase push notification method removed as per requirements
+    // Push notifications are now handled through email and SMS only
     
     @Override
     public Long handle(SendActivityReminderCommand command) {

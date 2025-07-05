@@ -123,9 +123,10 @@ TWILIO_AUTH_TOKEN=tu_auth_token_aqui
 TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
 ```
 
-### Firebase (Push Notifications)
+### Push Notifications
 ```env
-FIREBASE_SERVER_KEY=tu_firebase_server_key_aqui
+# Firebase has been removed as per requirements
+# Push notifications are handled through email and SMS only
 ```
 
 ## 📂 Estructura del Proyecto

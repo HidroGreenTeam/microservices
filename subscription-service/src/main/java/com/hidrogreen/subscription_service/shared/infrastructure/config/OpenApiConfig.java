@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.ExternalDocumentation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,26 +18,22 @@ import java.util.List;
 public class OpenApiConfig {
 
     @Bean
-    public OpenAPI customOpenAPI() {
+    public OpenAPI ayniSubscriptionServiceOpenApi() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("HidroGreen Subscription Service API")
-                        .version("v1.0")
-                        .description("API for managing user subscriptions, plans, and billing in the HidroGreen ecosystem. All endpoints require authentication.")
+                        .title("Ayni Subscription Service API")
+                        .version("v1.0.0")
+                        .description("Ayni Subscription Service REST API documentation - Subscription plans, billing, and payment management.")
                         .contact(new Contact()
-                                .name("HidroGreen Development Team")
-                                .email("dev@hidrogreen.com")
-                                .url("https://hidrogreen.com"))
+                                .name("Ayni Development Team")
+                                .email("dev@ayni.com")
+                                .url("https://ayni.com"))
                         .license(new License()
-                                .name("MIT License")
-                                .url("https://opensource.org/licenses/MIT")))
-                .servers(List.of(
-                        new Server()
-                                .url("http://localhost:8085")
-                                .description("Development server"),
-                        new Server()
-                                .url("https://api.hidrogreen.com/subscriptions")
-                                .description("Production server")))
+                                .name("Apache 2.0")
+                                .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
+                .externalDocs(new ExternalDocumentation()
+                        .description("Ayni Documentation")
+                        .url("https://github.com/Ayni-Team/Ayni-Documentation"))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth", new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)

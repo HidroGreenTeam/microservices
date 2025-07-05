@@ -10,11 +10,8 @@ from py_eureka_client import eureka_client
 import asyncio
 from contextlib import asynccontextmanager
 from fastapi import APIRouter
-from dotenv import load_dotenv
 import logging
 from messaging_service import messaging_service
-
-load_dotenv()  # Carga las variables de entorno desde el archivo .env
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -25,10 +22,14 @@ model = load_model(MODEL_PATH)
 
 class_names = ['miner', 'nodisease', 'phoma', 'redspider', 'rust']
 
-EUREKA_SERVER = os.getenv("EUREKA_SERVER", "https://discovery-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io/eureka")
+EUREKA_SERVER = os.getenv("EUREKA_SERVER", "http://discovery-service:8761/eureka")
 SERVICE_PORT = 8000
-SERVICE_HOST = os.getenv("EUREKA_INSTANCE_HOSTNAME", "detection-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io")
-SERVICE_SECURE_PORT = int(os.getenv("EUREKA_INSTANCE_SECURE_PORT", "443"))
+SERVICE_HOST = os.getenv("EUREKA_INSTANCE_HOSTNAME", "detection-service")
+SERVICE_SECURE_PORT = int(os.getenv("EUREKA_INSTANCE_SECURE_PORT", "8000"))
+
+# EUREKA_SERVER = os.getenv("EUREKA_SERVER", "https://discovery-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io/eureka")
+# SERVICE_HOST = os.getenv("EUREKA_INSTANCE_HOSTNAME", "detection-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io")
+# SERVICE_SECURE_PORT = int(os.getenv("EUREKA_INSTANCE_SECURE_PORT", "443"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -37,13 +38,25 @@ async def lifespan(app: FastAPI):
         app_name="detection-service",
         instance_port=SERVICE_SECURE_PORT,
         instance_host=SERVICE_HOST,
-        instance_secure_port_enabled=True,
-        home_page_url=f"https://{SERVICE_HOST}/",
-        status_page_url=f"https://{SERVICE_HOST}/api/v1/health",
-        health_check_url=f"https://{SERVICE_HOST}/api/v1/health",
+        instance_secure_port_enabled=False,  # HTTP para Docker
+        home_page_url=f"http://{SERVICE_HOST}:{SERVICE_PORT}/",
+        status_page_url=f"http://{SERVICE_HOST}:{SERVICE_PORT}/api/v1/health",
+        health_check_url=f"http://{SERVICE_HOST}:{SERVICE_PORT}/api/v1/health",
     )
+    
+    # Configuración comentada para producción (Azure)
+    # await eureka_client.init_async(
+    #     eureka_server=EUREKA_SERVER,
+    #     app_name="detection-service",
+    #     instance_port=SERVICE_SECURE_PORT,
+    #     instance_host=SERVICE_HOST,
+    #     instance_secure_port_enabled=True,
+    #     home_page_url=f"https://{SERVICE_HOST}/",
+    #     status_page_url=f"https://{SERVICE_HOST}/api/v1/health",
+    #     health_check_url=f"https://{SERVICE_HOST}/api/v1/health",
+    # )
+    
     yield
-    # Cerrar conexión con RabbitMQ al finalizar
     messaging_service.close_connection()
 
 app = FastAPI(
@@ -89,15 +102,14 @@ async def predict(file: UploadFile = File(...)):
 @router.post("/diagnose")
 async def diagnose(
     file: UploadFile = File(...),
-    crop_id: int = None,
-    profile_id: int = None
+    crop_id: int | None = None
 ):
     """
     Realiza diagnóstico completo y envía mensaje a RabbitMQ si se requiere tratamiento
     """
     try:
-        if not crop_id or not profile_id:
-            raise HTTPException(status_code=400, detail="crop_id y profile_id son requeridos")
+        if not crop_id:
+            raise HTTPException(status_code=400, detail="crop_id es requerido")
         
         # Realizar predicción
         contents = await file.read()
@@ -125,7 +137,6 @@ async def diagnose(
         result = {
             "diagnosis_id": diagnosis_id,
             "crop_id": crop_id,
-            "profile_id": profile_id,
             "predicted_class": predicted_class,
             "confidence": confidence,
             "disease_detected": disease_detected,

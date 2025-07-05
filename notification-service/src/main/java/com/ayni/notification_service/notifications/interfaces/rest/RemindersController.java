@@ -10,6 +10,7 @@ import com.ayni.notification_service.notifications.interfaces.rest.resources.Cre
 import com.ayni.notification_service.notifications.interfaces.rest.transform.ReminderResourceFromEntityAssembler;
 import com.ayni.notification_service.notifications.interfaces.rest.transform.CreateReminderCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/reminders", produces = "application/json")
-@Tag(name = "Reminders", description = "⏰ Reminder Management - Schedule, view, and cancel reminders for farming activities (PUBLIC ENDPOINTS)")
+@Tag(name = "Reminders", description = "Reminder Management - Schedule, view, and cancel reminders for farming activities")
+@SecurityRequirement(name = "bearerAuth")
 public class RemindersController {
     
     private final ReminderCommandService reminderCommandService;

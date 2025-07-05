@@ -4,14 +4,15 @@ import com.hidrogreen.treatment_service.treatment.domain.model.valueobjects.*;
 import com.hidrogreen.treatment_service.treatment.domain.model.events.StandaloneActivityCreatedEvent;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * Standalone Activity aggregate - Independent activities 🆓
- */
+
 @Entity
 @DiscriminatorValue("STANDALONE")
+@Getter
+@Setter
 public class StandaloneActivity extends Activity {
 
     @Column(name = "created_by_user", nullable = false)
@@ -32,17 +33,9 @@ public class StandaloneActivity extends Activity {
               new ActivityOrigin(ActivityOrigin.Origin.STANDALONE), 
               scheduledAt, frequency);
         this.createdByUser = createdByUser;
-        this.reminderEnabled = false; // Default to false
+        this.reminderEnabled = false; 
         
         this.registerEvent(new StandaloneActivityCreatedEvent(this));
-    }
-
-    public String getCreatedByUser() {
-        return createdByUser;
-    }
-
-    public boolean isReminderEnabled() {
-        return reminderEnabled;
     }
 
     public void enableReminder() {
@@ -53,11 +46,11 @@ public class StandaloneActivity extends Activity {
         this.reminderEnabled = false;
     }
 
-    public LocalDateTime getReminderTime() {
-        return reminderTime;
-    }
-
     public void setReminderTime(LocalDateTime reminderTime) {
         this.reminderTime = reminderTime;
+    }
+ 
+    public String getCreatedByUser() {
+        return createdByUser;
     }
 }

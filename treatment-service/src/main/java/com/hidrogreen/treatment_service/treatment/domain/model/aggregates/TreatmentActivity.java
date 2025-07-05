@@ -4,14 +4,15 @@ import com.hidrogreen.treatment_service.treatment.domain.model.valueobjects.*;
 import com.hidrogreen.treatment_service.treatment.domain.model.events.TreatmentActivityCreatedEvent;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * Treatment Activity aggregate - Complete treatment management 💊
- */
+
 @Entity
 @DiscriminatorValue("TREATMENT")
+@Getter
+@Setter
 public class TreatmentActivity extends Activity {
 
     @Column(name = "treatment_id")
@@ -94,16 +95,15 @@ public class TreatmentActivity extends Activity {
         return treatmentId != null && treatmentId > 0;
     }
 
+    @Override
+    public void complete() {
+        super.complete();
+        if (isLinkedToTreatment() || diagnosisId != null) {
+        }
+    }
+
     public Long getTreatmentId() {
         return treatmentId;
-    }
-
-    public Long getDiagnosisId() {
-        return diagnosisId;
-    }
-
-    public String getTargetDisease() {
-        return targetDisease;
     }
 
     public Integer getTreatmentStepOrder() {
@@ -112,21 +112,6 @@ public class TreatmentActivity extends Activity {
 
     public boolean isMandatory() {
         return isMandatory;
-    }
-
-    public boolean isCanBeDetached() {
-        return canBeDetached;
-    }
-
-    public String getTreatmentPhase() {
-        return treatmentPhase;
-    }
-
-    @Override
-    public void complete() {
-        super.complete();
-        if (isLinkedToTreatment() || diagnosisId != null) {
-        }
     }
 }
 

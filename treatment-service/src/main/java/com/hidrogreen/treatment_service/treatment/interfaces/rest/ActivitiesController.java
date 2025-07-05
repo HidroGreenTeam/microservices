@@ -29,6 +29,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping(value = "/api/v1/activities", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Activities", description = "Agricultural Activities Management")
+@CrossOrigin(origins = "*")
 public class ActivitiesController {
 
     private static final Logger log = LoggerFactory.getLogger(ActivitiesController.class);
@@ -199,24 +200,88 @@ public class ActivitiesController {
             @RequestBody ActivityReminderRequest request) {
         
         try {
+            log.info("Sending activity reminder for activity ID: {}", activityId);
+            
+            boolean emailSent = false;
+            boolean whatsAppSent = false;
+            StringBuilder result = new StringBuilder();
+            
+            // Verificar si el servicio de notificaciones está disponible
+            if (!notificationService.isNotificationServiceAvailable()) {
+                log.warn("⚠️ Notification service is not available. Reminder request will be queued.");
+                result.append("⚠️ Servicio de notificaciones no disponible. ");
+            }
+            
+            // Intentar enviar email
             if (request.sendEmail() && request.email() != null) {
-                notificationService.sendEmail(request.email(), 
-                    "Recordatorio: " + request.activityName(), 
-                    "Recordatorio para la actividad '" + request.activityName() + "' en " + request.cropName());
+                emailSent = notificationService.sendEmail(
+                    request.email(), 
+                    "🌱 Recordatorio: " + request.activityName(), 
+                    buildEmailMessage(request)
+                );
+                
+                if (emailSent) {
+                    result.append("✅ Email enviado exitosamente. ");
+                } else {
+                    result.append("❌ Error enviando email. ");
+                }
             }
             
+            // Intentar enviar WhatsApp
             if (request.sendWhatsApp() && request.phone() != null) {
-                notificationService.sendWhatsApp(request.phone(), 
-                    "Recordatorio: " + request.activityName() + " - " + request.cropName());
+                whatsAppSent = notificationService.sendWhatsApp(
+                    request.phone(), 
+                    buildWhatsAppMessage(request)
+                );
+                
+                if (whatsAppSent) {
+                    result.append("✅ WhatsApp enviado exitosamente. ");
+                } else {
+                    result.append("❌ Error enviando WhatsApp. ");
+                }
             }
             
-            return ResponseEntity.ok("Recordatorio enviado exitosamente");
+            // Determinar respuesta basada en resultados
+            if (emailSent || whatsAppSent) {
+                return ResponseEntity.ok(result.toString());
+            } else if (!request.sendEmail() && !request.sendWhatsApp()) {
+                return ResponseEntity.badRequest().body("❌ No se especificó ningún método de notificación");
+            } else {
+                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+                        .body("⚠️ Recordatorio procesado parcialmente: " + result.toString());
+            }
             
         } catch (Exception e) {
-            log.error("Error sending activity reminder: {}", e.getMessage(), e);
+            log.error("Error sending activity reminder for activity {}: {}", activityId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error enviando recordatorio: " + e.getMessage());
+                    .body("❌ Error interno enviando recordatorio: " + e.getMessage());
         }
+    }
+    
+    private String buildEmailMessage(ActivityReminderRequest request) {
+        return String.format(
+            "Estimado agricultor,\n\n" +
+            "Este es un recordatorio para la siguiente actividad:\n\n" +
+            "🌱 Actividad: %s\n" +
+            "🚜 Cultivo: %s\n" +
+            "📅 Programada para hoy\n\n" +
+            "Por favor, asegúrate de completar esta actividad según las instrucciones.\n\n" +
+            "Saludos,\n" +
+            "Equipo HidroGreen",
+            request.activityName(),
+            request.cropName()
+        );
+    }
+    
+    private String buildWhatsAppMessage(ActivityReminderRequest request) {
+        return String.format(
+            "🌱 Recordatorio HidroGreen\n" +
+            "Actividad: %s\n" +
+            "Cultivo: %s\n" +
+            "📅 Programada para hoy",
+            request.activityName(),
+            request.cropName()
+        );
     }
     
     

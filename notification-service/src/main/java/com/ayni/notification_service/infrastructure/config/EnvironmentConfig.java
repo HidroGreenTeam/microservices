@@ -28,7 +28,7 @@ public class EnvironmentConfig {
             setEnvVar(dotenv, "TWILIO_ACCOUNT_SID");
             setEnvVar(dotenv, "TWILIO_AUTH_TOKEN");
             setEnvVar(dotenv, "TWILIO_WHATSAPP_FROM");
-            setEnvVar(dotenv, "FIREBASE_SERVER_KEY");
+            // Firebase configuration removed as per requirements
             
             logger.info("Environment variables loaded successfully from .env file");
             

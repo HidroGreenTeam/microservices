@@ -31,7 +31,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/subscriptions")
-@Tag(name = "Subscriptions", description = "💳 Subscription Management - Create, manage, and cancel user subscriptions (AUTHENTICATED ENDPOINTS)")
+@Tag(name = "Subscriptions", description = "Subscription Management - Create, manage, and cancel user subscriptions (AUTHENTICATED ENDPOINTS)")
+@SecurityRequirement(name = "bearerAuth")
 public class SubscriptionController {
 
     private final SubscriptionCommandService subscriptionCommandService;
@@ -45,7 +46,7 @@ public class SubscriptionController {
 
     @PostMapping
     @Operation(
-            summary = "💳 Create a new subscription", 
+            summary = "Create a new subscription", 
             description = "Create a new subscription for a user with specified plan and payment details"
     )
     @ApiResponses(value = {
@@ -54,7 +55,6 @@ public class SubscriptionController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token required"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<SubscriptionResource> createSubscription(@RequestBody CreateSubscriptionResource resource) {
         try {
             CreateSubscriptionCommand command = CreateSubscriptionCommandFromResourceAssembler.toCommandFromResource(resource);
@@ -72,7 +72,13 @@ public class SubscriptionController {
     }
 
     @GetMapping("/{subscriptionId}")
-    @Operation(summary = "Get subscription by ID")
+    @Operation(summary = "Get subscription by ID", description = "Retrieve a specific subscription by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Subscription retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token required"),
+            @ApiResponse(responseCode = "404", description = "Subscription not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<SubscriptionResource> getSubscriptionById(@PathVariable Long subscriptionId) {
         try {
             GetSubscriptionByIdQuery query = new GetSubscriptionByIdQuery(subscriptionId);
@@ -88,7 +94,13 @@ public class SubscriptionController {
     }
 
     @GetMapping("/user/{userId}")
-    @Operation(summary = "Get subscription by user ID")
+    @Operation(summary = "Get subscription by user ID", description = "Retrieve a user's active subscription")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Subscription retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token required"),
+            @ApiResponse(responseCode = "404", description = "Subscription not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<SubscriptionResource> getSubscriptionByUserId(@PathVariable Long userId) {
         try {
             GetSubscriptionByUserIdQuery query = new GetSubscriptionByUserIdQuery(userId);
@@ -104,7 +116,14 @@ public class SubscriptionController {
     }
 
     @PutMapping("/{subscriptionId}/cancel")
-    @Operation(summary = "Cancel a subscription")
+    @Operation(summary = "Cancel a subscription", description = "Cancel an active subscription with a reason")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Subscription cancelled successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid cancellation request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token required"),
+            @ApiResponse(responseCode = "404", description = "Subscription not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<SubscriptionResource> cancelSubscription(@PathVariable Long subscriptionId, 
                                                                  @RequestParam String reason) {
         try {
@@ -123,7 +142,14 @@ public class SubscriptionController {
     }
 
     @PutMapping("/{subscriptionId}/renew")
-    @Operation(summary = "Renew a subscription")
+    @Operation(summary = "Renew a subscription", description = "Renew an existing subscription with optional plan upgrade")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Subscription renewed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid renewal request"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token required"),
+            @ApiResponse(responseCode = "404", description = "Subscription not found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     public ResponseEntity<SubscriptionResource> renewSubscription(@PathVariable Long subscriptionId,
                                                                 @RequestParam SubscriptionType newSubscriptionType,
                                                                 @RequestParam(required = false) String paymentReference) {
@@ -144,7 +170,7 @@ public class SubscriptionController {
 
     @GetMapping("/plans")
     @Operation(
-            summary = "📋 Get all available subscription plans", 
+            summary = "Get all available subscription plans", 
             description = "Retrieve all available subscription plans with pricing and features"
     )
     @ApiResponses(value = {
@@ -152,7 +178,6 @@ public class SubscriptionController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token required"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<SubscriptionPlanResource>> getAllSubscriptionPlans() {
         try {
             GetAllSubscriptionPlansQuery query = new GetAllSubscriptionPlansQuery();
