@@ -135,7 +135,9 @@ services:
       - RABBITMQ_USER=guest
       - RABBITMQ_PASSWORD=guest
       - USER_SERVICE_URL=http://user-service:8081
+      - DATABASE_URL=mysql+pymysql://root:root@mysql-db:3306/ayni
     depends_on:
+      - mysql-db
       - discovery-service
       - rabbitmq
       - user-service
