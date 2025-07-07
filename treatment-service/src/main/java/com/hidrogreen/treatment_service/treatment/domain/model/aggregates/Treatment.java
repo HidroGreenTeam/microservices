@@ -1,18 +1,24 @@
 package com.hidrogreen.treatment_service.treatment.domain.model.aggregates;
 
-import com.hidrogreen.treatment_service.treatment.domain.model.entities.TreatmentStep;
-import com.hidrogreen.treatment_service.treatment.domain.model.valueobjects.TreatmentFrequency;
-import com.hidrogreen.treatment_service.treatment.domain.model.valueobjects.TreatmentStatus;
-import com.hidrogreen.treatment_service.treatment.domain.model.events.TreatmentCreatedEvent;
-import com.hidrogreen.treatment_service.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
-import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.hidrogreen.treatment_service.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import com.hidrogreen.treatment_service.treatment.domain.model.entities.TreatmentStep;
+import com.hidrogreen.treatment_service.treatment.domain.model.events.TreatmentCreatedEvent;
+import com.hidrogreen.treatment_service.treatment.domain.model.valueobjects.TreatmentFrequency;
+import com.hidrogreen.treatment_service.treatment.domain.model.valueobjects.TreatmentStatus;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Treatment aggregate root - Representa un tratamiento completo con sus pasos
@@ -22,10 +28,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Treatment extends AuditableAbstractAggregateRoot<Treatment> {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(name = "diagnosis_id", unique = true, nullable = false)
     private Long diagnosisId;

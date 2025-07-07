@@ -1,13 +1,15 @@
 package com.hidrogreen.treatment_service.treatment.infrastructure.persistence.jpa.repositories;
 
-import com.hidrogreen.treatment_service.treatment.domain.model.aggregates.Treatment;
-import com.hidrogreen.treatment_service.treatment.domain.model.entities.TreatmentStep;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.hidrogreen.treatment_service.treatment.domain.model.aggregates.Treatment;
 
 @Repository
 public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
@@ -16,15 +18,14 @@ public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
     
     List<Treatment> findByProfileId(Long profileId);
     
-    Optional<Treatment> findByStepsId(Long stepId);
+    @Query("SELECT t FROM Treatment t JOIN t.steps s WHERE s.id = :stepId")
+    Optional<Treatment> findByStepsId(@Param("stepId") Long stepId);
     
-    List<Treatment> findByEndDateBeforeAndStatusStatusNotIn(LocalDateTime now, List<String> statuses);
-    
-    List<TreatmentStep> findByStepsScheduledDateBeforeAndStepsStatusStatus(LocalDateTime now, String status);
-    
-    List<TreatmentStep> findByStepsHasReminderTrue();
-    
-    List<TreatmentStep> findByStepsHasReminderTrueAndStepsStatusStatusNot(String status);
+    @Query("SELECT t FROM Treatment t WHERE t.endDate < :now AND t.status.status NOT IN :statuses")
+    List<Treatment> findByEndDateBeforeAndStatusStatusNotIn(
+        @Param("now") LocalDateTime now, 
+        @Param("statuses") List<String> statuses
+    );
     
     boolean existsByDiagnosisId(Long diagnosisId);
 }

@@ -1,25 +1,31 @@
 package com.hidrogreen.treatment_service.treatment.application.internal.queryservices;
 
-import com.hidrogreen.treatment_service.treatment.domain.model.aggregates.Treatment;
-import com.hidrogreen.treatment_service.treatment.domain.model.entities.TreatmentStep;
-import com.hidrogreen.treatment_service.treatment.domain.model.valueobjects.TreatmentStatus;
-import com.hidrogreen.treatment_service.treatment.domain.services.TreatmentQueryService;
-import com.hidrogreen.treatment_service.treatment.infrastructure.persistence.jpa.repositories.TreatmentRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.hidrogreen.treatment_service.treatment.domain.model.aggregates.Treatment;
+import com.hidrogreen.treatment_service.treatment.domain.model.entities.TreatmentStep;
+import com.hidrogreen.treatment_service.treatment.domain.model.valueobjects.TreatmentStatus;
+import com.hidrogreen.treatment_service.treatment.domain.model.valueobjects.TreatmentStepStatus;
+import com.hidrogreen.treatment_service.treatment.domain.services.TreatmentQueryService;
+import com.hidrogreen.treatment_service.treatment.infrastructure.persistence.jpa.repositories.TreatmentRepository;
+import com.hidrogreen.treatment_service.treatment.infrastructure.persistence.jpa.repositories.TreatmentStepRepository;
+
 @Service
 @Transactional(readOnly = true)
 public class TreatmentQueryServiceImpl implements TreatmentQueryService {
     private final TreatmentRepository treatmentRepository;
+    private final TreatmentStepRepository treatmentStepRepository;
 
-    public TreatmentQueryServiceImpl(TreatmentRepository treatmentRepository) {
+    public TreatmentQueryServiceImpl(TreatmentRepository treatmentRepository,
+                                   TreatmentStepRepository treatmentStepRepository) {
         this.treatmentRepository = treatmentRepository;
+        this.treatmentStepRepository = treatmentStepRepository;
     }
 
     @Override
@@ -53,20 +59,26 @@ public class TreatmentQueryServiceImpl implements TreatmentQueryService {
 
     @Override
     public List<TreatmentStep> getOverdueSteps() {
-        return treatmentRepository.findByStepsScheduledDateBeforeAndStepsStatusStatus(
+        TreatmentStepStatus pendingStatus = new TreatmentStepStatus(TreatmentStepStatus.Status.PENDING);
+        return treatmentStepRepository.findByScheduledDateBeforeAndStatus(
             LocalDateTime.now(), 
-            "PENDING"
+            pendingStatus
         );
     }
 
     @Override
     public List<TreatmentStep> getStepsWithReminders() {
-        return treatmentRepository.findByStepsHasReminderTrue();
+        return treatmentStepRepository.findByHasReminderTrue();
     }
     
     @Override
     public List<TreatmentStep> getStepsDueForReminder() {
-        // Get steps that have reminders enabled and are not completed
-        return treatmentRepository.findByStepsHasReminderTrueAndStepsStatusStatusNot("COMPLETED");
+        // Get steps that have reminders enabled, are not completed, and their reminder time has arrived
+        LocalDateTime reminderTime = LocalDateTime.now().plusMinutes(30); // Check steps due in next 30 minutes
+        TreatmentStepStatus completedStatus = new TreatmentStepStatus(TreatmentStepStatus.Status.COMPLETED);
+        return treatmentStepRepository.findByHasReminderTrueAndStatusNotAndScheduledDateLessThanEqual(
+            completedStatus, 
+            reminderTime
+        );
     }
 } 
