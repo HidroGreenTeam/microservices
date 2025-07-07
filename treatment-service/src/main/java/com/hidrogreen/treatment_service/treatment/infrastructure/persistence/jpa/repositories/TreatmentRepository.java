@@ -23,4 +23,8 @@ public interface TreatmentRepository extends JpaRepository<Treatment, Long> {
     List<TreatmentStep> findByStepsScheduledDateBeforeAndStepsStatusStatus(LocalDateTime now, String status);
     
     List<TreatmentStep> findByStepsHasReminderTrue();
+    
+    List<TreatmentStep> findByStepsHasReminderTrueAndStepsStatusStatusNot(String status);
+    
+    boolean existsByDiagnosisId(Long diagnosisId);
 }

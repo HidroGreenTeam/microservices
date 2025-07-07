@@ -10,12 +10,6 @@ public record SendNotificationCommand(
     NotificationType notificationType,
     NotificationChannel notificationChannel,
     String title,
-    String message,
-    Long activityId,
-    Long cropId
+    String message
 ) {
-    public SendNotificationCommand(Long profileId, NotificationType notificationType, 
-                                 NotificationChannel notificationChannel, String title, String message) {
-        this(profileId, notificationType, notificationChannel, title, message, null, null);
-    }
 }

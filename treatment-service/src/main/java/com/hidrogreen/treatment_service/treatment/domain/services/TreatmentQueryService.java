@@ -20,4 +20,6 @@ public interface TreatmentQueryService {
     List<TreatmentStep> getOverdueSteps();
     
     List<TreatmentStep> getStepsWithReminders();
+    
+    List<TreatmentStep> getStepsDueForReminder();
 } 

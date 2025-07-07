@@ -63,4 +63,10 @@ public class TreatmentQueryServiceImpl implements TreatmentQueryService {
     public List<TreatmentStep> getStepsWithReminders() {
         return treatmentRepository.findByStepsHasReminderTrue();
     }
+    
+    @Override
+    public List<TreatmentStep> getStepsDueForReminder() {
+        // Get steps that have reminders enabled and are not completed
+        return treatmentRepository.findByStepsHasReminderTrueAndStepsStatusStatusNot("COMPLETED");
+    }
 } 

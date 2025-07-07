@@ -18,14 +18,8 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.exchange.notifications}")
     private String notificationsExchange;
     
-    @Value("${rabbitmq.queue.activity-notifications}")
-    private String activityNotificationsQueue;
-    
     @Value("${rabbitmq.queue.treatment-reminders}")
     private String treatmentRemindersQueue;
-    
-    @Value("${rabbitmq.routing.key.activity}")
-    private String activityRoutingKey;
     
     @Value("${rabbitmq.routing.key.treatment}")
     private String treatmentRoutingKey;
@@ -38,12 +32,8 @@ public class RabbitMQConfig {
     public void init() {
         logger.info("RabbitMQ Configuration loaded in Notification Service:");
         logger.info("Exchange: {}", notificationsExchange);
-        logger.info("Activity Queue: {}", activityNotificationsQueue);
-        logger.info("Treatment Queue: {}", treatmentRemindersQueue);
-        logger.info("Activity Routing Key: {}", activityRoutingKey);
+        logger.info("Treatment Reminders Queue: {}", treatmentRemindersQueue);
         logger.info("Treatment Routing Key: {}", treatmentRoutingKey);
-        logger.info("Subscription Queue: {}", SUBSCRIPTION_NOTIFICATION_QUEUE);
-        logger.info("Subscription Exchange: {}", SUBSCRIPTION_EXCHANGE);
     }
     
     @Bean
@@ -61,25 +51,9 @@ public class RabbitMQConfig {
     }
     
     @Bean
-    public Queue activityNotificationsQueue() {
-        logger.info("Creating Queue: {}", activityNotificationsQueue);
-        return QueueBuilder.durable(activityNotificationsQueue).build();
-    }
-    
-    @Bean
     public Queue treatmentRemindersQueue() {
         logger.info("Creating Queue: {}", treatmentRemindersQueue);
         return QueueBuilder.durable(treatmentRemindersQueue).build();
-    }
-    
-    @Bean
-    public Binding activityNotificationsBinding() {
-        logger.info("Creating Binding for activity notifications: queue={}, exchange={}, routingKey={}", 
-                   activityNotificationsQueue, notificationsExchange, activityRoutingKey);
-        return BindingBuilder
-                .bind(activityNotificationsQueue())
-                .to(notificationsExchange())
-                .with(activityRoutingKey);
     }
     
     @Bean
@@ -91,14 +65,14 @@ public class RabbitMQConfig {
                 .to(notificationsExchange())
                 .with(treatmentRoutingKey);
     }
-    
+
     // Subscription-related beans
     @Bean
     public TopicExchange subscriptionExchange() {
         logger.info("Creating Subscription TopicExchange: {}", SUBSCRIPTION_EXCHANGE);
         return new TopicExchange(SUBSCRIPTION_EXCHANGE);
     }
-    
+
     @Bean
     public Queue subscriptionNotificationQueue() {
         logger.info("Creating Subscription Queue: {}", SUBSCRIPTION_NOTIFICATION_QUEUE);

@@ -3,6 +3,7 @@ package com.ayni.notification_service.notifications.application.internal.outboun
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -19,10 +20,7 @@ public class EmailNotificationService {
 
     @Value("${email.from.address}")
     private String fromEmail;
-
-    @Value("${email.from.name}")
-    private String fromName;
-
+ 
     public EmailNotificationService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
@@ -42,7 +40,7 @@ public class EmailNotificationService {
             mailSender.send(mailMessage);
             log.info("Email sent successfully to: {}", to);
             
-        } catch (Exception e) {
+        } catch (MailException e) {
             log.error("Failed to send email to {}: {}", to, e.getMessage(), e);
             throw new RuntimeException("Failed to send email", e);
         }

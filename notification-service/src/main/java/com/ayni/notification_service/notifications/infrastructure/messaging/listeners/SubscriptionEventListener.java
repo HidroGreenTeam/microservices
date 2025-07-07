@@ -40,12 +40,10 @@ public class SubscriptionEventListener {
             
             SendNotificationCommand command = new SendNotificationCommand(
                 notification.getUserId(),
-                NotificationType.INFO,
+                NotificationType.SUBSCRIPTION,
                 NotificationChannel.EMAIL,
                 title,
-                notificationMessage,
-                null, // activityId
-                null  // cropId
+                notificationMessage
             );
             
             Long notificationId = notificationCommandService.handle(command);

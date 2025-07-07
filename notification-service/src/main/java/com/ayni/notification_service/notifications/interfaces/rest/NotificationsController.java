@@ -1,141 +1,60 @@
 package com.ayni.notification_service.notifications.interfaces.rest;
 
-import com.ayni.notification_service.notifications.application.internal.outboundservices.EmailNotificationService;
-import com.ayni.notification_service.notifications.application.internal.outboundservices.WhatsAppNotificationService;
-import com.ayni.notification_service.notifications.domain.services.NotificationCommandService;
-import com.ayni.notification_service.notifications.domain.services.NotificationQueryService;
-import com.ayni.notification_service.notifications.interfaces.rest.resources.NotificationResource;
-import com.ayni.notification_service.notifications.interfaces.rest.resources.SendNotificationResource;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ayni.notification_service.notifications.domain.model.aggregates.Notification;
+import com.ayni.notification_service.notifications.domain.model.queries.GetNotificationByIdQuery;
+import com.ayni.notification_service.notifications.domain.model.queries.GetNotificationsByProfileIdQuery;
+import com.ayni.notification_service.notifications.domain.services.NotificationQueryService;
+import com.ayni.notification_service.notifications.interfaces.rest.resources.NotificationResource;
+import com.ayni.notification_service.notifications.interfaces.rest.transform.NotificationResourceFromEntityAssembler;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.util.List;
-
 /**
- * Notification REST Controller
+ * Notification REST Controller - Query Only (Read-Only for Frontend)
+ * Notifications are created automatically via event processing
  */
 @RestController
 @RequestMapping("/api/v1/notifications")
-@Tag(name = "Notifications", description = "Operations related to notifications")
+@Tag(name = "Notifications", description = "Query notification history and status")
 public class NotificationsController {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationsController.class);
 
-    private final NotificationCommandService notificationCommandService;
     private final NotificationQueryService notificationQueryService;
-    private final EmailNotificationService emailNotificationService;
-    private final WhatsAppNotificationService whatsAppNotificationService;
 
-    public NotificationsController(
-            NotificationCommandService notificationCommandService,
-            NotificationQueryService notificationQueryService,
-            EmailNotificationService emailNotificationService,
-            WhatsAppNotificationService whatsAppNotificationService) {
-        this.notificationCommandService = notificationCommandService;
+    public NotificationsController(NotificationQueryService notificationQueryService) {
         this.notificationQueryService = notificationQueryService;
-        this.emailNotificationService = emailNotificationService;
-        this.whatsAppNotificationService = whatsAppNotificationService;
     }
 
     /**
-     * Send email notification
+     * Get notification history for a user (for frontend display)
      */
-    @PostMapping("/email")
-    @Operation(summary = "Send email notification", description = "Send an email notification to a user")
-    public ResponseEntity<String> sendEmail(@RequestBody SendNotificationResource resource) {
-        try {
-            logger.info("Sending email notification to: {}", resource.recipient());
-            emailNotificationService.sendEmail(
-                    resource.recipient(),
-                    resource.subject(),
-                    resource.message()
-            );
-            return ResponseEntity.ok("Email sent successfully");
-        } catch (Exception e) {
-            logger.error("Failed to send email: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send email: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Send WhatsApp notification
-     */
-    @PostMapping("/whatsapp")
-    @Operation(summary = "Send WhatsApp notification", description = "Send a WhatsApp message to a user")
-    public ResponseEntity<String> sendWhatsApp(@RequestBody SendNotificationResource resource) {
-        try {
-            logger.info("Sending WhatsApp notification to: {}", resource.recipient());
-            whatsAppNotificationService.sendWhatsApp(
-                    resource.recipient(),
-                    resource.message()
-            );
-            return ResponseEntity.ok("WhatsApp message sent successfully");
-        } catch (Exception e) {
-            logger.error("Failed to send WhatsApp message: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send WhatsApp message: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Test email configuration
-     */
-    @PostMapping("/test/email")
-    @Operation(summary = "Test email configuration", description = "Send a test email to verify configuration")
-    public ResponseEntity<String> testEmail(@RequestParam String recipient) {
-        try {
-            logger.info("Testing email configuration with recipient: {}", recipient);
-            emailNotificationService.sendEmail(
-                    recipient,
-                    "Test Email from HidroGreen",
-                    "This is a test email to verify the email configuration is working correctly. " +
-                    "If you receive this email, the notification service is configured properly."
-            );
-            return ResponseEntity.ok("Test email sent successfully to " + recipient);
-        } catch (Exception e) {
-            logger.error("Failed to send test email: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send test email: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Test WhatsApp configuration
-     */
-    @PostMapping("/test/whatsapp")
-    @Operation(summary = "Test WhatsApp configuration", description = "Send a test WhatsApp message to verify configuration")
-    public ResponseEntity<String> testWhatsApp(@RequestParam String recipient) {
-        try {
-            logger.info("Testing WhatsApp configuration with recipient: {}", recipient);
-            whatsAppNotificationService.sendWhatsApp(
-                    recipient,
-                    "🌱 Test message from HidroGreen! This is a test to verify WhatsApp notifications are working correctly."
-            );
-            return ResponseEntity.ok("Test WhatsApp message sent successfully to " + recipient);
-        } catch (Exception e) {
-            logger.error("Failed to send test WhatsApp message: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to send test WhatsApp message: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Get notification history for a user
-     */
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{profileId}")
     @Operation(summary = "Get user notifications", description = "Get notification history for a specific user")
-    public ResponseEntity<List<NotificationResource>> getUserNotifications(@PathVariable Long userId) {
+    public ResponseEntity<List<NotificationResource>> getUserNotifications(@PathVariable Long profileId) {
         try {
-            // This would be implemented based on your notification query service
-            logger.info("Getting notifications for user: {}", userId);
-            return ResponseEntity.ok().build(); // Placeholder
+            logger.info("Getting notifications for profile: {}", profileId);
+            
+            GetNotificationsByProfileIdQuery query = new GetNotificationsByProfileIdQuery(profileId);
+            List<Notification> notifications = notificationQueryService.handle(query);
+            
+            List<NotificationResource> notificationResources = notifications.stream()
+                .map(NotificationResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+                
+            return ResponseEntity.ok(notificationResources);
         } catch (Exception e) {
             logger.error("Failed to get user notifications: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -143,11 +62,25 @@ public class NotificationsController {
     }
 
     /**
-     * Health check endpoint
+     * Get notification by ID (for frontend details)
      */
-    @GetMapping("/health")
-    @Operation(summary = "Health check", description = "Check if the notification service is running")
-    public ResponseEntity<String> health() {
-        return ResponseEntity.ok("Notification Service is running");
+    @GetMapping("/{notificationId}")
+    @Operation(summary = "Get notification by ID", description = "Get a specific notification by its ID")
+    public ResponseEntity<NotificationResource> getNotificationById(@PathVariable Long notificationId) {
+        try {
+            logger.info("Getting notification: {}", notificationId);
+
+            GetNotificationByIdQuery query = new GetNotificationByIdQuery(notificationId);
+            Notification notification = notificationQueryService.handle(query).orElse(null);
+            if (notification != null) {
+                NotificationResource notificationResource = NotificationResourceFromEntityAssembler.toResourceFromEntity(notification);
+                return ResponseEntity.ok(notificationResource);
+            }
+            
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            logger.error("Failed to get notification: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
