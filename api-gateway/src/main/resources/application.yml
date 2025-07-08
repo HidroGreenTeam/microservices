@@ -5,7 +5,7 @@ spring:
     gateway:
       globalcors:
         cors-configurations:
-          '[/**]':
+          "[/**]":
             allowedOrigins: "*"
             allowedMethods:
               - GET
@@ -25,9 +25,9 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_SERVER_URL:https://discovery-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io/eureka/}
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://discovery-service:8761/eureka}
   instance:
-    hostname: ${EUREKA_INSTANCE_HOSTNAME:api-gateway.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io}
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:api-gateway}
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
     securePortEnabled: true
     securePort: ${EUREKA_INSTANCE_SECURE_PORT:443}
@@ -48,5 +48,5 @@ management:
 
 logging:
   level:
-    '[org.springframework.cloud.gateway]': DEBUG
-    '[reactor.netty]': DEBUG
+    "[org.springframework.cloud.gateway]": DEBUG
+    "[reactor.netty]": DEBUG

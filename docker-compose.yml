@@ -5,7 +5,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: ayni
-      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_HOST: "%"
     ports:
       - "3307:3306"
     volumes:
@@ -42,6 +42,9 @@ services:
     container_name: hidrogreen-discovery
     ports:
       - "8761:8761"
+    environment:
+      - EUREKA_INSTANCE_HOSTNAME=discovery-service
+      - EUREKA_INSTANCE_SECURE_PORT=443
     networks:
       - hidrogreen-network
     restart: unless-stopped
@@ -55,6 +58,8 @@ services:
       - "8081:8081"
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_HOSTNAME=user-service
+      - EUREKA_INSTANCE_SECURE_PORT=443
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -79,6 +84,8 @@ services:
       - "8082:8082"
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_HOSTNAME=treatment-service
+      - EUREKA_INSTANCE_SECURE_PORT=443
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -105,6 +112,8 @@ services:
       - "8085:8085"
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_HOSTNAME=crop-service
+      - EUREKA_INSTANCE_SECURE_PORT=443
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -112,6 +121,7 @@ services:
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_RABBITMQ_HOST=rabbitmq
+      - DETECTION_SERVICE_URL=http://detection-service:8000/api/v1/detections
     depends_on:
       - mysql-db
       - rabbitmq
@@ -154,6 +164,8 @@ services:
       - "8083:8083"
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_HOSTNAME=report-service
+      - EUREKA_INSTANCE_SECURE_PORT=443
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -178,6 +190,8 @@ services:
       - "8084:8084"
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_HOSTNAME=notification-service
+      - EUREKA_INSTANCE_SECURE_PORT=443
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -210,13 +224,16 @@ services:
       - "8087:8087"
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC  # Cambiar 3307 por 3306
+      - EUREKA_INSTANCE_HOSTNAME=subscription-service
+      - EUREKA_INSTANCE_SECURE_PORT=443
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC # Cambiar 3307 por 3306
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=com.mysql.cj.jdbc.Driver
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_RABBITMQ_HOST=rabbitmq
+      - USER_SERVICE_URL=http://user-service:8081
     depends_on:
       - mysql-db
       - rabbitmq
@@ -235,6 +252,8 @@ services:
       - "8086:8086"
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_HOSTNAME=payment-gateway-service
+      - EUREKA_INSTANCE_SECURE_PORT=443
     depends_on:
       - discovery-service
     networks:
@@ -250,12 +269,13 @@ services:
       - "8080:8080"
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
+      - EUREKA_INSTANCE_HOSTNAME=api-gateway
+      - EUREKA_INSTANCE_SECURE_PORT=443
     depends_on:
       - discovery-service
     networks:
       - hidrogreen-network
     restart: unless-stopped
-
 
 volumes:
   mysql_data:
