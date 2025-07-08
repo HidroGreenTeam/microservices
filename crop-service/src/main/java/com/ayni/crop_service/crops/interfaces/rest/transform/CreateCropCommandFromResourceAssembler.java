@@ -8,13 +8,13 @@ import com.ayni.crop_service.crops.interfaces.rest.resources.CreateCropResource;
  */
 public class CreateCropCommandFromResourceAssembler {
 
-    public static CreateCropCommand toCommandFromResource(CreateCropResource resource) {
+    public static CreateCropCommand toCommandFromResource(Long farmerId, CreateCropResource resource) {
         return new CreateCropCommand(
-            resource.profileId(),
+            farmerId,
             resource.cropName(),
+            resource.area(),
             resource.plantingDate(),
-            resource.location(),
-            resource.notes()
+            resource.location()
         );
     }
 }

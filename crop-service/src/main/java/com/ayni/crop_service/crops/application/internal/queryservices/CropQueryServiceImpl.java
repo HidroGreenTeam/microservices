@@ -2,10 +2,8 @@ package com.ayni.crop_service.crops.application.internal.queryservices;
 
 import com.ayni.crop_service.crops.domain.model.aggregates.Crop;
 import com.ayni.crop_service.crops.domain.model.queries.GetCropByIdQuery;
-import com.ayni.crop_service.crops.domain.model.queries.GetCropsByProfileIdQuery;
-import com.ayni.crop_service.crops.domain.model.queries.GetCropsWithActiveDiseaseQuery;
+import com.ayni.crop_service.crops.domain.model.queries.GetCropsByFarmerIdQuery;
 import com.ayni.crop_service.crops.domain.services.CropQueryService;
-import com.ayni.crop_service.crops.domain.model.valueobjects.CropHealthStatus;
 import com.ayni.crop_service.crops.infrastructure.persistence.jpa.repositories.CropRepository;
 import org.springframework.stereotype.Service;
 
@@ -30,12 +28,7 @@ public class CropQueryServiceImpl implements CropQueryService {
     }
 
     @Override
-    public List<Crop> handle(GetCropsByProfileIdQuery query) {
-        return cropRepository.findByProfileId(query.getProfileId());
-    }
-
-    @Override
-    public List<Crop> handle(GetCropsWithActiveDiseaseQuery query) {
-        return cropRepository.findByProfileIdAndDiseasedStatus(query.profileId());
+    public List<Crop> handle(GetCropsByFarmerIdQuery query) {
+        return cropRepository.findByFarmerId(query.farmerId());
     }
 }

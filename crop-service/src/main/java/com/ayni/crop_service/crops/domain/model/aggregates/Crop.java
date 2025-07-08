@@ -1,26 +1,31 @@
 package com.ayni.crop_service.crops.domain.model.aggregates;
 
-import com.ayni.crop_service.crops.domain.model.valueobjects.*;
-import com.ayni.crop_service.crops.domain.model.events.CropCreatedEvent;
-import com.ayni.crop_service.crops.domain.model.events.CropStatusUpdatedEvent;
-import com.ayni.crop_service.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
-import jakarta.persistence.*;
-import lombok.Getter;
-
 import java.time.LocalDate;
+
+import com.ayni.crop_service.crops.domain.model.events.CropCreatedEvent; 
+import com.ayni.crop_service.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.Getter;
 
 /**
  * Crop aggregate root
  */
 @Entity
 @Table(name = "crops")
+@Getter
 public class Crop extends AuditableAbstractAggregateRoot<Crop> {
 
-    @Column(name = "profile_id", nullable = false)
-    private Long profileId;
+    @Column(name = "farmer_id", nullable = false)
+    private Long farmerId;
 
     @Column(name = "crop_name", nullable = false)
     private String cropName;
+
+    @Column(name = "area")
+    private Double area;
 
     @Column(name = "planting_date", nullable = false)
     private LocalDate plantingDate;
@@ -28,80 +33,47 @@ public class Crop extends AuditableAbstractAggregateRoot<Crop> {
     @Column(name = "location")
     private String location;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "health_status", nullable = false)
-    private CropHealthStatus healthStatus;
-
-    @Column(name = "notes", length = 1000)
-    private String notes;
+    @Column(name = "image_url")
+    private String imageUrl;
+ 
 
     protected Crop() {}
 
-    public Crop(Long profileId, String cropName, LocalDate plantingDate, String location) {
-        this.profileId = profileId;
+    public Crop(Long farmerId, String cropName, Double area, LocalDate plantingDate, String location) {
+        this.farmerId = farmerId;
         this.cropName = cropName;
+        this.area = area;
         this.plantingDate = plantingDate;
         this.location = location;
-        this.healthStatus = CropHealthStatus.HEALTHY;
         
         this.registerEvent(new CropCreatedEvent(this));
-    }
-
-    public void updateHealthStatus(CropHealthStatus newStatus) {
-        CropHealthStatus oldStatus = this.healthStatus;
-        this.healthStatus = newStatus;
-        this.registerEvent(new CropStatusUpdatedEvent(this, oldStatus, newStatus));
-    }
-
-    public void updateNotes(String notes) {
-        this.notes = notes;
     }
 
     public Long getCropId() {
         return this.getId();
     }
 
-    public Long getProfileId() {
-        return profileId;
+    public void updateCropName(String cropName) {
+        this.cropName = cropName;
     }
 
-    public String getCropName() {
-        return cropName;
+    public void updateArea(Double area) {
+        this.area = area;
     }
 
-    public LocalDate getPlantingDate() {
-        return plantingDate;
+    public void updatePlantingDate(LocalDate plantingDate) {
+        this.plantingDate = plantingDate;
     }
 
-    public String getLocation() {
-        return location;
+    public void updateLocation(String location) {
+        this.location = location;
     }
 
-    public CropHealthStatus getHealthStatus() {
-        return healthStatus;
+    public void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
-    public String getNotes() {
-        return notes;
-    }
-
-    public boolean isHealthy() {
-        return healthStatus.isHealthy();
-    }
-
-    public boolean isDiseased() {
-        return healthStatus.isDiseased();
-    }
-
-    public boolean isAtRisk() {
-        return healthStatus.isAtRisk();
-    }
-
-    public boolean isCritical() {
-        return healthStatus.isCritical();
-    }
-
-    public int getHealthScore() {
-        return healthStatus.getHealthScore();
+    public void removeImage() {
+        this.imageUrl = null;
     }
 }

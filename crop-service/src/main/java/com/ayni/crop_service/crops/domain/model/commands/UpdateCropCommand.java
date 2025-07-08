@@ -3,10 +3,10 @@ package com.ayni.crop_service.crops.domain.model.commands;
 import java.time.LocalDate;
 
 /**
- * Command to create a new crop
+ * Command to update a crop
  */
-public record CreateCropCommand(
-    Long farmerId,
+public record UpdateCropCommand(
+    Long cropId,
     String cropName,
     Double area,
     LocalDate plantingDate,

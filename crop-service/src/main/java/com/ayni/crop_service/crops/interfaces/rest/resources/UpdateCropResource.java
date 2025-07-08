@@ -3,9 +3,9 @@ package com.ayni.crop_service.crops.interfaces.rest.resources;
 import java.time.LocalDate;
 
 /**
- * Create crop resource
+ * Update crop resource
  */
-public record CreateCropResource(
+public record UpdateCropResource(
     String cropName,
     Double area,
     LocalDate plantingDate,

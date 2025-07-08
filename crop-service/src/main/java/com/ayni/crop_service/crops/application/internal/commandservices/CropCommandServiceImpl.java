@@ -1,14 +1,17 @@
 package com.ayni.crop_service.crops.application.internal.commandservices;
 
-import com.ayni.crop_service.crops.domain.model.aggregates.Crop;
-import com.ayni.crop_service.crops.domain.model.commands.CreateCropCommand;
-import com.ayni.crop_service.crops.domain.model.commands.UpdateCropStatusCommand;
-import com.ayni.crop_service.crops.domain.services.CropCommandService;
-import com.ayni.crop_service.crops.infrastructure.persistence.jpa.repositories.CropRepository;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import com.ayni.crop_service.crops.domain.model.aggregates.Crop;
+import com.ayni.crop_service.crops.domain.model.commands.CreateCropCommand;
+import com.ayni.crop_service.crops.domain.model.commands.DeleteCropCommand;
+import com.ayni.crop_service.crops.domain.model.commands.UpdateCropCommand;
+import com.ayni.crop_service.crops.domain.model.commands.UpdateCropImageCommand;
+import com.ayni.crop_service.crops.domain.services.CropCommandService;
+import com.ayni.crop_service.crops.infrastructure.persistence.jpa.repositories.CropRepository;
 
 /**
  * Crop command service implementation
@@ -25,18 +28,13 @@ public class CropCommandServiceImpl implements CropCommandService {
     @Override
     @Transactional
     public Long handle(CreateCropCommand command) {
-        String cropName = command.cropName();
-
         Crop crop = new Crop(
-            command.getProfileId(),
-            cropName,
+            command.farmerId(),
+            command.cropName(),
+            command.area(),
             command.plantingDate(),
             command.location()
         );
-
-        if (command.notes() != null && !command.notes().isBlank()) {
-            crop.updateNotes(command.notes());
-        }
 
         Crop savedCrop = cropRepository.save(crop);
         return savedCrop.getId();
@@ -44,23 +42,39 @@ public class CropCommandServiceImpl implements CropCommandService {
 
     @Override
     @Transactional
-    public Optional<Crop> handle(UpdateCropStatusCommand command) {
+    public Optional<Crop> handle(UpdateCropCommand command) {
         return cropRepository.findById(command.cropId())
             .map(crop -> {
-                crop.updateHealthStatus(command.healthStatus());
-                if (command.notes() != null && !command.notes().isBlank()) {
-                    crop.updateNotes(command.notes());
-                }
+                crop.updateCropName(command.cropName());
+                crop.updateArea(command.area());
+                crop.updatePlantingDate(command.plantingDate());
+                crop.updateLocation(command.location());
                 return cropRepository.save(crop);
             });
     }
 
     @Override
     @Transactional
-    public Optional<Crop> updateCropNotes(Long cropId, String notes) {
+    public void handle(DeleteCropCommand command) {
+        cropRepository.deleteById(command.cropId());
+    }
+
+    @Override
+    @Transactional
+    public Optional<Crop> handle(UpdateCropImageCommand command) {
+        return cropRepository.findById(command.cropId())
+            .map(crop -> {
+                crop.updateImageUrl(command.imageUrl());
+                return cropRepository.save(crop);
+            });
+    }
+
+    @Override
+    @Transactional
+    public Optional<Crop> removeCropImage(Long cropId) {
         return cropRepository.findById(cropId)
             .map(crop -> {
-                crop.updateNotes(notes);
+                crop.removeImage();
                 return cropRepository.save(crop);
             });
     }

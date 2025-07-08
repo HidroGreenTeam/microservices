@@ -1,5 +1,8 @@
 package com.ayni.crop_service.crops.interfaces.rest.transform;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 import com.ayni.crop_service.crops.domain.model.aggregates.Crop;
 import com.ayni.crop_service.crops.interfaces.rest.resources.CropResource;
 
@@ -11,14 +14,16 @@ public class CropResourceFromEntityAssembler {
     public static CropResource toResourceFromEntity(Crop entity) {
         return new CropResource(
             entity.getId(),
-            entity.getProfileId(),
             entity.getCropName(),
+            entity.getArea(),
             entity.getPlantingDate(),
             entity.getLocation(),
-            entity.getHealthStatus().name(),
-            entity.getNotes(),
-            entity.getCreatedAt() != null ? entity.getCreatedAt().toString() : null,
-            entity.getUpdatedAt() != null ? entity.getUpdatedAt().toString() : null
+            entity.getFarmerId(),
+            entity.getImageUrl(),
+            entity.getCreatedAt() != null ? 
+                LocalDateTime.ofInstant(entity.getCreatedAt().toInstant(), ZoneId.systemDefault()) : null,
+            entity.getUpdatedAt() != null ? 
+                LocalDateTime.ofInstant(entity.getUpdatedAt().toInstant(), ZoneId.systemDefault()) : null
         );
     }
 }

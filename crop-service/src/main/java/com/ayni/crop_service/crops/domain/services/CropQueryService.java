@@ -1,12 +1,11 @@
 package com.ayni.crop_service.crops.domain.services;
 
-import com.ayni.crop_service.crops.domain.model.aggregates.Crop;
-import com.ayni.crop_service.crops.domain.model.queries.GetCropByIdQuery;
-import com.ayni.crop_service.crops.domain.model.queries.GetCropsByProfileIdQuery;
-import com.ayni.crop_service.crops.domain.model.queries.GetCropsWithActiveDiseaseQuery;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.ayni.crop_service.crops.domain.model.aggregates.Crop;
+import com.ayni.crop_service.crops.domain.model.queries.GetCropByIdQuery;
+import com.ayni.crop_service.crops.domain.model.queries.GetCropsByFarmerIdQuery;
 
 /**
  * Crop query service interface
@@ -22,18 +21,10 @@ public interface CropQueryService {
     Optional<Crop> handle(GetCropByIdQuery query);
 
     /**
-     * Get crops by profile ID
+     * Get crops by farmer ID
      *
-     * @param query the get crops by profile ID query
+     * @param query the get crops by farmer ID query
      * @return the list of crops
      */
-    List<Crop> handle(GetCropsByProfileIdQuery query);
-
-    /**
-     * Get crops with active diseases
-     *
-     * @param query the get crops with active disease query
-     * @return the list of crops with active diseases
-     */
-    List<Crop> handle(GetCropsWithActiveDiseaseQuery query);
+    List<Crop> handle(GetCropsByFarmerIdQuery query);
 }
