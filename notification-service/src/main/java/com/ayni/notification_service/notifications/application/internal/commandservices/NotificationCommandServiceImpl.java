@@ -1,16 +1,16 @@
 package com.ayni.notification_service.notifications.application.internal.commandservices;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import com.ayni.notification_service.notifications.application.internal.outboundservices.EmailNotificationService;
 import com.ayni.notification_service.notifications.application.internal.outboundservices.WhatsAppNotificationService;
 import com.ayni.notification_service.notifications.application.internal.outboundservices.acl.ExternalProfileService;
 import com.ayni.notification_service.notifications.domain.model.aggregates.Notification;
 import com.ayni.notification_service.notifications.domain.model.commands.SendNotificationCommand;
-
 import com.ayni.notification_service.notifications.domain.services.NotificationCommandService;
 import com.ayni.notification_service.notifications.infrastructure.persistence.jpa.repositories.NotificationRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 /**
  * NotificationCommandServiceImpl - Handles notification creation and delivery
@@ -37,11 +37,15 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
     @Override
     public Long handle(SendNotificationCommand command) {
-        log.info("Processing SendNotificationCommand for profileId: {}, type: {}, channel: {}",
-                command.profileId(), command.notificationType(), command.notificationChannel());
+        log.info("=== PROCESSING SENDNOTIFICATIONCOMMAND ===");
+        log.info("Profile ID: {}", command.profileId());
+        log.info("Notification Type: {}", command.notificationType());
+        log.info("Notification Channel: {}", command.notificationChannel());
+        log.info("Title: {}", command.title());
+        log.info("Message: {}", command.message());
 
         try {
-
+            log.info("=== CREATING NOTIFICATION ENTITY ===");
             Notification notification = new Notification(
                     command.profileId(),
                     command.notificationType(),
@@ -50,19 +54,27 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
                     command.message()
             );
 
+            log.info("Notification entity created with ID: {}", notification.getId());
+
             Notification savedNotification = notificationRepository.save(notification);
+            log.info("=== NOTIFICATION SAVED SUCCESSFULLY ===");
+            log.info("Saved notification ID: {}", savedNotification.getId());
 
-            log.info("Notification saved successfully with ID: {}", savedNotification.getId());
-
+            log.info("=== STARTING NOTIFICATION DELIVERY ===");
             deliverNotification(savedNotification);
+            
             savedNotification.markAsSent();
             notificationRepository.save(savedNotification);
             savedNotification.publishSentEvent();
+            
+            log.info("=== NOTIFICATION PROCESS COMPLETED SUCCESSFULLY ===");
+            log.info("Final notification ID: {}", savedNotification.getId());
+            
             return savedNotification.getId();
 
         } catch (Exception e) {
-            log.error("Error handling SendNotificationCommand for profileId: {}: {}",
-                    command.profileId(), e.getMessage(), e);
+            log.error("=== ERROR HANDLING SENDNOTIFICATIONCOMMAND ===");
+            log.error("Profile ID: {}, Error: {}", command.profileId(), e.getMessage(), e);
             throw new RuntimeException("Failed to send notification", e);
         }
     }
@@ -121,22 +133,32 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
      * Deliver notification via WhatsApp
      */
     private void deliverByWhatsApp(Notification notification) {
-        log.debug("Retrieving phone number for profile: {}", notification.getProfileId());
+        log.info("=== STARTING WHATSAPP DELIVERY ===");
+        log.info("Notification ID: {}", notification.getId());
+        log.info("Profile ID: {}", notification.getProfileId());
 
         try {
+            log.info("=== RETRIEVING PHONE NUMBER FOR PROFILE ===");
             String phone = externalProfileService.getProfilePhoneNumber(notification.getProfileId());
-            log.debug("Retrieved phone: {} for profile: {}", phone, notification.getProfileId());
+            log.info("Retrieved phone: {} for profile: {}", phone, notification.getProfileId());
 
             String message = notification.getTitle() + "\n\n" + notification.getMessage();
+            log.info("=== PREPARING WHATSAPP MESSAGE ===");
+            log.info("Final message to send: {}", message);
+            
+            log.info("=== CALLING WHATSAPP SERVICE ===");
             whatsAppNotificationService.sendWhatsApp(phone, message);
 
             notification.markAsDelivered();
+            log.info("=== WHATSAPP NOTIFICATION MARKED AS DELIVERED ===");
 
-            log.info("WhatsApp notification {} delivered successfully to profile: {} ({})",
+            log.info("=== WHATSAPP NOTIFICATION DELIVERED SUCCESSFULLY ===");
+            log.info("Notification ID: {}, Profile: {}, Phone: {}", 
                     notification.getId(), notification.getProfileId(), phone);
 
         } catch (Exception e) {
-            log.error("Failed to send WhatsApp notification {} to profile: {}: {}",
+            log.error("=== ERROR SENDING WHATSAPP NOTIFICATION ===");
+            log.error("Notification ID: {}, Profile: {}, Error: {}", 
                     notification.getId(), notification.getProfileId(), e.getMessage(), e);
             throw e;
         }

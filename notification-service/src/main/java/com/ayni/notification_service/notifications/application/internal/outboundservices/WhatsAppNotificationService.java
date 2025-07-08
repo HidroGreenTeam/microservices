@@ -1,12 +1,13 @@
 package com.ayni.notification_service.notifications.application.internal.outboundservices;
 
-import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.type.PhoneNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 
 /**
  * WhatsApp Notification Service using Twilio
@@ -30,10 +31,18 @@ public class WhatsAppNotificationService {
      */
     public void sendWhatsApp(String to, String message) {
         try {
+            log.info("=== INITIALIZING TWILIO WHATSAPP SERVICE ===");
+            log.info("Account SID: {}", accountSid != null ? accountSid.substring(0, Math.min(10, accountSid.length())) + "..." : "NULL");
+            log.info("Auth Token: {}", authToken != null && !authToken.isEmpty() ? "[SET]" : "NOT SET");
+            log.info("From Number: {}", fromNumber);
+            log.info("To Number: {}", to);
+            log.info("Message: {}", message);
+            
             // Initialize Twilio
             Twilio.init(accountSid, authToken);
+            log.info("Twilio initialized successfully");
             
-            log.info("Sending WhatsApp message to: {}", to);
+            log.info("=== SENDING WHATSAPP MESSAGE VIA TWILIO ===");
             
             // Create WhatsApp message
             Message twilioMessage = Message.creator(
@@ -42,10 +51,15 @@ public class WhatsAppNotificationService {
                 message
             ).create();
             
-            log.info("WhatsApp message sent successfully to: {} with SID: {}", to, twilioMessage.getSid());
+            log.info("=== WHATSAPP MESSAGE SENT SUCCESSFULLY ===");
+            log.info("Message SID: {}", twilioMessage.getSid());
+            log.info("Message Status: {}", twilioMessage.getStatus());
+            log.info("To: {}", to);
             
         } catch (Exception e) {
-            log.error("Failed to send WhatsApp message to {}: {}", to, e.getMessage(), e);
+            log.error("=== ERROR SENDING WHATSAPP MESSAGE ===");
+            log.error("To: {}, Error: {}", to, e.getMessage(), e);
+            log.error("Full stack trace:", e);
             throw new RuntimeException("Failed to send WhatsApp message", e);
         }
     }
