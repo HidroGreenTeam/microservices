@@ -1,19 +1,33 @@
 package com.hidrogreen.treatment_service.treatment.interfaces.rest;
 
-import com.hidrogreen.treatment_service.treatment.domain.services.TreatmentCommandService;
-import com.hidrogreen.treatment_service.treatment.domain.services.TreatmentQueryService;
-import com.hidrogreen.treatment_service.treatment.domain.model.aggregates.Treatment;
-import com.hidrogreen.treatment_service.treatment.domain.model.entities.TreatmentStep;
-import com.hidrogreen.treatment_service.treatment.domain.exceptions.TreatmentNotFoundException;
-import com.hidrogreen.treatment_service.treatment.domain.exceptions.TreatmentStepNotFoundException;
-import com.hidrogreen.treatment_service.treatment.interfaces.rest.resources.*;
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.time.ZoneId;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hidrogreen.treatment_service.treatment.domain.exceptions.TreatmentNotFoundException;
+import com.hidrogreen.treatment_service.treatment.domain.exceptions.TreatmentStepNotFoundException;
+import com.hidrogreen.treatment_service.treatment.domain.model.aggregates.Treatment;
+import com.hidrogreen.treatment_service.treatment.domain.model.entities.TreatmentStep;
+import com.hidrogreen.treatment_service.treatment.domain.services.TreatmentCommandService;
+import com.hidrogreen.treatment_service.treatment.domain.services.TreatmentQueryService;
+import com.hidrogreen.treatment_service.treatment.interfaces.rest.resources.CreateTreatmentStepRequest;
+import com.hidrogreen.treatment_service.treatment.interfaces.rest.resources.TreatmentResponse;
+import com.hidrogreen.treatment_service.treatment.interfaces.rest.resources.TreatmentStepResponse;
+
+import jakarta.validation.Valid;
 
 /**
  * REST Controller for managing Treatments and their Activities
@@ -22,6 +36,8 @@ import java.time.ZoneId;
 @RequestMapping("/api/v1/treatments")
 @CrossOrigin(origins = "*")
 public class TreatmentController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TreatmentController.class);
 
     private final TreatmentCommandService commandService;
     private final TreatmentQueryService queryService;
@@ -35,17 +51,32 @@ public class TreatmentController {
     public ResponseEntity<TreatmentStepResponse> createStep(
             @PathVariable Long treatmentId,
             @Valid @RequestBody CreateTreatmentStepRequest request) {
-        Treatment treatment = commandService.addStep(
-            treatmentId,
-            request.name(),
-            request.description(),
-            request.scheduledDate(),
-            request.hasReminder(),
-            request.reminderMinutesBefore()
-        );
+        try {
+            Treatment treatment = commandService.addStep(
+                treatmentId,
+                request.name(),
+                request.description(),
+                request.scheduledDate(),
+                request.hasReminder(),
+                request.reminderMinutesBefore()
+            );
 
-        TreatmentStep step = treatment.getSteps().get(treatment.getSteps().size() - 1);
-        return ResponseEntity.ok(convertToStepResponse(step));
+            TreatmentStep step = treatment.getSteps().get(treatment.getSteps().size() - 1);
+            
+            logger.info("=== TREATMENT STEP CREADO EXITOSAMENTE ===");
+            logger.info("Step ID: {}", step.getId());
+            logger.info("Step Status: {}", step.getStatus());
+            logger.info("Step Created At: {}", step.getCreatedAt());
+            logger.info("Step Has Reminder: {}", step.isHasReminder());
+            
+            TreatmentStepResponse response = convertToStepResponse(step);
+            logger.info("Returning response with step ID: {}", response.getId());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("ERROR CREANDO TREATMENT STEP: ", e);
+            throw e;
+        }
     }
 
     @GetMapping("/{treatmentId}/steps")

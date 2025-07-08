@@ -1,12 +1,12 @@
 package com.hidrogreen.treatment_service.shared.infrastructure.messaging.services;
-
-import com.hidrogreen.treatment_service.shared.infrastructure.messaging.dto.TreatmentReminderMessage;
-import com.hidrogreen.treatment_service.treatment.domain.model.entities.TreatmentStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.hidrogreen.treatment_service.shared.infrastructure.messaging.dto.TreatmentReminderMessage;
+import com.hidrogreen.treatment_service.treatment.domain.model.entities.TreatmentStep;
 
 @Service
 public class ReminderService {

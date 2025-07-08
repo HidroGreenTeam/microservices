@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.hidrogreen.treatment_service.treatment.domain.model.entities.TreatmentStep;
@@ -19,4 +20,7 @@ public interface TreatmentStepRepository extends JpaRepository<TreatmentStep, Lo
         TreatmentStepStatus status, 
         LocalDateTime reminderTime
     );
+    
+    @Query("SELECT ts FROM TreatmentStep ts JOIN FETCH ts.treatment WHERE ts.hasReminder = true")
+    List<TreatmentStep> findByHasReminderTrueWithTreatment();
 }
