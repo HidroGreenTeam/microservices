@@ -1,6 +1,5 @@
 package com.hidrogreen.treatment_service.treatment.interfaces.rest.resources;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -14,7 +13,6 @@ public record CreateTreatmentStepRequest(
     String description,
 
     @NotNull(message = "Scheduled date is required")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime scheduledDate,
 
     boolean hasReminder,

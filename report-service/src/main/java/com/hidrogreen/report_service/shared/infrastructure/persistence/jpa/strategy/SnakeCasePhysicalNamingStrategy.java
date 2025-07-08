@@ -1,4 +1,4 @@
-package com.hidrogreen.report_service.shared.infrastructure.persistance.jpa.strategy;
+package com.hidrogreen.report_service.shared.infrastructure.persistence.jpa.strategy;
 
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
