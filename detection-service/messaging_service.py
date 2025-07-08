@@ -14,7 +14,7 @@ class MessagingService:
         self.rabbitmq_user = os.getenv("RABBITMQ_USER", "guest")
         self.rabbitmq_password = os.getenv("RABBITMQ_PASSWORD", "guest")
         self.user_service_url = os.getenv("USER_SERVICE_URL", "http://user-service:8081")
-        self.rabbitmq_virtual_host = os.getenv("RABBITMQ_VIRTUAL_HOST", "ticlkyrw")
+        self.rabbitmq_virtual_host = os.getenv("RABBITMQ_VIRTUAL_HOST", "/")
 
         self.connection = None
         self.channel = None

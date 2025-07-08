@@ -25,7 +25,7 @@ load_dotenv()  # Carga las variables de entorno desde el archivo .env
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-MODEL_PATH = os.path.join("model", "model-8678.keras")
+MODEL_PATH = os.path.join("model", "model-91840.keras")
 model = load_model(MODEL_PATH)
 
 class_names = ['miner', 'nodisease', 'phoma', 'redspider', 'rust']
@@ -69,7 +69,7 @@ async def predict(file: UploadFile = File(...)):
     try:
         contents = await file.read()
         img = Image.open(io.BytesIO(contents)).convert("RGB")
-        img = img.resize((300, 300))
+        img = img.resize((224, 224))
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0) / 255.0
 
@@ -117,7 +117,7 @@ async def diagnose(
         await file.seek(0)  # Resetear el puntero del archivo
         contents = await file.read()
         img = Image.open(io.BytesIO(contents)).convert("RGB")
-        img = img.resize((300, 300))
+        img = img.resize((224, 224))
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0) / 255.0
 

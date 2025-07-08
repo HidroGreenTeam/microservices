@@ -144,6 +144,7 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=guest
       - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_VIRTUAL_HOST=/
       - USER_SERVICE_URL=http://user-service:8081
       - DATABASE_URL=mysql+pymysql://root:root@mysql-db:3306/ayni
     depends_on:
