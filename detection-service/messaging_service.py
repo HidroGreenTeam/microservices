@@ -14,7 +14,8 @@ class MessagingService:
         self.rabbitmq_user = os.getenv("RABBITMQ_USER", "guest")
         self.rabbitmq_password = os.getenv("RABBITMQ_PASSWORD", "guest")
         self.user_service_url = os.getenv("USER_SERVICE_URL", "http://user-service:8081")
-        
+        self.rabbitmq_virtual_host = os.getenv("RABBITMQ_VIRTUAL_HOST", "ticlkyrw")
+
         self.connection = None
         self.channel = None
         self.setup_connection_with_retry()
@@ -46,6 +47,7 @@ class MessagingService:
             parameters = pika.ConnectionParameters(
                 host=self.rabbitmq_host,
                 port=self.rabbitmq_port,
+                virtual_host=self.rabbitmq_virtual_host,
                 credentials=credentials,
                 heartbeat=600,
                 blocked_connection_timeout=300,
