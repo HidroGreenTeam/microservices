@@ -60,12 +60,13 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
             log.info("=== NOTIFICATION SAVED SUCCESSFULLY ===");
             log.info("Saved notification ID: {}", savedNotification.getId());
 
-            log.info("=== STARTING NOTIFICATION DELIVERY ===");
-            deliverNotification(savedNotification);
-            
+            log.info("=== MARKING NOTIFICATION AS SENT ===");
             savedNotification.markAsSent();
             notificationRepository.save(savedNotification);
             savedNotification.publishSentEvent();
+            
+            log.info("=== STARTING NOTIFICATION DELIVERY ===");
+            deliverNotification(savedNotification);
             
             log.info("=== NOTIFICATION PROCESS COMPLETED SUCCESSFULLY ===");
             log.info("Final notification ID: {}", savedNotification.getId());
@@ -118,6 +119,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
             emailNotificationService.sendEmail(email, notification.getTitle(), notification.getMessage());
 
             notification.markAsDelivered();
+            notificationRepository.save(notification);
 
             log.info("Email notification {} delivered successfully to profile: {} ({})",
                     notification.getId(), notification.getProfileId(), email);
@@ -148,8 +150,9 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
             
             log.info("=== CALLING WHATSAPP SERVICE ===");
             whatsAppNotificationService.sendWhatsApp(phone, message);
-
+            
             notification.markAsDelivered();
+            notificationRepository.save(notification);
             log.info("=== WHATSAPP NOTIFICATION MARKED AS DELIVERED ===");
 
             log.info("=== WHATSAPP NOTIFICATION DELIVERED SUCCESSFULLY ===");

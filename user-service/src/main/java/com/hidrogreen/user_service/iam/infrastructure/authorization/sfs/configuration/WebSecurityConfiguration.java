@@ -1,8 +1,7 @@
 package com.hidrogreen.user_service.iam.infrastructure.authorization.sfs.configuration;
 
-import com.hidrogreen.user_service.iam.infrastructure.authorization.sfs.pipeline.BearerAuthorizationRequestFilter;
-import com.hidrogreen.user_service.iam.infrastructure.hashing.bcrypt.BCryptHashingService;
-import com.hidrogreen.user_service.iam.infrastructure.tokens.jwt.BearerTokenService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +18,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import java.util.List;
+import com.hidrogreen.user_service.iam.infrastructure.authorization.sfs.pipeline.BearerAuthorizationRequestFilter;
+import com.hidrogreen.user_service.iam.infrastructure.hashing.bcrypt.BCryptHashingService;
+import com.hidrogreen.user_service.iam.infrastructure.tokens.jwt.BearerTokenService;
 
 @Configuration
 @EnableMethodSecurity
@@ -84,7 +85,12 @@ public class WebSecurityConfiguration {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
-                                "/webjars/**").permitAll()
+                                "/webjars/**",
+                                // Microservice communication endpoints - no authentication required
+                                "/api/v1/farmers/*/email",
+                                "/api/v1/farmers/*/phone", 
+                                "/api/v1/farmers/*/name",
+                                "/api/v1/farmers/*/exists").permitAll()
                         .anyRequest().authenticated());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authorizationRequestFilter(), UsernamePasswordAuthenticationFilter.class);

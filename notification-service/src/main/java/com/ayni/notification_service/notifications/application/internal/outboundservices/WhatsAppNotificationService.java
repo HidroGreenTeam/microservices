@@ -44,17 +44,38 @@ public class WhatsAppNotificationService {
             
             log.info("=== SENDING WHATSAPP MESSAGE VIA TWILIO ===");
             
-            // Create WhatsApp message
-            Message twilioMessage = Message.creator(
-                new PhoneNumber("whatsapp:" + to),
-                new PhoneNumber(fromNumber),
-                message
-            ).create();
-            
-            log.info("=== WHATSAPP MESSAGE SENT SUCCESSFULLY ===");
-            log.info("Message SID: {}", twilioMessage.getSid());
-            log.info("Message Status: {}", twilioMessage.getStatus());
-            log.info("To: {}", to);
+            try {
+                // Create WhatsApp message
+                Message twilioMessage = Message.creator(
+                    new PhoneNumber("whatsapp:" + to),
+                    new PhoneNumber(fromNumber),
+                    message
+                ).create();
+                
+                log.info("=== WHATSAPP MESSAGE SENT SUCCESSFULLY ===");
+                log.info("Message SID: {}", twilioMessage.getSid());
+                log.info("Message Status: {}", twilioMessage.getStatus());
+                log.info("To: {}", to);
+                
+            } catch (com.twilio.exception.ApiException apiEx) {
+                if (apiEx.getMessage().contains("Channel with the specified From address")) {
+                    log.warn("=== WHATSAPP CHANNEL NOT CONFIGURED, FALLING BACK TO SMS ===");
+                    log.warn("WhatsApp number {} not configured in Twilio, sending SMS instead", fromNumber);
+                    
+                    // Fallback to SMS
+                    Message smsMessage = Message.creator(
+                        new PhoneNumber(to),
+                        new PhoneNumber(fromNumber.replace("whatsapp:", "")),
+                        "SMS: " + message
+                    ).create();
+                    
+                    log.info("=== SMS SENT SUCCESSFULLY AS FALLBACK ===");
+                    log.info("SMS SID: {}", smsMessage.getSid());
+                    log.info("SMS Status: {}", smsMessage.getStatus());
+                } else {
+                    throw apiEx;
+                }
+            }
             
         } catch (Exception e) {
             log.error("=== ERROR SENDING WHATSAPP MESSAGE ===");
