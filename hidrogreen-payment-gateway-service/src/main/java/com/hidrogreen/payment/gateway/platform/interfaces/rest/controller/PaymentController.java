@@ -19,7 +19,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/payments") 
-@CrossOrigin("http://localhost:8086") 
+// Removed @CrossOrigin to delegate CORS handling to API Gateway
 public class PaymentController {
 
   private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);

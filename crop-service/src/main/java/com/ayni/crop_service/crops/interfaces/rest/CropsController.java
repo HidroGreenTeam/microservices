@@ -35,7 +35,6 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/api/v1/crops", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Crops", description = "Crop Management API")
-@CrossOrigin(origins = "*")
 public class CropsController {
 
     private final CropCommandService cropCommandService;

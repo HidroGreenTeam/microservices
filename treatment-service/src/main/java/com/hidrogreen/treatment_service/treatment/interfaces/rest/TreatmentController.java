@@ -34,7 +34,6 @@ import jakarta.validation.Valid;
  */
 @RestController
 @RequestMapping("/api/v1/treatments")
-@CrossOrigin(origins = "*")
 public class TreatmentController {
 
     private static final Logger logger = LoggerFactory.getLogger(TreatmentController.class);

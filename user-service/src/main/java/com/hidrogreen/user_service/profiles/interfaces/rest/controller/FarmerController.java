@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "api/v1/farmers", produces = "application/json")
 @Tag(name = "Farmers", description = "Farmers API")
-@CrossOrigin(origins = "*")
 public class FarmerController {
 
     private final FarmerCommandService farmerCommandService;
