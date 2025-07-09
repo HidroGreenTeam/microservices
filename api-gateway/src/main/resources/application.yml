@@ -3,22 +3,21 @@ spring:
     name: api-gateway
   cloud:
     gateway:
-      # Commenting out global CORS configuration to avoid duplicate headers
-      # globalcors:
-      #   cors-configurations:
-      #     "[/**]":
-      #       allowedOrigins: "*"
-      #       allowedMethods:
-      #         - GET
-      #         - POST
-      #         - PUT
-      #         - DELETE
-      #         - OPTIONS
-      #         - PATCH
-      #       allowedHeaders: "*"
-      #       allowCredentials: false
-      # default-filters:
-      #   - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders: "*"
+            allowCredentials: false
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
 
 server:
   port: 8080
