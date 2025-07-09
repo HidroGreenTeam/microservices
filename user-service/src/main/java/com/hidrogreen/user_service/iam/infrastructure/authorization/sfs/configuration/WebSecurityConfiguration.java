@@ -1,7 +1,5 @@
 package com.hidrogreen.user_service.iam.infrastructure.authorization.sfs.configuration;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
 
 import com.hidrogreen.user_service.iam.infrastructure.authorization.sfs.pipeline.BearerAuthorizationRequestFilter;
 import com.hidrogreen.user_service.iam.infrastructure.hashing.bcrypt.BCryptHashingService;
@@ -63,15 +60,6 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // CORS default configuration
-        http.cors(configurer -> configurer.configurationSource(source -> {
-            var cors = new CorsConfiguration();
-            cors.setAllowedOriginPatterns(List.of("*"));
-            cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
-            cors.setAllowedHeaders(List.of("*"));
-            cors.setAllowCredentials(true);
-            return cors;
-        }));
 
         // CSRF disabled
         http.csrf(csrfConfigurer -> csrfConfigurer.disable());
