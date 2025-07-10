@@ -30,8 +30,8 @@ async def lifespan(app: FastAPI):
         logger.info("Base de datos inicializada")
         
         # Configuración básica de Eureka
-        eureka_server = os.getenv("EUREKA_SERVER", "https://discovery-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io/eureka")
-        service_host = os.getenv("EUREKA_INSTANCE_HOSTNAME", "detection-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io")
+        eureka_server = os.getenv("EUREKA_SERVER", "http://discovery-service:8761/eureka")
+        service_host = os.getenv("EUREKA_INSTANCE_HOSTNAME", "detection-service")
         secure_port = int(os.getenv("EUREKA_INSTANCE_SECURE_PORT", "443"))
         
         # Registrar servicio en Eureka con configuración básica
