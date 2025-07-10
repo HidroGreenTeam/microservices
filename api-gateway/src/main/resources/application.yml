@@ -26,12 +26,12 @@ eureka:
   instance:
     hostname: ${EUREKA_INSTANCE_HOSTNAME:api-gateway}
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    securePortEnabled: true
-    nonSecurePortEnabled: false
+    securePortEnabled: false
+    nonSecurePortEnabled: true
     preferIpAddress: false
-    statusPageUrl: https://${eureka.instance.hostname}/actuator/info
-    healthCheckUrl: https://${eureka.instance.hostname}/actuator/health
-    homePageUrl: https://${eureka.instance.hostname}/
+    statusPageUrl: http://${eureka.instance.hostname}:${server.port}/actuator/info
+    healthCheckUrl: http://${eureka.instance.hostname}:${server.port}/actuator/health
+    homePageUrl: http://${eureka.instance.hostname}:${server.port}/
 
 management:
   endpoints:

@@ -44,7 +44,6 @@ services:
       - "8761:8761"
     environment:
       - EUREKA_INSTANCE_HOSTNAME=discovery-service
-      - EUREKA_INSTANCE_SECURE_PORT=443
     networks:
       - hidrogreen-network
     restart: unless-stopped
@@ -59,7 +58,6 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - EUREKA_INSTANCE_HOSTNAME=user-service
-      - EUREKA_INSTANCE_SECURE_PORT=443
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -88,7 +86,6 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - EUREKA_INSTANCE_HOSTNAME=treatment-service
-      - EUREKA_INSTANCE_SECURE_PORT=443
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -116,7 +113,6 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - EUREKA_INSTANCE_HOSTNAME=crop-service
-      - EUREKA_INSTANCE_SECURE_PORT=443
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -144,7 +140,7 @@ services:
       # Eureka Service Discovery
       - EUREKA_SERVER=http://discovery-service:8761/eureka/
       - EUREKA_INSTANCE_HOSTNAME=detection-service
-      - EUREKA_INSTANCE_SECURE_PORT=443
+      - SERVICE_PORT=8000
       # RabbitMQ Configuration
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
@@ -189,7 +185,6 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - EUREKA_INSTANCE_HOSTNAME=report-service
-      - EUREKA_INSTANCE_SECURE_PORT=443
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -215,7 +210,6 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - EUREKA_INSTANCE_HOSTNAME=notification-service
-      - EUREKA_INSTANCE_SECURE_PORT=443
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -249,7 +243,6 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - EUREKA_INSTANCE_HOSTNAME=subscription-service
-      - EUREKA_INSTANCE_SECURE_PORT=443
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/ayni?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC # Cambiar 3307 por 3306
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
@@ -277,7 +270,6 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - EUREKA_INSTANCE_HOSTNAME=payment-gateway-service
-      - EUREKA_INSTANCE_SECURE_PORT=443
     depends_on:
       - discovery-service
     networks:
@@ -294,7 +286,6 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://discovery-service:8761/eureka
       - EUREKA_INSTANCE_HOSTNAME=api-gateway
-      - EUREKA_INSTANCE_SECURE_PORT=443
     depends_on:
       - discovery-service
     networks:
