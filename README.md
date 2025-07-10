@@ -194,3 +194,17 @@ Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) par
 ---
 
 🌱 **HidroGreen** - Innovando en agricultura hidropónica con tecnología de vanguardia
+
+
+
+## UPDATE ALL TO AZURE
+docker build -t aynicontainer.azurecr.io/discovery-service:latest ./discovery-service; docker push aynicontainer.azurecr.io/discovery-service:latest;
+docker build -t aynicontainer.azurecr.io/api-gateway:latest ./api-gateway; docker push aynicontainer.azurecr.io/api-gateway:latest;
+docker build -t aynicontainer.azurecr.io/crop-service:latest ./crop-service; docker push aynicontainer.azurecr.io/crop-service:latest;
+docker build -t aynicontainer.azurecr.io/detection-service:latest ./detection-service; docker push aynicontainer.azurecr.io/detection-service:latest;
+docker build -t aynicontainer.azurecr.io/payment-gateway-serivce:latest ./hidrogreen-payment-gateway-service; docker push aynicontainer.azurecr.io/payment-gateway-serivce:latest;
+docker build -t aynicontainer.azurecr.io/notification-service:latest ./notification-service; docker push aynicontainer.azurecr.io/notification-service:latest;
+docker build -t aynicontainer.azurecr.io/report-service:latest ./report-service; docker push aynicontainer.azurecr.io/report-service:latest;
+docker build -t aynicontainer.azurecr.io/subscription-service:latest ./subscription-service; docker push aynicontainer.azurecr.io/subscription-service:latest;
+docker build -t aynicontainer.azurecr.io/treatment-service:latest ./treatment-service; docker push aynicontainer.azurecr.io/treatment-service:latest;
+docker build -t aynicontainer.azurecr.io/user-service:latest ./user-service; docker push aynicontainer.azurecr.io/user-service:latest;
