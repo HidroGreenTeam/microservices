@@ -8,6 +8,7 @@ from py_eureka_client import eureka_client
 
 from .infrastructure.config.database_config import database_config
 from .infrastructure.config.dependency_injection import dependency_container
+from .infrastructure.config.eureka_config import EurekaConfig
 from .interfaces.rest.detection_controller import router as detection_router
 from .interfaces.rest.health_controller import router as health_router
 
@@ -19,10 +20,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Configuración de Eureka
-EUREKA_SERVER = os.getenv("EUREKA_SERVER", "https://discovery-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io/eureka")
 SERVICE_PORT = 8000
-SERVICE_HOST = os.getenv("EUREKA_INSTANCE_HOSTNAME", "detection-service.thankfulwater-e8adfc7e.eastus.azurecontainerapps.io")
-SERVICE_SECURE_PORT = int(os.getenv("EUREKA_INSTANCE_SECURE_PORT", "443"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -32,18 +30,12 @@ async def lifespan(app: FastAPI):
         database_config.create_tables()
         logger.info("Base de datos inicializada")
         
+        # Obtener configuración de Eureka
+        eureka_config = EurekaConfig.get_eureka_config()
+        
         # Registrar servicio en Eureka
-        await eureka_client.init_async(
-            eureka_server=EUREKA_SERVER,
-            app_name="detection-service",
-            instance_host=SERVICE_HOST,
-            instance_port=SERVICE_SECURE_PORT,
-            instance_secure_port_enabled=True,
-            home_page_url=f"https://{SERVICE_HOST}/",
-            status_page_url=f"https://{SERVICE_HOST}/api/v1/health",
-            health_check_url=f"https://{SERVICE_HOST}/api/v1/health",
-        )
-        logger.info("Servicio registrado en Eureka")
+        await eureka_client.init_async(**eureka_config)
+        logger.info(f"Servicio registrado en Eureka con hostname: {eureka_config['instance_host']}")
         
         yield
         
