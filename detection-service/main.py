@@ -19,6 +19,8 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 import time
 
+TAM_IMG = 480
+
 load_dotenv()  # Carga las variables de entorno desde el archivo .env
 
 # Configurar logging
@@ -69,7 +71,7 @@ async def predict(file: UploadFile = File(...)):
     try:
         contents = await file.read()
         img = Image.open(io.BytesIO(contents)).convert("RGB")
-        img = img.resize((224, 224))
+        img = img.resize((TAM_IMG, TAM_IMG))
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0) / 255.0
 
@@ -117,7 +119,7 @@ async def diagnose(
         await file.seek(0)  # Resetear el puntero del archivo
         contents = await file.read()
         img = Image.open(io.BytesIO(contents)).convert("RGB")
-        img = img.resize((224, 224))
+        img = img.resize((TAM_IMG, TAM_IMG))
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0) / 255.0
 
