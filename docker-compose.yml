@@ -162,6 +162,10 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
+      user-service:
+        condition: service_started
+      api-gateway:
+        condition: service_started
     networks:
       - hidrogreen-network
     restart: unless-stopped
