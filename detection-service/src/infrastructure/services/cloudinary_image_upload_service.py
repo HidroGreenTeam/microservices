@@ -4,15 +4,17 @@ import cloudinary.api
 import os
 import logging
 from typing import Optional, Dict, Any
-from io import BytesIO
 from fastapi import UploadFile
 
-# Configurar logging
+from ...infrastructure.services.image_upload_service import ImageUploadService
+
 logger = logging.getLogger(__name__)
 
-class CloudinaryService:
+class CloudinaryImageUploadService(ImageUploadService):
+    """Implementación del servicio de subida de imágenes usando Cloudinary"""
+    
     def __init__(self):
-        # Configurar Cloudinary con las credenciales proporcionadas
+        # Configurar Cloudinary con las credenciales
         cloudinary.config(
             cloud_name="deu4nwmqh",
             api_key="789752667392435",
@@ -59,7 +61,7 @@ class CloudinaryService:
             logger.error(f"Error al subir imagen a Cloudinary: {e}")
             return None
     
-    def delete_image(self, public_id: str) -> bool:
+    async def delete_image(self, public_id: str) -> bool:
         """
         Elimina una imagen de Cloudinary
         
@@ -77,7 +79,7 @@ class CloudinaryService:
             logger.error(f"Error al eliminar imagen de Cloudinary: {e}")
             return False
     
-    def get_image_info(self, public_id: str) -> Optional[Dict[str, Any]]:
+    async def get_image_info(self, public_id: str) -> Optional[Dict[str, Any]]:
         """
         Obtiene información de una imagen de Cloudinary
         
@@ -92,7 +94,4 @@ class CloudinaryService:
             return result
         except Exception as e:
             logger.error(f"Error al obtener información de imagen: {e}")
-            return None
-
-# Instancia singleton del servicio
-cloudinary_service = CloudinaryService()
+            return None 

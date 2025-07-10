@@ -138,23 +138,39 @@ services:
     ports:
       - "8000:8000"
     environment:
+      # Eureka Service Discovery
       - EUREKA_SERVER=http://discovery-service:8761/eureka/
-      - SERVICE_HOST=detection-service
+      - EUREKA_INSTANCE_HOSTNAME=detection-service
+      - EUREKA_INSTANCE_SECURE_PORT=443
+      # RabbitMQ Configuration
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_USER=guest
       - RABBITMQ_PASSWORD=guest
       - RABBITMQ_VIRTUAL_HOST=/
-      - USER_SERVICE_URL=http://user-service:8081
+      # Database Configuration
       - DATABASE_URL=mysql+pymysql://root:root@mysql-db:3306/ayni
+      # External Services
+      - USER_SERVICE_URL=http://user-service:8081
+      # Python Configuration
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
     depends_on:
-      - mysql-db
-      - discovery-service
-      - rabbitmq
-      - user-service
+      mysql-db:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - hidrogreen-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   report-service:
     build:

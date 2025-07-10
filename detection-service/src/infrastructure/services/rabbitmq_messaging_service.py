@@ -3,17 +3,21 @@ import json
 import os
 import logging
 from typing import Dict, Any
-import requests
 from datetime import datetime
 import time
 
-class MessagingService:
+from ...infrastructure.services.messaging_service import MessagingService
+
+logger = logging.getLogger(__name__)
+
+class RabbitMQMessagingService(MessagingService):
+    """Implementación del servicio de mensajería usando RabbitMQ"""
+    
     def __init__(self):
         self.rabbitmq_host = os.getenv("RABBITMQ_HOST", "rabbitmq")
         self.rabbitmq_port = int(os.getenv("RABBITMQ_PORT", "5672"))
         self.rabbitmq_user = os.getenv("RABBITMQ_USER", "guest")
         self.rabbitmq_password = os.getenv("RABBITMQ_PASSWORD", "guest")
-        self.user_service_url = os.getenv("USER_SERVICE_URL", "http://user-service:8081")
         self.rabbitmq_virtual_host = os.getenv("RABBITMQ_VIRTUAL_HOST", "/")
 
         self.connection = None
@@ -24,24 +28,24 @@ class MessagingService:
         """Establece conexión con RabbitMQ con reintentos"""
         for attempt in range(max_retries):
             try:
-                logging.info(f"=== INTENTO DE CONEXIÓN {attempt + 1}/{max_retries} ===")
+                logger.info(f"=== INTENTO DE CONEXIÓN {attempt + 1}/{max_retries} ===")
                 self.setup_connection()
                 if self.connection and self.channel:
-                    logging.info("✅ Conexión establecida exitosamente")
+                    logger.info("✅ Conexión establecida exitosamente")
                     return
             except Exception as e:
-                logging.warning(f"❌ Intento {attempt + 1} falló: {e}")
+                logger.warning(f"❌ Intento {attempt + 1} falló: {e}")
                 if attempt < max_retries - 1:
-                    logging.info(f"⏳ Esperando {delay} segundos antes del siguiente intento...")
+                    logger.info(f"⏳ Esperando {delay} segundos antes del siguiente intento...")
                     time.sleep(delay)
                 else:
-                    logging.error("❌ Todos los intentos de conexión fallaron")
+                    logger.error("❌ Todos los intentos de conexión fallaron")
     
     def setup_connection(self):
         """Establece conexión con RabbitMQ"""
         try:
-            logging.info("=== CONFIGURANDO CONEXIÓN RABBITMQ ===")
-            logging.info("Host: %s, Port: %s, User: %s", self.rabbitmq_host, self.rabbitmq_port, self.rabbitmq_user)
+            logger.info("=== CONFIGURANDO CONEXIÓN RABBITMQ ===")
+            logger.info("Host: %s, Port: %s, User: %s", self.rabbitmq_host, self.rabbitmq_port, self.rabbitmq_user)
             
             credentials = pika.PlainCredentials(self.rabbitmq_user, self.rabbitmq_password)
             parameters = pika.ConnectionParameters(
@@ -55,32 +59,30 @@ class MessagingService:
                 retry_delay=5
             )
             
-            logging.info("Conectando a RabbitMQ...")
+            logger.info("Conectando a RabbitMQ...")
             self.connection = pika.BlockingConnection(parameters)
             self.channel = self.connection.channel()
             
             # Declarar la cola para diagnósticos
-            logging.info("Declarando cola 'diagnosis_queue'...")
+            logger.info("Declarando cola 'diagnosis_queue'...")
             self.channel.queue_declare(queue='diagnosis_queue', durable=True)
             
-            logging.info("✅ Conexión establecida con RabbitMQ exitosamente")
+            logger.info("✅ Conexión establecida con RabbitMQ exitosamente")
         except Exception as e:
-            logging.error("❌ Error conectando a RabbitMQ: %s", e)
+            logger.error("❌ Error conectando a RabbitMQ: %s", e)
             self.connection = None
             self.channel = None
             raise e
     
-
-    
-    def send_diagnosis_message(self, diagnosis_data: Dict[str, Any]):
+    def send_diagnosis_message(self, diagnosis_data: Dict[str, Any]) -> bool:
         """Envía mensaje de diagnóstico a la cola de RabbitMQ"""
         if not self.channel:
-            logging.error("❌ No hay conexión con RabbitMQ")
+            logger.error("❌ No hay conexión con RabbitMQ")
             return False
         
         try:
-            logging.info("=== ENVIANDO MENSAJE DE DIAGNÓSTICO ===")
-            logging.info("Datos de diagnóstico: %s", diagnosis_data)
+            logger.info("=== ENVIANDO MENSAJE DE DIAGNÓSTICO ===")
+            logger.info("Datos de diagnóstico: %s", diagnosis_data)
             
             # Preparar el mensaje
             message = {
@@ -95,7 +97,7 @@ class MessagingService:
                 "requires_treatment": diagnosis_data.get('requires_treatment', False)
             }
             
-            logging.info("Mensaje preparado: %s", message)
+            logger.info("Mensaje preparado: %s", message)
             
             # Enviar mensaje
             self.channel.basic_publish(
@@ -108,18 +110,15 @@ class MessagingService:
                 )
             )
             
-            logging.info("✅ Mensaje de diagnóstico enviado exitosamente: %s", diagnosis_data.get('diagnosis_id'))
+            logger.info("✅ Mensaje de diagnóstico enviado exitosamente: %s", diagnosis_data.get('diagnosis_id'))
             return True
             
         except Exception as e:
-            logging.error("❌ Error enviando mensaje de diagnóstico: %s", e)
+            logger.error("❌ Error enviando mensaje de diagnóstico: %s", e)
             return False
     
     def close_connection(self):
         """Cierra la conexión con RabbitMQ"""
         if self.connection and not self.connection.is_closed:
             self.connection.close()
-            logging.info("Conexión con RabbitMQ cerrada")
-
-# Instancia global del servicio de mensajería
-messaging_service = MessagingService() 
+            logger.info("Conexión con RabbitMQ cerrada") 

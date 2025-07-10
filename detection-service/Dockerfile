@@ -1,10 +1,10 @@
-# Use Python 3.12 slim image as base
+# Usar imagen base de Python 3.12
 FROM python:3.12-slim
 
-# Set working directory
+# Establecer directorio de trabajo
 WORKDIR /app
 
-# Install system dependencies required for TensorFlow, MySQL and other packages
+# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
@@ -16,37 +16,32 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Poetry
-RUN pip install poetry
-
-# Copy Poetry configuration files
+# Copiar archivos de configuración
 COPY pyproject.toml poetry.lock ./
 
-# Configure Poetry to not create virtual environment (since we're in a container)
+# Instalar Poetry
+RUN pip install poetry
+
+# Configurar Poetry para no crear entorno virtual
 RUN poetry config virtualenvs.create false
 
-# Regenerate lock file and install dependencies
-RUN poetry lock && poetry install --only=main --no-interaction --no-ansi
+# Instalar dependencias
+RUN poetry install --only=main
 
-# Copy application code
-COPY . .
+# Copiar código fuente
+COPY src/ ./src/
+COPY model/ ./model/
 
-# Create directory for model if it doesn't exist
-RUN mkdir -p model
-
-# Copy the ML model (if not already copied)
-COPY model/model-8678.keras model/
-
-# Expose port
-EXPOSE 8000
-
-# Set environment variables
+# Establecer variables de entorno
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
+
+# Exponer puerto
+EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/api/v1/health || exit 1
 
-# Run the application
-CMD ["poetry", "run", "fastapi", "run", "main.py", "--host", "0.0.0.0", "--port", "8000"] 
+# Comando para ejecutar la aplicación
+CMD ["python", "-m", "src.main"] 

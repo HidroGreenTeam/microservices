@@ -53,4 +53,15 @@ Thumbs.db
 .gitignore
 
 # Documentation
-README.md 
+README.md
+
+# Development files
+migrate_to_ddd.sh
+env.example
+*.md
+
+# Old files (if they still exist)
+main.py
+database.py
+messaging_service.py
+cloudinary_service.py 
