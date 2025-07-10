@@ -32,20 +32,20 @@ async def lifespan(app: FastAPI):
         # Configuración básica de Eureka
         eureka_server = os.getenv("EUREKA_SERVER", "http://discovery-service:8761/eureka")
         service_host = os.getenv("EUREKA_INSTANCE_HOSTNAME", "detection-service")
-        service_port = int(os.getenv("SERVICE_PORT", "8000"))
+        secure_port = int(os.getenv("EUREKA_INSTANCE_SECURE_PORT", "443"))
         
-        # Registrar servicio en Eureka con configuración básica
+        # Registrar servicio en Eureka con configuración para Azure Container Apps
         await eureka_client.init_async(
             eureka_server=eureka_server,
             app_name="detection-service",
-            instance_host=service_host,  # Asegurar que use el hostname interno
-            instance_port=service_port,  # Usar puerto HTTP interno
-            instance_secure_port_enabled=False,  # Deshabilitar SSL para comunicación interna
-            home_page_url=f"http://{service_host}:{service_port}/",
-            status_page_url=f"http://{service_host}:{service_port}/api/v1/health",
-            health_check_url=f"http://{service_host}:{service_port}/api/v1/health"
+            instance_host=service_host,
+            instance_port=secure_port,
+            instance_secure_port_enabled=True,
+            home_page_url=f"https://{service_host}/",
+            status_page_url=f"https://{service_host}/api/v1/health",
+            health_check_url=f"https://{service_host}/api/v1/health"
         )
-        logger.info(f"Servicio registrado en Eureka con hostname: {service_host} y puerto: {service_port}")
+        logger.info(f"Servicio registrado en Eureka con hostname: {service_host} y puerto seguro: {secure_port}")
         
         yield
         
