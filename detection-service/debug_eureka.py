@@ -31,17 +31,22 @@ def check_eureka_registry():
             
             # Obtener información de las aplicaciones registradas
             apps_data = response.json()
-            print(f"📊 Aplicaciones registradas: {len(apps_data.get('applications', {}).get('application', []))}")
+            applications = apps_data.get('applications', {}).get('application', [])
+            print(f"📊 Aplicaciones registradas: {len(applications)}")
+            
+            # Mostrar todas las aplicaciones
+            for app in applications:
+                print(f"  - {app.get('name')}: {len(app.get('instance', []))} instancias")
             
             # Buscar detection-service
             detection_service = None
-            for app in apps_data.get('applications', {}).get('application', []):
+            for app in applications:
                 if app.get('name') == 'DETECTION-SERVICE':
                     detection_service = app
                     break
             
             if detection_service:
-                print("✅ Detection Service encontrado en Eureka")
+                print("\n✅ Detection Service encontrado en Eureka")
                 instances = detection_service.get('instance', [])
                 print(f"📋 Instancias registradas: {len(instances)}")
                 
@@ -55,7 +60,7 @@ def check_eureka_registry():
                     print(f"URL Home: {instance.get('homePageUrl')}")
                     print(f"URL Health: {instance.get('healthCheckUrl')}")
             else:
-                print("❌ Detection Service NO encontrado en Eureka")
+                print("\n❌ Detection Service NO encontrado en Eureka")
                 
         else:
             print(f"❌ Eureka no está disponible. Status: {response.status_code}")
