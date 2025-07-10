@@ -68,9 +68,12 @@ services:
       - SPRING_JPA_SHOW_SQL=true
       - SPRING_RABBITMQ_HOST=rabbitmq
     depends_on:
-      - mysql-db
-      - rabbitmq
-      - discovery-service
+      discovery-service:
+        condition: service_healthy
+      mysql-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - hidrogreen-network
     restart: unless-stopped
