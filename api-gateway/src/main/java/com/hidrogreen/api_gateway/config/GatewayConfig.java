@@ -87,7 +87,21 @@ public class GatewayConfig {
                 .route("reports", r -> r.path("/api/v1/reports/**")
                         .uri("lb://report-service"))
                 
-                // Detection service routes
+                // Detection service routes - específicas primero
+                .route("detections-statistics", r -> r.path("/api/v1/detections/statistics")
+                        .and().method("GET")
+                        .uri("lb://detection-service"))
+                .route("detections-predict", r -> r.path("/api/v1/detections/predict")
+                        .and().method("POST")
+                        .uri("lb://detection-service"))
+                .route("detections-diagnose", r -> r.path("/api/v1/detections/diagnose")
+                        .and().method("POST")
+                        .uri("lb://detection-service"))
+                .route("detections-detail", r -> r.path("/api/v1/detections/detail/**")
+                        .uri("lb://detection-service"))
+                .route("detections-crop", r -> r.path("/api/v1/detections/crop/**")
+                        .uri("lb://detection-service"))
+                // Ruta genérica para detections (debe ir al final)
                 .route("detections", r -> r.path("/api/v1/detections/**")
                         .uri("lb://detection-service"))
                 

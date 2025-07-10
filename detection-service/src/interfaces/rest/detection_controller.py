@@ -96,30 +96,6 @@ async def create_diagnosis(
         logger.error(f"Error en diagnóstico: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/{farmerId}")
-async def get_farmer_diagnosis_history(farmerId: int, db: Session = Depends(get_db)):
-    """
-    Obtiene el historial de diagnósticos de un farmer/profile
-    """
-    try:
-        # Crear consulta
-        query = GetDiagnosisByProfileQuery(profile_id=farmerId)
-        
-        # Obtener repositorio
-        diagnosis_repository = dependency_container.get_diagnosis_repository(db)
-        
-        # Crear y ejecutar handler
-        handler = GetDiagnosisByProfileHandler(diagnosis_repository)
-        results = await handler.handle(query)
-        
-        return [result.to_dict() for result in results]
-        
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        logger.error(f"Error al obtener historial de diagnósticos: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
 @router.get("/detail/{diagnosisId}")
 async def get_diagnosis_by_id(diagnosisId: int, db: Session = Depends(get_db)):
     """
@@ -193,4 +169,28 @@ async def get_statistics(db: Session = Depends(get_db)):
         
     except Exception as e:
         logger.error(f"Error al obtener estadísticas: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/{farmerId}")
+async def get_farmer_diagnosis_history(farmerId: int, db: Session = Depends(get_db)):
+    """
+    Obtiene el historial de diagnósticos de un farmer/profile
+    """
+    try:
+        # Crear consulta
+        query = GetDiagnosisByProfileQuery(profile_id=farmerId)
+        
+        # Obtener repositorio
+        diagnosis_repository = dependency_container.get_diagnosis_repository(db)
+        
+        # Crear y ejecutar handler
+        handler = GetDiagnosisByProfileHandler(diagnosis_repository)
+        results = await handler.handle(query)
+        
+        return [result.to_dict() for result in results]
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error al obtener historial de diagnósticos: {e}")
         raise HTTPException(status_code=500, detail=str(e)) 

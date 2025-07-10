@@ -3,6 +3,13 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+    loadbalancer:
+      ribbon:
+        enabled: false
+    discovery:
+      locator:
+        enabled: true
+        lower-case-service-id: true
 
 server:
   port: 8080
@@ -11,16 +18,17 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://discovery-service:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
   instance:
     hostname: ${EUREKA_INSTANCE_HOSTNAME:api-gateway}
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    securePortEnabled: true
-    securePort: ${EUREKA_INSTANCE_SECURE_PORT:443}
-    nonSecurePortEnabled: false
+    securePortEnabled: false
+    nonSecurePortEnabled: true
     preferIpAddress: false
-    statusPageUrl: https://${eureka.instance.hostname}/actuator/info
-    healthCheckUrl: https://${eureka.instance.hostname}/actuator/health
-    homePageUrl: https://${eureka.instance.hostname}/
+    statusPageUrl: http://${eureka.instance.hostname}:8080/actuator/info
+    healthCheckUrl: http://${eureka.instance.hostname}:8080/actuator/health
+    homePageUrl: http://${eureka.instance.hostname}:8080/
 
 management:
   endpoints:

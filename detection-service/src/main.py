@@ -37,11 +37,11 @@ async def lifespan(app: FastAPI):
             eureka_server=EUREKA_SERVER,
             app_name="detection-service",
             instance_host=SERVICE_HOST,
-            instance_port=SERVICE_SECURE_PORT,
-            instance_secure_port_enabled=True,
-            home_page_url=f"https://{SERVICE_HOST}/",
-            status_page_url=f"https://{SERVICE_HOST}/api/v1/health",
-            health_check_url=f"https://{SERVICE_HOST}/api/v1/health",
+            instance_port=SERVICE_PORT,
+            instance_secure_port_enabled=False,
+            home_page_url=f"http://{SERVICE_HOST}:{SERVICE_PORT}/",
+            status_page_url=f"http://{SERVICE_HOST}:{SERVICE_PORT}/api/v1/health",
+            health_check_url=f"http://{SERVICE_HOST}:{SERVICE_PORT}/api/v1/health",
         )
         logger.info("Servicio registrado en Eureka")
         

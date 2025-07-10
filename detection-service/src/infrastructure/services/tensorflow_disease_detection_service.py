@@ -3,6 +3,7 @@ import logging
 from typing import List
 import numpy as np
 from PIL import Image
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
@@ -82,7 +83,7 @@ class TensorFlowDiseaseDetectionService(DiseaseDetectionService):
             resized_image = image.resize(target_size)
             
             # Convertir a array y normalizar
-            img_array = image.img_to_array(resized_image)
+            img_array = tf.keras.preprocessing.image.img_to_array(resized_image)
             img_array = np.expand_dims(img_array, axis=0) / 255.0
             
             return img_array
