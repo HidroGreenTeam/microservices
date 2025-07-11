@@ -85,15 +85,27 @@ spring:
             - name: CircuitBreaker
               args:
                 name: payment-service-circuit-breaker
+
+        - id: detection-diagnose-post
+          uri: lb://detection-service
+          predicates:
+            - Path=/api/v1/detections/diagnose
+            - Method=POST
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: detection-diagnose-circuit-breaker
                 fallbackUri: forward:/fallback/service-unavailable
-        # Detection Service (Python)
+                timeout: 600000
+
+        # Ruta general para otros endpoints
         - id: detection-diagnose-service
           uri: lb://detection-service
           predicates:
             - Path=/api/v1/detections/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,PUT,DELETE
           filters:
-            - name: CircuitBreaker
+            - name: Ci  rcuitBreaker
               args:
                 name: detection-diagnose-circuit-breaker
                 fallbackUri: forward:/fallback/service-unavailable
