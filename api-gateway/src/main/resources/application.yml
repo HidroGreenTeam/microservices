@@ -86,26 +86,13 @@ spring:
               args:
                 name: payment-service-circuit-breaker
 
-        - id: detection-diagnose-post
-          uri: lb://detection-service
-          predicates:
-            - Path=/api/v1/detections/diagnose
-            - Method=POST
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: detection-diagnose-circuit-breaker
-                fallbackUri: forward:/fallback/service-unavailable
-                timeout: 600000
-
-        # Ruta general para otros endpoints
         - id: detection-diagnose-service
           uri: lb://detection-service
           predicates:
             - Path=/api/v1/detections/**
-            - Method=GET,PUT,DELETE
+            - Method=GET,PUT,DELETE,POST,PATCH
           filters:
-            - name: Ci  rcuitBreaker
+            - name: CircuitBreaker
               args:
                 name: detection-diagnose-circuit-breaker
                 fallbackUri: forward:/fallback/service-unavailable
@@ -115,10 +102,9 @@ spring:
       ribbon:
         enabled: false
       cache:
-        enabled: false
-      health-check:
         enabled: true
-        interval: 25s
+      health-check:
+        enabled: false
 
 server:
   port: 8080
