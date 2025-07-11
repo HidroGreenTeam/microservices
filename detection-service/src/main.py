@@ -35,7 +35,7 @@ async def lifespan(app: FastAPI):
 
         init_params = {
             "eureka_server": eureka_server,
-            "app_name": "detection-service",
+            "app_name": "DETECTION-SERVICE",
             "instance_host": service_hostname,
             "instance_port": SERVICE_PORT,
             "metadata": {

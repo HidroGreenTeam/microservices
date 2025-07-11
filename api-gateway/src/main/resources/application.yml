@@ -87,7 +87,7 @@ spring:
                 name: payment-service-circuit-breaker
 
         - id: detection-diagnose-service
-          uri: lb://detection-service
+          uri: lb://DETECTION-SERVICE
           predicates:
             - Path=/api/v1/detections/**
             - Method=GET,PUT,DELETE,POST,PATCH
