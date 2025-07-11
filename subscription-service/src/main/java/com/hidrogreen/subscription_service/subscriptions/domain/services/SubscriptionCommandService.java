@@ -4,6 +4,7 @@ import com.hidrogreen.subscription_service.subscriptions.domain.model.aggregates
 import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.CancelSubscriptionCommand;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.CreateSubscriptionCommand;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.RenewSubscriptionCommand;
+import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.ActivateSubscriptionCommand;
 
 import java.util.Optional;
 
@@ -11,4 +12,5 @@ public interface SubscriptionCommandService {
     Optional<Subscription> handle(CreateSubscriptionCommand command);
     Optional<Subscription> handle(CancelSubscriptionCommand command);
     Optional<Subscription> handle(RenewSubscriptionCommand command);
+    Optional<Subscription> handle(ActivateSubscriptionCommand command);
 }

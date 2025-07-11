@@ -4,6 +4,7 @@ import com.hidrogreen.subscription_service.subscriptions.application.internal.ou
 import com.hidrogreen.subscription_service.subscriptions.domain.model.events.SubscriptionCreatedEvent;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.events.SubscriptionCancelledEvent;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.events.SubscriptionRenewedEvent;
+import com.hidrogreen.subscription_service.subscriptions.domain.model.events.SubscriptionActivatedEvent;
 import com.hidrogreen.subscription_service.subscriptions.infrastructure.messaging.dto.SubscriptionNotificationDto;
 import com.hidrogreen.subscription_service.subscriptions.infrastructure.messaging.publisher.SubscriptionNotificationPublisher;
 import org.slf4j.Logger;
@@ -176,6 +177,53 @@ public class SubscriptionEventHandler {
             
         } catch (Exception e) {
             LOGGER.error("Failed to handle subscription renewed event for subscription ID: {}", event.getSubscriptionId(), e);
+        }
+    }
+
+    @EventListener
+    public void handleSubscriptionActivated(SubscriptionActivatedEvent event) {
+        LOGGER.info("Handling subscription activated event for subscription ID: {}", event.getSubscriptionId());
+        
+        try {
+            // Get user information
+            Optional<ExternalUserService.UserInfo> userInfoOpt = externalUserService.getUserById(event.getUserId());
+            
+            String userEmail = "user@example.com"; // Default email
+            String userName = "User";
+            
+            if (userInfoOpt.isPresent()) {
+                ExternalUserService.UserInfo userInfo = userInfoOpt.get();
+                userEmail = userInfo.email();
+                userName = userInfo.firstName() + " " + userInfo.lastName();
+            }
+            
+            // Generate invoice number
+            String invoiceNumber = generateInvoiceNumber(event.getSubscriptionId(), event.getEventTime());
+            
+            // Create notification DTO
+            SubscriptionNotificationDto notification = new SubscriptionNotificationDto();
+            notification.setNotificationType("SUBSCRIPTION_ACTIVATED");
+            notification.setUserId(event.getUserId());
+            notification.setUserEmail(userEmail);
+            notification.setUserName(userName);
+            notification.setSubscriptionId(event.getSubscriptionId());
+            notification.setSubscriptionType(event.getSubscriptionType());
+            notification.setPlanName(event.getPlanName());
+            notification.setPrice(event.getPrice());
+            notification.setCurrency("USD");
+            notification.setEventTime(event.getEventTime());
+            notification.setSubject("¡Suscripción Activada! - HidroGreen");
+            notification.setInvoiceNumber(invoiceNumber);
+            notification.setFeatures(getPlanFeatures(event.getSubscriptionType()));
+            notification.setPaymentReference(event.getPaymentReference());
+            
+            // Publish notification
+            notificationPublisher.publishSubscriptionActivated(notification);
+            
+            LOGGER.info("Successfully handled subscription activated event for subscription ID: {}", event.getSubscriptionId());
+            
+        } catch (Exception e) {
+            LOGGER.error("Failed to handle subscription activated event for subscription ID: {}", event.getSubscriptionId(), e);
         }
     }
 }

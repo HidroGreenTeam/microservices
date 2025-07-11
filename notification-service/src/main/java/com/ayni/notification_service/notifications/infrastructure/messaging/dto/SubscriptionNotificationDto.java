@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.math.BigDecimal;
 
 /**
  * DTO for subscription notification messages
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SubscriptionNotificationDto {
     
     @JsonProperty("notification_type")
@@ -37,7 +40,7 @@ public class SubscriptionNotificationDto {
     private String planName;
     
     @JsonProperty("price")
-    private Double price;
+    private BigDecimal price;
     
     @JsonProperty("start_date")
     private LocalDateTime startDate;
@@ -50,4 +53,16 @@ public class SubscriptionNotificationDto {
     
     @JsonProperty("event_time")
     private LocalDateTime eventTime;
+
+    @JsonProperty("subject")
+    private String subject;
+
+    @JsonProperty("features")
+    private String features;
+
+    @JsonProperty("invoice_number")
+    private String invoiceNumber;
+
+    @JsonProperty("payment_reference")
+    private String paymentReference;
 }

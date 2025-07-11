@@ -4,6 +4,7 @@ import com.hidrogreen.subscription_service.subscriptions.domain.model.aggregates
 import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.CancelSubscriptionCommand;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.CreateSubscriptionCommand;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.RenewSubscriptionCommand;
+import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.ActivateSubscriptionCommand;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.entities.SubscriptionPlan;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.queries.GetAllSubscriptionPlansQuery;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.queries.GetSubscriptionByIdQuery;
@@ -14,6 +15,7 @@ import com.hidrogreen.subscription_service.subscriptions.domain.services.Subscri
 import com.hidrogreen.subscription_service.subscriptions.interfaces.rest.resources.CreateSubscriptionResource;
 import com.hidrogreen.subscription_service.subscriptions.interfaces.rest.resources.SubscriptionPlanResource;
 import com.hidrogreen.subscription_service.subscriptions.interfaces.rest.resources.SubscriptionResource;
+import com.hidrogreen.subscription_service.subscriptions.interfaces.rest.resources.ActivateSubscriptionResource;
 import com.hidrogreen.subscription_service.subscriptions.interfaces.rest.transform.CreateSubscriptionCommandFromResourceAssembler;
 import com.hidrogreen.subscription_service.subscriptions.interfaces.rest.transform.SubscriptionPlanResourceFromEntityAssembler;
 import com.hidrogreen.subscription_service.subscriptions.interfaces.rest.transform.SubscriptionResourceFromEntityAssembler;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/subscriptions")
@@ -126,6 +129,27 @@ public class SubscriptionController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{subscriptionId}/activate")
+    @Operation(summary = "Activate a subscription with payment reference")
+    public ResponseEntity<Object> activateSubscription(@PathVariable Long subscriptionId,
+                                                     @RequestBody ActivateSubscriptionResource resource) {
+        try {
+            // Crear comando directamente con subscriptionId del path y paymentReference del body
+            ActivateSubscriptionCommand command = new ActivateSubscriptionCommand(subscriptionId, resource.getPaymentReference());
+            
+            Optional<Subscription> subscription = subscriptionCommandService.handle(command);
+            if (subscription.isPresent()) {
+                SubscriptionResource subscriptionResource = SubscriptionResourceFromEntityAssembler.toResourceFromEntity(subscription.get());
+                return new ResponseEntity<>(subscriptionResource, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(Map.of("error", "Subscription not found"), HttpStatus.NOT_FOUND);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(Map.of("error", e.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(Map.of("error", "Internal server error: " + e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

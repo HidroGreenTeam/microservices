@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
+import java.util.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -40,8 +40,9 @@ public class SubscriptionMaintenanceScheduler {
 
         try {
             LocalDateTime now = LocalDateTime.now();
-            Date nowAsDate = (Date) Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
-            Date beginningOfTime = (Date) Date.from(LocalDateTime.MIN.atZone(ZoneId.systemDefault()).toInstant());
+            Date nowDate = Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
+            java.sql.Date nowAsDate = new java.sql.Date(nowDate.getTime());
+            java.sql.Date beginningOfTime = new java.sql.Date(0L); // Unix epoch start
 
             // Find active subscriptions that have passed their end date
             List<Subscription> expiredSubscriptions = subscriptionRepository

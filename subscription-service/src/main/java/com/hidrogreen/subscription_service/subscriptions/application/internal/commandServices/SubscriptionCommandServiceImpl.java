@@ -4,22 +4,27 @@ import com.hidrogreen.subscription_service.subscriptions.domain.model.aggregates
 import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.CancelSubscriptionCommand;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.CreateSubscriptionCommand;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.RenewSubscriptionCommand;
+import com.hidrogreen.subscription_service.subscriptions.domain.model.commands.ActivateSubscriptionCommand;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.entities.SubscriptionPlan;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.valueobjects.SubscriptionStatus;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.events.SubscriptionCreatedEvent;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.events.SubscriptionCancelledEvent;
 import com.hidrogreen.subscription_service.subscriptions.domain.model.events.SubscriptionRenewedEvent;
+import com.hidrogreen.subscription_service.subscriptions.domain.model.events.SubscriptionActivatedEvent;
 import com.hidrogreen.subscription_service.subscriptions.domain.services.SubscriptionCommandService;
 import com.hidrogreen.subscription_service.subscriptions.infrastructure.persistence.jpa.repositories.SubscriptionPlanRepository;
 import com.hidrogreen.subscription_service.subscriptions.infrastructure.persistence.jpa.repositories.SubscriptionRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 @Service
 public class SubscriptionCommandServiceImpl implements SubscriptionCommandService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SubscriptionCommandServiceImpl.class);
     private final SubscriptionRepository subscriptionRepository;
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final ApplicationEventPublisher eventPublisher;
@@ -151,6 +156,47 @@ public class SubscriptionCommandServiceImpl implements SubscriptionCommandServic
         );
         eventPublisher.publishEvent(renewEvent);
         
+        return Optional.of(subscription);
+    }
+
+    @Override
+    public Optional<Subscription> handle(ActivateSubscriptionCommand command) {
+        Optional<Subscription> subscriptionOptional = subscriptionRepository.findById(command.subscriptionId());
+        LOGGER.info("Subscription ID: {}", command.subscriptionId());
+        if (subscriptionOptional.isEmpty()) {
+            LOGGER.info("Subscription ID: {} is empty", command.subscriptionId());
+            return Optional.empty();
+        }
+
+        Subscription subscription = subscriptionOptional.get();
+        LOGGER.info("Subscription ID: {} is not empty", command.subscriptionId());
+        // Verificar que la suscripción esté en estado PENDING_PAYMENT
+        if (subscription.getStatus() != SubscriptionStatus.PENDING_PAYMENT) {
+            LOGGER.info("Subscription ID: {} is not in PENDING_PAYMENT status. Current status: {}", command.subscriptionId(), subscription.getStatus());
+            throw new IllegalStateException("Subscription is not in PENDING_PAYMENT status. Current status: " + subscription.getStatus());
+        }
+
+        // Activar la suscripción
+        subscription.activate();
+        LOGGER.info("Subscription ID: {} activated", command.subscriptionId());
+        subscription.setPaymentReference(command.paymentReference());
+        LOGGER.info("Subscription ID: {} payment reference set", command.subscriptionId());
+        subscription = subscriptionRepository.save(subscription);
+        LOGGER.info("Subscription ID: {} saved", command.subscriptionId());
+        
+        // Publicar evento de suscripción activada
+        SubscriptionActivatedEvent activatedEvent = new SubscriptionActivatedEvent(
+            this,
+            subscription.getId(),
+            subscription.getUserId(),
+            subscription.getSubscriptionPlan().getPlanType().name(),
+            subscription.getSubscriptionPlan().getName(),
+            subscription.getSubscriptionPlan().getPrice(),
+            command.paymentReference()
+        );
+        LOGGER.info("Subscription ID: {} activated event published", command.subscriptionId());
+        eventPublisher.publishEvent(activatedEvent);
+        LOGGER.info("Subscription ID: {} activated event published", command.subscriptionId());
         return Optional.of(subscription);
     }
 }

@@ -57,4 +57,7 @@ public class SubscriptionNotificationDto {
     
     @JsonProperty("invoice_number")
     private String invoiceNumber;
+    
+    @JsonProperty("payment_reference")
+    private String paymentReference;
 }

@@ -48,9 +48,8 @@ public class ExternalUserServiceImpl implements ExternalUserService {
             return Optional.empty();
             
         } catch (Exception e) {
-            LOGGER.error("Failed to fetch user information for user ID: {}", userId, e);
-            // Do not return a default user, instead throw an exception
-            throw new RuntimeException("Error fetching user details for user ID: " + userId, e);
+            LOGGER.warn("Could not fetch user information for ID: {}. Proceeding without it. Cause: {}", userId, e.getMessage());
+            return Optional.empty();
         }
     }
     

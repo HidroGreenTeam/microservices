@@ -73,4 +73,23 @@ public class SubscriptionNotificationPublisher {
                         notification.getSubscriptionId(), e);
         }
     }
+
+    public void publishSubscriptionActivated(SubscriptionNotificationDto notification) {
+        try {
+            LOGGER.info("Publishing subscription activated notification for user ID: {}, subscription ID: {}", 
+                       notification.getUserId(), notification.getSubscriptionId());
+            
+            rabbitTemplate.convertAndSend(
+                RabbitMQConfig.SUBSCRIPTION_EXCHANGE,
+                RabbitMQConfig.SUBSCRIPTION_ACTIVATED_ROUTING_KEY,
+                notification
+            );
+            
+            LOGGER.info("Successfully published subscription activated notification for subscription ID: {}", 
+                       notification.getSubscriptionId());
+        } catch (Exception e) {
+            LOGGER.error("Failed to publish subscription activated notification for subscription ID: {}", 
+                        notification.getSubscriptionId(), e);
+        }
+    }
 }
