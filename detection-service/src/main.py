@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 from dotenv import load_dotenv
@@ -14,7 +15,6 @@ from .infrastructure.config.database_config import database_config
 from .infrastructure.config.dependency_injection import dependency_container
 from .interfaces.rest.detection_controller import router as detection_router
 from .interfaces.rest.health_controller import router as health_router
-from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -26,13 +26,13 @@ SERVICE_PORT = 8000
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Gestión del ciclo de vida de la aplicación"""
-    database_config.create_tables()
-    logger.info("Base de datos inicializada")
-    
-    eureka_server = os.getenv("EUREKA_SERVER", "http://discovery-service:8761/eureka")
-    service_hostname = os.getenv("EUREKA_INSTANCE_HOSTNAME", "detection-service")
-    
     try:
+        database_config.create_tables()
+        logger.info("Base de datos inicializada")
+        
+        eureka_server = os.getenv("EUREKA_SERVER", "http://discovery-service:8761/eureka")
+        service_hostname = os.getenv("EUREKA_INSTANCE_HOSTNAME", "detection-service")
+
         init_params = {
             "eureka_server": eureka_server,
             "app_name": "detection-service",
@@ -41,14 +41,22 @@ async def lifespan(app: FastAPI):
             "metadata": {
                 "management.port": str(SERVICE_PORT)
             },
-            "health_check_url": f"http://{service_hostname}:{SERVICE_PORT}/api/v1/health",
+            "health_check_url": f"http://{service_hostname}:{SERVICE_PORT}/api/v1/health"
         }
 
         if eureka_server.startswith("https://"):
+            if not eureka_server.endswith("/eureka/"):
+                if eureka_server.endswith("/eureka"):
+                    eureka_server = eureka_server + "/"
+                elif not eureka_server.endswith("/"):
+                    eureka_server = eureka_server + "/eureka/"
+                else:
+                    eureka_server = eureka_server + "eureka/"
             logger.info(f"Usando conexión segura a Eureka: {eureka_server}")
             
             init_params.update({
                 "eureka_protocol": "https",
+                "instance_secure_port": int(os.getenv("EUREKA_INSTANCE_SECURE_PORT", "443")),
                 "instance_secure_port_enabled": True,
                 "home_page_url": f"https://{service_hostname}/",
                 "status_page_url": f"https://{service_hostname}/api/v1/health",
@@ -87,10 +95,10 @@ app.add_middleware(
     allow_headers=["*"],  # Permite todas las cabeceras
 )
 
-app.include_router(detection_router, prefix="/api/v1")
-app.include_router(health_router, prefix="/api/v1")
+app.include_router(detection_router, prefix="/api/v1/detections")
+app.include_router(health_router, prefix="/api/v1/detections/health")
 
-@app.get("/api/v1")
+@app.get("/")
 async def read_root():
     """Endpoint raíz"""
     return {
