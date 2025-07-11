@@ -86,6 +86,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Configuración de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",           # desarrollo local
+        "https://ayni-app.vercel.app"      # producción
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["*"],
+)
+
 app.include_router(detection_router, prefix="/api/v1/detections")
 app.include_router(health_router, prefix="/api/v1/detections/health")
 
