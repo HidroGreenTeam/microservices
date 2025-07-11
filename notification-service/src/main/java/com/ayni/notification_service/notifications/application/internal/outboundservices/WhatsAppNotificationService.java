@@ -37,6 +37,12 @@ public class WhatsAppNotificationService {
             log.info("From Number: {}", fromNumber);
             log.info("To Number: {}", to);
             log.info("Message: {}", message);
+
+            // === Normalizar los números al formato requerido por Twilio (ambos con prefijo whatsapp:) ===
+            String formattedFrom = fromNumber.startsWith("whatsapp:") ? fromNumber : "whatsapp:" + fromNumber;
+            String formattedTo = to.startsWith("whatsapp:") ? to : "whatsapp:" + to;
+            log.info("Formatted From: {}", formattedFrom);
+            log.info("Formatted To: {}", formattedTo);
             
             // Initialize Twilio
             Twilio.init(accountSid, authToken);
@@ -47,8 +53,8 @@ public class WhatsAppNotificationService {
             try {
                 // Create WhatsApp message
                 Message twilioMessage = Message.creator(
-                    new PhoneNumber("whatsapp:" + to),
-                    new PhoneNumber(fromNumber),
+                    new PhoneNumber(formattedTo),
+                    new PhoneNumber(formattedFrom),
                     message
                 ).create();
                 
