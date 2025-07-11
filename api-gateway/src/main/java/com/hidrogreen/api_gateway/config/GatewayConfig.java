@@ -73,9 +73,13 @@ public class GatewayConfig {
                 .route("diagnosis", r -> r.path("/api/v1/diagnosis/**")
                         .uri("lb://crop-service"))
                 
-                // Treatment service routes
-                .route("activities", r -> r.path("/api/v1/activities/**")
+                // Treatment service routes - AGREGADAS
+                .route("treatments", r -> r.path("/api/v1/treatments/**")
                         .uri("lb://treatment-service"))
+                
+                // Subscription service routes - AGREGADAS
+                .route("subscriptions", r -> r.path("/api/v1/subscriptions/**")
+                        .uri("lb://subscription-service"))
                 
                 // Notification service routes
                 .route("notifications", r -> r.path("/api/v1/notifications/**")
@@ -87,22 +91,40 @@ public class GatewayConfig {
                 .route("reports", r -> r.path("/api/v1/reports/**")
                         .uri("lb://report-service"))
                 
-                // Detection service routes - específicas primero
+                // Detection service routes con circuit breakers para manejar timeouts
                 .route("detections-statistics", r -> r.path("/api/v1/detections/statistics")
                         .and().method("GET")
+                        .filters(f -> f.circuitBreaker(config -> config
+                            .setName("detection-service-circuit-breaker")
+                            .setFallbackUri("forward:/fallback/detection-service")))
                         .uri("lb://detection-service"))
                 .route("detections-predict", r -> r.path("/api/v1/detections/predict")
                         .and().method("POST")
+                        .filters(f -> f.circuitBreaker(config -> config
+                            .setName("detection-service-circuit-breaker")
+                            .setFallbackUri("forward:/fallback/detection-service")))
                         .uri("lb://detection-service"))
                 .route("detections-diagnose", r -> r.path("/api/v1/detections/diagnose")
                         .and().method("POST")
+                        .filters(f -> f.circuitBreaker(config -> config
+                            .setName("detection-service-circuit-breaker")
+                            .setFallbackUri("forward:/fallback/detection-service")))
                         .uri("lb://detection-service"))
                 .route("detections-detail", r -> r.path("/api/v1/detections/detail/**")
+                        .filters(f -> f.circuitBreaker(config -> config
+                            .setName("detection-service-circuit-breaker")
+                            .setFallbackUri("forward:/fallback/detection-service")))
                         .uri("lb://detection-service"))
                 .route("detections-crop", r -> r.path("/api/v1/detections/crop/**")
+                        .filters(f -> f.circuitBreaker(config -> config
+                            .setName("detection-service-circuit-breaker")
+                            .setFallbackUri("forward:/fallback/detection-service")))
                         .uri("lb://detection-service"))
                 // Ruta genérica para detections (debe ir al final)
                 .route("detections", r -> r.path("/api/v1/detections/**")
+                        .filters(f -> f.circuitBreaker(config -> config
+                            .setName("detection-service-circuit-breaker")
+                            .setFallbackUri("forward:/fallback/detection-service")))
                         .uri("lb://detection-service"))
                 
                 .build();
