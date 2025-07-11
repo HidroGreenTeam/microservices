@@ -24,6 +24,8 @@ pymysql = "^1.1.0"
 cloudinary = "^1.40.0"
 python-dotenv = "^1.0.0"
 uvicorn = "^0.27.1"
+certifi = "^2025.7.9"
+aiohttp = "^3.12.14"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

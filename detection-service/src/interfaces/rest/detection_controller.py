@@ -25,7 +25,7 @@ from ...infrastructure.config.dependency_injection import dependency_container
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/v1/detections")
+router = APIRouter()
 
 def get_db():
     """Dependency para obtener sesión de base de datos"""
@@ -193,4 +193,4 @@ async def get_farmer_diagnosis_history(farmerId: int, db: Session = Depends(get_
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error(f"Error al obtener historial de diagnósticos: {e}")
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
