@@ -6,13 +6,28 @@ spring:
       httpclient:
         connect-timeout: 5000
         response-timeout: 30s
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+          # Predicados para capturar requests a /api/v1/{service}/**
+          predicates:
+            - Path=/api/v1/{service}/**
+          # Filtros para reescribir la ruta
+          filters:
+            - RewritePath=/api/v1/(?<service>[^/]+)/(?<path>.*), /api/v1/${service}/${path}
+            - name: CircuitBreaker
+              args:
+                name: microservices-circuit-breaker
+                fallbackUri: forward:/fallback/service-unavailable
     loadbalancer:
       ribbon:
         enabled: false
-    discovery:
-      locator:
+      cache:
+        enabled: false
+      health-check:
         enabled: true
-        lower-case-service-id: true
+        interval: 25s
 
 server:
   port: 8080
@@ -26,26 +41,30 @@ eureka:
     registry-fetch-interval-seconds: 5
     eureka-server-connect-timeout-seconds: 10
     eureka-server-read-timeout-seconds: 10
+    initial-instance-info-replication-interval-seconds: 5
+    instance-info-replication-interval-seconds: 10
   instance:
     hostname: ${EUREKA_INSTANCE_HOSTNAME:api-gateway}
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    securePortEnabled: true
-    nonSecurePortEnabled: false
-    preferIpAddress: false
-    statusPageUrl: https://${eureka.instance.hostname}/actuator/info
-    healthCheckUrl: https://${eureka.instance.hostname}/actuator/health
-    homePageUrl: https://${eureka.instance.hostname}/
+    prefer-ip-address: false
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,gateway
+        include: health,info,gateway,routes,circuitbreakers
   endpoint:
     gateway:
       access: UNRESTRICTED
+    health:
+      show-details: always
 
 logging:
   level:
     "[org.springframework.cloud.gateway]": DEBUG
-    "[reactor.netty]": DEBUG
+    "[org.springframework.cloud.loadbalancer]": DEBUG
+    "[com.netflix.discovery]": DEBUG
+    "[com.netflix.eureka]": DEBUG
+    "[org.springframework.cloud.gateway.discovery]": DEBUG
