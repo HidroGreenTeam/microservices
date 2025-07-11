@@ -86,15 +86,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Configuración de CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Permite todos los orígenes
-    allow_credentials=True,
-    allow_methods=["*"],  # Permite todos los métodos
-    allow_headers=["*"],  # Permite todas las cabeceras
-)
-
 app.include_router(detection_router, prefix="/api/v1/detections")
 app.include_router(health_router, prefix="/api/v1/detections/health")
 
