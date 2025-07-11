@@ -16,7 +16,7 @@ class TensorFlowDiseaseDetectionService(DiseaseDetectionService):
     """Implementación del servicio de detección de enfermedades usando TensorFlow"""
     
     def __init__(self, model_path: str = None):
-        self.model_path = model_path or os.path.join("model", "model-91840.keras")
+        self.model_path = model_path or os.path.join("model", "model-8678.keras")
         self.model = None
         self.class_names = ['miner', 'nodisease', 'phoma', 'redspider', 'rust']
         self._load_model()
@@ -67,7 +67,7 @@ class TensorFlowDiseaseDetectionService(DiseaseDetectionService):
             logger.error(f"Error al realizar predicción: {e}")
             raise
     
-    async def preprocess_image(self, image: Image.Image, target_size: tuple = (480, 480)) -> np.ndarray:
+    async def preprocess_image(self, image: Image.Image, target_size: tuple = (300, 300)) -> np.ndarray:
         """
         Preprocesa una imagen para el modelo de predicción
         
